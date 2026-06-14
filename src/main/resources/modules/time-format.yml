@@ -1,0 +1,77 @@
+# =========================================================================
+# Конфигурация: Модуль форматирования времени
+# =========================================================================
+
+defaults_views:
+  all: "default"
+  holograms: "clock"
+  messages: "detail"
+
+formats:
+  default:
+    formats:
+      years: "%years% г."
+      months: "%months% мес."
+      weeks: "%weeks% нед."
+      days: "%days% д."
+      hours: "%hours% ч."
+      minutes: "%minutes% мин."
+      seconds: "%seconds% сек."
+    types:
+      years: "год"
+      months: "месяц"
+      weeks: "неделя"
+      days: "день"
+      hours: "час"
+      minutes: "минута"
+      seconds: "секунда"
+
+  clock:
+    formats:
+      years: "%years%г %months%:%days%:%hours%:%minutes%:%seconds%"
+      months: "%months%:%days%:%hours%:%minutes%:%seconds%"
+      weeks: "%days%:%hours%:%minutes%:%seconds%"
+      days: "%days%:%hours%:%minutes%:%seconds%"
+      hours: "%hours%:%minutes%:%seconds%"
+      minutes: "%minutes%:%seconds%"
+      seconds: "00:%seconds%"
+    types: {}
+
+  detail:
+    formats:
+      years: "%years% %months% %days% %hours% %minutes% %seconds%"
+      months: "%months% %days% %hours% %minutes% %seconds%"
+      weeks: "%weeks% %days% %hours% %minutes% %seconds%"
+      days: "%days% %hours% %minutes% %seconds%"
+      hours: "%hours% %minutes% %seconds%"
+      minutes: "%minutes% %seconds%"
+      seconds: "%seconds%"
+    types:
+      years:
+        form_1: "год"
+        form_2: "года"
+        form_5: "лет"
+      months:
+        form_1: "месяц"
+        form_2: "месяца"
+        form_5: "месяцев"
+      weeks:
+        form_1: "неделя"
+        form_2: "недели"
+        form_5: "недель"
+      days:
+        form_1: "день"
+        form_2: "дня"
+        form_5: "дней"
+      hours:
+        form_1: "час"
+        form_2: "часа"
+        form_5: "часов"
+      minutes:
+        form_1: "минута"
+        form_2: "минуты"
+        form_5: "минут"
+      seconds:
+        form_1: "секунда"
+        form_2: "секунды"
+        form_5: "секунд"

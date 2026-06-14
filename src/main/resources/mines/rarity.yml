@@ -1,0 +1,92 @@
+name: default
+world: world
+
+mode: RARITY
+
+positions:
+  one: '10;100;10'
+  two: '15;105;15'
+
+rarity:
+  - id: default
+    chance: 75.0
+    # Поддержка MiniMessage, HEX и Legacy форматов цветов
+    # Данная секция будет выводить название редкости в плейсхолдерах %rarity_<current/next>%
+    name: '&fОбычная'
+    # Все блоки должны давать не больше 100% !
+    blocks:
+      - id: stone
+        chance: 80.0
+        drop:
+          - STONE
+      - id: iron_ore
+        chance: 19.0
+        drop: [ ] # если ничего не указано, то ванильный дроп по умолчанию
+      - id: diamond_ore
+        chance: 1.0
+  - id: epic
+    chance: 25.0
+    name: '<#9900FF>Эпическая'
+    blocks:
+      - id: stone
+        chance: 50.0 # 50%
+      - id: cobblestone
+        chance: 25.0 # 75%
+      - id: redstone_ore
+        chance: 7.25 # 82.25%
+      - id: lapis_ore
+        chance: 4.25 # 86.5%
+      - id: iron_ore
+        chance: 5.0 # 91.5%
+      - id: coal_ore
+        chance: 3.5 # 95%
+      - id: diamond_ore
+        chance: 3.5 # 98.5%
+      - id: emerald_ore
+        chance: 1.25 # 99.75%
+      - id: ancient_debris
+        chance: 0.25 # 100%
+
+actions:
+  - '[message] [update] &fАвтоШахта обновилась!'
+  - '[message] [update] &f \n&fТекущая редкость: %rarity_current%\n&fСледующая редкость: %rarity_next%'
+  # звуки
+  - '[sound] [update] entity.villager.yes 0.8 0.5'
+
+permissions:
+  enable: false
+
+online:
+  enable: false
+
+teleport:
+  enable: true
+  # float;float;float;float;float
+  # x;y;z;yaw;pitch
+  pos: '9;106;9;0.0;0.0'
+  # или
+  # pos:
+  #   offset: '9;106;9'
+  #   yaw: 0.0
+  #   pitch: 0.0
+  #
+  # или
+  # pos:
+  #   x: 9.0
+  #   y: 106.0
+  #   z: 9.0
+  #   yaw: 0.0
+  #   pitch: 0.0
+
+hologram:
+  enable: true
+  provider: Vanilla
+  offset: '5;106;5'
+  texts:
+    - '&6АвтоШахта с Редкостями'
+    - '&fДо обновления: <gold>%time_reset:detail%</gold>'
+    - ''
+    - '&fТекущая редкость: &r%rarity_current%&r'
+    - '&fСледующая редкость: &r%rarity_next%&r'
+    - ''
+    - '&fMade with &6LastMines &c<3 &7(laststudio.space)'

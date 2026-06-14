@@ -1,0 +1,20 @@
+debug:
+  enable: true
+
+  level:
+    info:
+      enable: true
+      prefix: '[Debug] '
+    warn:
+      enable: true
+      prefix: '[Debug] '
+    error:
+      enable: true
+      prefix: '[Debug] '
+
+time_load_all_mines: 15s
+
+modules:
+  # all: true
+  commands: true
+  time-format: true

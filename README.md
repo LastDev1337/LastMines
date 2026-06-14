@@ -1,0 +1,1 @@
+URL Wiki: https://wiki.laststudio.space/lastmines

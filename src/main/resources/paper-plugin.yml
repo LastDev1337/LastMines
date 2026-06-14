@@ -1,0 +1,37 @@
+name: LastMines
+version: '0.1'
+main: ru.last.mines.LastMines
+api-version: '1.19'
+
+dependencies:
+  server:
+    BLib:
+      load: BEFORE
+      required: true
+    PlaceholderAPI:
+      load: BEFORE
+      required: false
+    BMenu:
+      load: BEFORE
+      required: false
+    WorldEdit:
+      load: BEFORE
+      required: false
+    WorldGuard:
+      load: BEFORE
+      required: false
+    DecentHolograms:
+      load: BEFORE
+      required: false
+    FancyHolograms:
+      load: BEFORE
+      required: false
+
+author: Last
+description: Плагин на автошахты с большой кастомизацией и гибкой настройкой на 1.16.5 - 26.1.2 версиях
+website: https://laststudio.space
+
+commands:
+  lastmines:
+    description: Main command
+    aliases: [lmines, lmine, lm]

@@ -1,0 +1,20 @@
+id: lastmines:permissions
+provider: lastmines:permissions
+type: chest
+size: 36
+title: '&8Права доступа &7{MINE_ID}'
+
+items:
+  back:
+    material: arrow
+    name: '&cНазад'
+    slot: 27
+    on_click: '[open] lastmines:main'
+
+  info:
+    material: written_book
+    name: '&6Права доступа'
+    lore:
+      - '&7Здесь вы можете настраивать права доступа'
+      - '&7для автошахты &f{MINE_ID}'
+    slot: 31
