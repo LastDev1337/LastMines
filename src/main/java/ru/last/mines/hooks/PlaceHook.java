@@ -59,10 +59,10 @@ public class PlaceHook extends PlaceholderExpansion {
             String id = params.replace("blocks_", "");
             Mine mine = plugin.getMineManager().getMine(id);
             if (mine != null) return String.valueOf(mine.getCurrentBlocks().size());
-        } else if (params.startsWith("rarities_")) {
-            String id = params.replace("rarities_", "");
-            Mine mine = plugin.getMineManager().getMine(id);
-            if (mine != null) return String.valueOf(mine.getRarities().size());
+        // } else if (params.startsWith("rarities_")) {
+        //    String id = params.replace("rarities_", "");
+        //    Mine mine = plugin.getMineManager().getMine(id);
+        //    if (mine != null) return String.valueOf(mine.getRarities().size());
         } else if (params.equals("count")) { return String.valueOf(plugin.getMineManager().getMines().size()); }
         
         return null;
