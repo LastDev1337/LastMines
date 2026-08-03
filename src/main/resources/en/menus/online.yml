@@ -1,0 +1,29 @@
+id: lastmines:online
+provider: lastmines:online
+type: chest
+size: 36
+title: '&8Online players &7{MINE_ID}'
+
+items:
+  back:
+    material: arrow
+    name: '&cBack'
+    slot: 27
+    on_click:
+      - '[open] lastmines:main'
+
+  info:
+    material: player_head
+    name: '&aOnline players'
+    lore:
+      - '&7Here you can see who is at'
+      - '&7mine &f{MINE_ID}'
+    slot: 31
+
+online_list:
+  slots: "0-8, 9-17"
+  name: "&aPlayer &f{PLAYER}"
+  lore:
+    - "&7Click to teleport"
+  on_click:
+    - "[tp_mine] {MINE_ID} {PLAYER}"

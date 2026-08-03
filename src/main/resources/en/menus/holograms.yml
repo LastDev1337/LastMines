@@ -1,0 +1,45 @@
+id: lastmines:holograms
+provider: lastmines:holograms
+type: chest
+size: 54
+title: '&8Holograms &7{MINE_ID}'
+
+lines_list:
+  slots: 10-16,19-25,28-34,37-43
+  name: "&eLine #{INDEX}"
+  lore:
+    - "&7Text: &f{LINE}"
+    - ""
+    - "&cClick to remove"
+  on_click: "[holo_edit] {MINE_ID} {INDEX} remove"
+
+items:
+  back:
+    material: arrow
+    name: '&cBack'
+    slot: 53
+    on_click: '[open] lastmines:main'
+
+  info:
+    material: book
+    name: '&dHolograms'
+    lore:
+      - '&7Here you can configure the holograms'
+      - '&7for mine &f{MINE_ID}'
+    slot: 3
+
+  settings:
+    material: comparator
+    name: '&bHologram settings'
+    lore:
+      - '&7Provider, position, on/off'
+    slot: 5
+    on_click: '[open] lastmines:hologram_settings'
+
+  add_line:
+    material: nether_star
+    name: '&aAdd line'
+    lore:
+      - '&7Type a new hologram line in chat'
+    slot: 7
+    on_click: '[holo_line_add_input] {MINE_ID}'

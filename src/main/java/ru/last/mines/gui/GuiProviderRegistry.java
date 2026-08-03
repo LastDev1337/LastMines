@@ -14,5 +14,16 @@ public class GuiProviderRegistry {
         BMenu.menuLoader().codecRegistry().register("lastmines:permissions", PermissionsProvider::new);
         BMenu.menuLoader().codecRegistry().register("lastmines:online", OnlineProvider::new);
         BMenu.menuLoader().codecRegistry().register("lastmines:all_mines", AllMinesProvider::new);
+        BMenu.menuLoader().codecRegistry().register("lastmines:block_settings", BlockSettingsProvider::new);
+        BMenu.menuLoader().codecRegistry().register("lastmines:reset_time", ResetTimeProvider::new);
+        BMenu.menuLoader().codecRegistry().register("lastmines:delete_confirm", DeleteConfirmProvider::new);
+        BMenu.menuLoader().codecRegistry().register("lastmines:block_drop_items", BlockDropItemsProvider::new);
+        BMenu.menuLoader().codecRegistry().register("lastmines:block_drop_item", BlockDropItemProvider::new);
+        BMenu.menuLoader().codecRegistry().register("lastmines:enchants", EnchantsProvider::new);
+        BMenu.menuLoader().codecRegistry().register("lastmines:online_requirements", OnlineRequirementsProvider::new);
+        BMenu.menuLoader().codecRegistry().register("lastmines:teleport_settings", TeleportSettingsProvider::new);
+        BMenu.menuLoader().codecRegistry().register("lastmines:hologram_settings", HologramSettingsProvider::new);
+        BMenu.menuLoader().codecRegistry().register("lastmines:all_blocks", AllBlocksProvider::new);
+        BMenu.menuLoader().codecRegistry().register("lastmines:permission_messages", PermMessagesProvider::new);
     }
 }

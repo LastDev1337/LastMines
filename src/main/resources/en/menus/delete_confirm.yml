@@ -1,0 +1,24 @@
+id: lastmines:delete_confirm
+provider: lastmines:delete_confirm
+type: chest
+size: 9
+title: '&4Delete mine {MINE_ID}?'
+
+items:
+  confirm:
+    material: lime_stained_glass_pane
+    name: '&a&lCONFIRM'
+    lore:
+      - '&7Mine &f{MINE_ID} &7will be deleted permanently'
+    slot: 2
+    on_click:
+      - '[delete_mine] {MINE_ID}'
+      - '[open] lastmines:all_mines'
+
+  cancel:
+    material: red_stained_glass_pane
+    name: '&c&lCANCEL'
+    lore:
+      - '&7Go back'
+    slot: 6
+    on_click: '[open] lastmines:main'

@@ -1,12 +1,19 @@
 package ru.last.mines.holograms.providers;
 
+import dev.by1337.yaml.YamlMap;
+
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.Color;
+import org.bukkit.persistence.PersistentDataType;
+import ru.last.mines.LastMines;
 import ru.last.mines.holograms.*;
 import ru.last.mines.models.*;
 import ru.last.mines.utils.*;
+import ru.last.mines.utils.time.TimeFormatter;
 
 import java.util.HashMap;
 import java.util.List;
@@ -14,24 +21,31 @@ import java.util.Map;
 
 public class VanillaHoloProvider implements HologramProvider {
     private final Map<String, TextDisplay> displays = new HashMap<>();
+    private final NamespacedKey hologramKey = new NamespacedKey(LastMines.get(), "hologram");
 
     public VanillaHoloProvider() { }
 
     @SuppressWarnings("deprecation")
     @Override
     public void create(Mine mine) {
-        if (displays.containsKey(mine.getId())) return;
-        
+        TextDisplay tracked = displays.get(mine.getId());
+        if (tracked != null && tracked.isValid()) return;
+        displays.remove(mine.getId());
+
         Location loc = mine.getHoloOffset();
         if (loc == null || loc.getWorld() == null) return;
-        
+
+        removeOrphaned(loc, mine.getId());
+
         TextDisplay display = (TextDisplay) loc.getWorld().spawnEntity(loc, EntityType.TEXT_DISPLAY);
         display.setBillboard(TextDisplay.Billboard.CENTER);
         display.setText(buildText(mine));
         display.setDefaultBackground(false);
         display.setBackgroundColor(Color.fromARGB(0, 0, 0, 0));
+        display.setPersistent(false);
+        display.getPersistentDataContainer().set(hologramKey, PersistentDataType.STRING, mine.getId());
         
-        dev.by1337.yaml.YamlMap holoMap = mine.getHoloMap();
+        YamlMap holoMap = mine.getHoloMap();
         if (holoMap != null) {
             if (holoMap.has("view_range")) {
                 display.setViewRange((float) (double) holoMap.get("view_range").asDouble(1.0));
@@ -97,6 +111,14 @@ public class VanillaHoloProvider implements HologramProvider {
             }
         }
         displays.clear();
+    }
+
+    private void removeOrphaned(Location loc, String mineId) {
+        for (Entity nearby : loc.getWorld().getNearbyEntities(loc, 0.5, 0.5, 0.5)) {
+            if (nearby instanceof TextDisplay td && mineId.equals(td.getPersistentDataContainer().get(hologramKey, PersistentDataType.STRING))) {
+                td.remove();
+            }
+        }
     }
 
     private String buildText(Mine mine) {

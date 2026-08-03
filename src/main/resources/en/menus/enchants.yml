@@ -1,0 +1,208 @@
+id: lastmines:enchants
+provider: lastmines:enchants
+type: chest
+size: 54
+title: '&8Pickaxe enchantments &7{MINE_ID}'
+
+items:
+  back:
+    material: arrow
+    name: '&cBack'
+    slot: 53
+    on_click: '[open] lastmines:main'
+
+  toggle:
+    slot: 3
+    oneOf:
+      - on_view: '{ENCHANT_ENABLE} == false'
+        material: gray_dye
+        name: '&7Requirements disabled'
+        lore:
+          - '&7Click to enable'
+        on_click:
+          - '[enchant_toggle] {MINE_ID}'
+      - on_view: '{ENCHANT_ENABLE} == true'
+        material: lime_dye
+        name: '&aRequirements enabled'
+        lore:
+          - '&7Players won''t be able to break blocks'
+          - '&7without the required pickaxe enchantments'
+          - '&7Click to disable'
+        on_click:
+          - '[enchant_toggle] {MINE_ID}'
+  info:
+    material: book
+    name: '&eOther enchantments'
+    lore:
+      - '&7Any other enchantment can be'
+      - '&7set manually in the mine config:'
+      - '&fenchant_requirements.enchantments'
+      - '&7The message shown when enchantments are missing —'
+      - '&7is in &fenchant_requirements.actions'
+    slot: 5
+
+  minus_eff_3:
+    material: red_concrete
+    slot: 10
+    name: '&c-3'
+    on_click:
+      - '[enchant_edit] {MINE_ID} efficiency -3'
+  minus_eff_2:
+    material: red_concrete
+    slot: 11
+    name: '&c-2'
+    on_click:
+      - '[enchant_edit] {MINE_ID} efficiency -2'
+  minus_eff_1:
+    material: red_concrete
+    slot: 12
+    name: '&c-1'
+    on_click:
+      - '[enchant_edit] {MINE_ID} efficiency -1'
+  efficiency:
+    material: diamond_pickaxe
+    name: '&dEfficiency {EFFICIENCY_LVL}'
+    item_flags:
+      - hide_attributes
+    slot: 13
+  plus_eff_1:
+    material: lime_concrete
+    slot: 14
+    name: '&a+1'
+    on_click:
+      - '[enchant_edit] {MINE_ID} efficiency 1'
+  plus_eff_2:
+    material: lime_concrete
+    slot: 15
+    name: '&a+2'
+    on_click:
+      - '[enchant_edit] {MINE_ID} efficiency 2'
+  plus_eff_3:
+    material: lime_concrete
+    slot: 16
+    name: '&a+3'
+    on_click:
+      - '[enchant_edit] {MINE_ID} efficiency 3'
+
+  minus_fortune_3:
+    material: red_concrete
+    slot: 19
+    name: '&c-3'
+    on_click:
+      - '[enchant_edit] {MINE_ID} fortune -3'
+  minus_fortune_2:
+    material: red_concrete
+    slot: 20
+    name: '&c-2'
+    on_click:
+      - '[enchant_edit] {MINE_ID} fortune -2'
+  minus_fortune_1:
+    material: red_concrete
+    slot: 21
+    name: '&c-1'
+    on_click:
+      - '[enchant_edit] {MINE_ID} fortune -1'
+  fortune:
+    material: emerald
+    name: '&dFortune {FORTUNE_LVL}'
+    slot: 22
+  plus_fortune_1:
+    material: lime_concrete
+    slot: 23
+    name: '&a+1'
+    on_click:
+      - '[enchant_edit] {MINE_ID} fortune 1'
+  plus_fortune_2:
+    material: lime_concrete
+    slot: 24
+    name: '&a+2'
+    on_click:
+      - '[enchant_edit] {MINE_ID} fortune 2'
+  plus_fortune_3:
+    material: lime_concrete
+    slot: 25
+    name: '&a+3'
+    on_click:
+      - '[enchant_edit] {MINE_ID} fortune 3'
+
+  minus_silk_3:
+    material: red_concrete
+    slot: 28
+    name: '&c-3'
+    on_click:
+      - '[enchant_edit] {MINE_ID} silk_touch -3'
+  minus_silk_2:
+    material: red_concrete
+    slot: 29
+    name: '&c-2'
+    on_click:
+      - '[enchant_edit] {MINE_ID} silk_touch -2'
+  minus_silk_1:
+    material: red_concrete
+    slot: 30
+    name: '&c-1'
+    on_click:
+      - '[enchant_edit] {MINE_ID} silk_touch -1'
+  silk_touch:
+    material: glass
+    name: '&dSilk Touch {SILK_TOUCH_LVL}'
+    slot: 31
+  plus_silk_1:
+    material: lime_concrete
+    slot: 32
+    name: '&a+1'
+    on_click:
+      - '[enchant_edit] {MINE_ID} silk_touch 1'
+  plus_silk_2:
+    material: lime_concrete
+    slot: 33
+    name: '&a+2'
+    on_click:
+      - '[enchant_edit] {MINE_ID} silk_touch 2'
+  plus_silk_3:
+    material: lime_concrete
+    slot: 34
+    name: '&a+3'
+    on_click:
+      - '[enchant_edit] {MINE_ID} silk_touch 3'
+
+  minus_unbreaking_3:
+    material: red_concrete
+    slot: 37
+    name: '&c-3'
+    on_click:
+      - '[enchant_edit] {MINE_ID} unbreaking -3'
+  minus_unbreaking_2:
+    material: red_concrete
+    slot: 38
+    name: '&c-2'
+    on_click:
+      - '[enchant_edit] {MINE_ID} unbreaking -2'
+  minus_unbreaking_1:
+    material: red_concrete
+    slot: 39
+    name: '&c-1'
+    on_click:
+      - '[enchant_edit] {MINE_ID} unbreaking -1'
+  unbreaking:
+    material: anvil
+    name: '&dUnbreaking {UNBREAKING_LVL}'
+    slot: 40
+  plus_unbreaking_1:
+    material: lime_concrete
+    slot: 41
+    name: '&a+1'
+    on_click:
+      - '[enchant_edit] {MINE_ID} unbreaking 1'
+  plus_unbreaking_2:
+    material: lime_concrete
+    slot: 42
+    name: '&a+2'
+    on_click:
+      - '[enchant_edit] {MINE_ID} unbreaking 2'
+  plus_unbreaking_3:
+    material: lime_concrete
+    slot: 43
+    name: '&a+3'
+    on_click:
+      - '[enchant_edit] {MINE_ID} unbreaking 3'

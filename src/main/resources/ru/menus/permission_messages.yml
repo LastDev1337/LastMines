@@ -1,0 +1,47 @@
+id: lastmines:permission_messages
+provider: lastmines:permission_messages
+type: chest
+size: 54
+title: '&8Сообщения без прав &7{MINE_ID}'
+
+messages_list:
+  slots: 10-16,19-25,28-34,37-43
+  name: "&f{INDEX}. &7{ACTION}"
+
+items:
+  back:
+    material: arrow
+    name: '&cНазад'
+    slot: 53
+    on_click: '[open] lastmines:permissions'
+
+  info:
+    material: written_book
+    name: '&fСообщения об отсутствии прав'
+    lore:
+      - '&7Эти действия сработают у игрока,'
+      - '&7у которого нет прав на ломание шахты'
+      - '&7Страница: &f{PAGE}&7/&f{MAX_PAGE}'
+    slot: 3
+
+  add:
+    material: writable_book
+    name: '&aДобавить сообщение'
+    lore:
+      - '&7Ввести новую строку действия в чат'
+      - '&7Формат тот же, что и в config.yml:'
+      - '&f[message/title/actionbar/sound]'
+    slot: 5
+    on_click: '[perm_message_add_input] {MINE_ID}'
+
+  prev_page:
+    material: arrow
+    name: '&eПредыдущая страница'
+    slot: 48
+    on_click: '[perm_messages_page] {MINE_ID} -1'
+
+  next_page:
+    material: arrow
+    name: '&eСледующая страница'
+    slot: 50
+    on_click: '[perm_messages_page] {MINE_ID} 1'

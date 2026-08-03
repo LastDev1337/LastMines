@@ -2,7 +2,7 @@ package ru.last.mines.config.models;
 
 import dev.by1337.yaml.YamlMap;
 import dev.by1337.yaml.YamlValue;
-import ru.last.mines.utils.TimeUtils;
+import ru.last.mines.utils.time.TimeUtils;
 
 public class Main {
     private final boolean debugEnable;
@@ -10,11 +10,13 @@ public class Main {
     private final DebugSettings warn;
     private final DebugSettings error;
     private final int timeLoadAllMines;
+    private final String language;
 
     private final Modules modules;
 
     public Main(YamlMap root) {
         this.timeLoadAllMines = TimeUtils.parseToSeconds(root.get("time_load_all_mines").asString("5s"));
+        this.language = root.get("language").asString("ru").toLowerCase().trim();
         
         YamlValue debugNode = root.get("debug");
         if (debugNode.asYamlMap().hasResult()) {
@@ -42,11 +44,12 @@ public class Main {
         this.modules = new Modules(modulesMap);
     }
 
-    public boolean isDebugEnable() { return !debugEnable; }
+    public boolean isDebugEnable() { return debugEnable; }
     public DebugSettings getInfo() { return info; }
     public DebugSettings getWarn() { return warn; }
     public DebugSettings getError() { return error; }
     public int getTimeLoadAllMines() { return timeLoadAllMines; }
+    public String getLanguage() { return language; }
     public Modules getModules() { return modules; }
     
     public static class Modules {

@@ -1,0 +1,206 @@
+id: lastmines:main
+provider: lastmines:main
+type: chest
+size: 54
+title: '&8Mine control &7{MINE_ID}'
+
+items:
+  back:
+    material: arrow
+    slot: 53
+    name: '&cBack'
+    on_click: '[open] lastmines:all_mines'
+
+  delete:
+    material: redstone_block
+    name: '&4Delete mine'
+    lore:
+      - '&7Click to permanently'
+      - '&7delete this mine'
+    slot: 3
+    on_click:
+      - '[open] lastmines:delete_confirm'
+
+  info:
+    material: deepslate_diamond_ore
+    slot: 4
+    tick_speed: 20
+    on_tick: '[update]'
+    oneOf:
+      - on_view: '{MODE} == BLOCKS'
+        name: '&fMine info'
+        lore:
+          - '&7ID: &f{MINE_ID}'
+          - '&7Blocks: &f%lastmines_blocks_{MINE_ID}%'
+          - '&7Filled to &f%lastmines_blocks_current_count_{MINE_ID}%/%lastmines_blocks_max_count_{MINE_ID}%'
+          - '&7Resets in &f%lastmines_time_detail_{MINE_ID}%'
+      - on_view: '{MODE} == BLOCKS'
+        name: '&fMine info'
+        lore:
+          - '&fID: &7{MINE_ID}'
+          - '&fBlocks: &7%lastmines_blocks_{MINE_ID}%'
+          - '&fRarities: &7%lastmines_rarities_{MINE_ID}%'
+
+  toggle_stop:
+    slot: 5
+    oneOf:
+      - on_view: '{STOPPED} == false'
+        material: redstone_torch
+        name: '&fMine &ais running'
+        lore:
+          - '&7Auto-reset is enabled'
+          - '&7Click to stop it'
+        on_click:
+          - '[mine_toggle_stop] {MINE_ID}'
+      - on_view: '{STOPPED} == true'
+        material: lever
+        name: '&fMine &cis stopped'
+        lore:
+          - '&7Auto-reset is paused'
+          - '&7(blocks can still be broken)'
+          - '&7Click to resume it'
+        on_click:
+          - '[mine_toggle_stop] {MINE_ID}'
+
+  blocks:
+    material: cobblestone
+    name: '&fMine blocks'
+    lore:
+      - '&fClick to configure the blocks'
+    slot: 19
+    on_click:
+      - '[open] lastmines:blocks'
+
+  rarities:
+    slot: 21
+    oneOf:
+      - on_view: '{MODE} == RARITY'
+        material: nether_star
+        name: '&eMine rarities'
+        lore:
+          - '&7Click to configure the rarities'
+        on_click:
+          - '[open] lastmines:rarities'
+      - name: '&cMine rarities'
+        material: barrier
+        lore:
+          - '&4This section is only available'
+          - '&4with <u>RARITY</u> mode!'
+        on_click:
+          - sound: entity.villager.no 0.8 1
+
+  mode_switch:
+    slot: 23
+    oneOf:
+      - on_view: '{MODE} == BLOCKS'
+        material: diamond_ore
+        name: '&bMode: &fBLOCKS'
+        lore:
+          - '&7A single list of blocks with chances'
+          - '&7Click to switch to RARITY'
+          - '&c(current blocks will become the "default" rarity)'
+        on_click:
+          - '[mode_switch] {MINE_ID} RARITY'
+      - on_view: '{MODE} == RARITY'
+        material: nether_star
+        name: '&eMode: &fRARITY'
+        lore:
+          - '&7Several sets of blocks (rarities)'
+          - '&7Click to switch to BLOCKS'
+          - '&c(only the blocks of the first rarity will remain!)'
+        on_click:
+          - '[mode_switch] {MINE_ID} BLOCKS'
+
+  holograms:
+    material: armor_stand
+    name: '&dHolograms'
+    lore:
+      - '&7Click to configure the holograms'
+    slot: 25
+    on_click:
+      - '[open] lastmines:holograms'
+
+  actions:
+    material: command_block
+    name: '&cActions'
+    lore:
+      - '&7Click to configure the actions'
+    slot: 29
+    on_click:
+      - '[open] lastmines:actions'
+
+  permissions:
+    material: written_book
+    all_flags: true
+    name: '&6Permissions'
+    lore:
+      - '&7Click to configure the permissions'
+    slot: 31
+    on_click:
+      - '[open] lastmines:permissions'
+
+  reset_time:
+    material: clock
+    name: '&bReset timer'
+    lore:
+      - '&7Click to configure'
+      - '&7the time between resets'
+    slot: 33
+    on_click:
+      - '[open] lastmines:reset_time'
+
+  enchants:
+    material: enchanted_book
+    name: '&bPickaxe enchantments'
+    lore:
+      - '&7Enchantment requirements'
+      - '&7for the tool that breaks blocks'
+    slot: 37
+    on_click:
+      - '[open] lastmines:enchants'
+
+  teleport:
+    material: ender_pearl
+    name: '&aTeleport to mine'
+    lore:
+      - '&7Click to teleport'
+    slot: 39
+    on_click:
+      - '[tp_mine] {MINE_ID} %player_name%'
+
+  online:
+    material: player_head
+    name: '&aWho is on the mine'
+    lore:
+      - '&7List of players currently'
+      - '&7standing on this mine'
+    on_click:
+      - '[open] lastmines:online'
+
+  teleport_settings:
+    material: compass
+    name: '&aTeleport settings'
+    lore:
+      - '&7Point and on/off toggle for teleport'
+    slot: 41
+    on_click:
+      - '[open] lastmines:teleport_settings'
+
+  online_requirements:
+    material: player_head
+    name: '&eOnline requirements'
+    lore:
+      - '&7Min./max. players online'
+      - '&7for auto-reset to work'
+    slot: 43
+    on_click:
+      - '[open] lastmines:online_requirements'
+
+  reset:
+    material: bedrock
+    name: '&cReset mine'
+    lore:
+      - '&7Click to force a reset'
+    slot: 49
+    on_click:
+      - '[reset_mine] {MINE_ID}'

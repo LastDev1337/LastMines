@@ -1,0 +1,30 @@
+id: lastmines:online
+provider: lastmines:online
+type: chest
+size: 36
+title: '&8Игроки онлайн &7{MINE_ID}'
+
+online_list:
+  slots: 0-8,9-17
+  name: "&аИгрок &f{PLAYER}"
+  lore:
+    - "&7Нажмите, чтобы телепортироваться"
+  on_click:
+    - "[tp_mine] {MINE_ID} {PLAYER}"
+
+items:
+  back:
+    material: arrow
+    name: '&cНазад'
+    slot: 27
+    on_click:
+      - '[open] lastmines:main'
+
+  info:
+    material: player_head
+    name: '&aИгроки онлайн'
+    lore:
+      - '&7Здесь вы можете посмотреть кто находится'
+      - '&7на автошахте &f{MINE_ID}'
+    slot: 31
+

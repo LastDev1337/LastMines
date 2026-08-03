@@ -1,0 +1,94 @@
+name: default
+world: world
+
+mode: RARITY
+
+positions:
+  one: '10;100;10'
+  two: '15;105;15'
+
+rarity:
+  - id: default
+    chance: 75.0
+    # Supports MiniMessage, HEX and Legacy color formats
+    # This section outputs the rarity name in the %rarity_<current/next>% placeholders
+    name: '&fCommon'
+    # All blocks within a rarity must not add up to more than 100% !
+    blocks:
+      - id: stone
+        chance: 80.0
+        drop:
+          - STONE
+      - id: iron_ore
+        chance: 19.0
+        drop: [ ] # if nothing is specified, the vanilla drop is used by default
+      - id: diamond_ore
+        chance: 1.0
+  - id: epic
+    chance: 25.0
+    name: '<#9900FF>Epic'
+    # Optional: a custom icon for this rarity in the lastmines:rarities menu (otherwise the menu's default material is used)
+    icon: diamond_block
+    blocks:
+      - id: stone
+        chance: 50.0 # 50%
+      - id: cobblestone
+        chance: 25.0 # 75%
+      - id: redstone_ore
+        chance: 7.25 # 82.25%
+      - id: lapis_ore
+        chance: 4.25 # 86.5%
+      - id: iron_ore
+        chance: 5.0 # 91.5%
+      - id: coal_ore
+        chance: 3.5 # 95%
+      - id: diamond_ore
+        chance: 3.5 # 98.5%
+      - id: emerald_ore
+        chance: 1.25 # 99.75%
+      - id: ancient_debris
+        chance: 0.25 # 100%
+
+actions:
+  - '[message] [update] &fThe mine has been reset!'
+  - '[message] [update] &f \n&fCurrent rarity: %rarity_current%\n&fNext rarity: %rarity_next%'
+  # sounds
+  - '[sound] [update] entity.villager.yes 0.8 0.5'
+
+permissions:
+  enable: false
+
+online:
+  enable: false
+
+teleport:
+  enable: true
+  # float;float;float;float;float
+  # x;y;z;yaw;pitch
+  pos: '9;106;9;0.0;0.0'
+  # or
+  # pos:
+  #   offset: '9;106;9'
+  #   yaw: 0.0
+  #   pitch: 0.0
+  #
+  # or
+  # pos:
+  #   x: 9.0
+  #   y: 106.0
+  #   z: 9.0
+  #   yaw: 0.0
+  #   pitch: 0.0
+
+hologram:
+  enable: true
+  provider: Vanilla
+  offset: '10;106;10'
+  texts:
+    - '&6Mine with Rarities'
+    - '&fTime until reset: <gold>%time_reset:detail%</gold>'
+    - ''
+    - '&fCurrent rarity: &r%rarity_current%&r'
+    - '&fNext rarity: &r%rarity_next%&r'
+    - ''
+    - '&fMade with &6LastMines &c<3 &7(laststudio.space)'

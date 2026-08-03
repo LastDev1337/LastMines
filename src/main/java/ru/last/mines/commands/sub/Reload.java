@@ -15,6 +15,7 @@ public class Reload extends AbstractSubCommand {
         plugin.getMineManager().unloadAll();
         plugin.getMineManager().loadAll();
         if (plugin.getGuiManager() != null) plugin.getGuiManager().reload();
+        if (plugin.getMainCommand() != null) plugin.getMainCommand().loadSubCommands();
         plugin.getConfigManager().getMessages().getReloaded().send(sender);
     }
 }

@@ -1,0 +1,47 @@
+id: lastmines:actions
+provider: lastmines:actions
+type: chest
+size: 54
+title: '&8Actions &7{MINE_ID}'
+
+actions_list:
+  slots: 10-16,19-25,28-34,37-43
+  name: "&f{INDEX}. &7{ACTION}"
+
+items:
+  back:
+    material: arrow
+    name: '&cBack'
+    slot: 53
+    on_click: '[open] lastmines:main'
+
+  info:
+    material: command_block
+    name: '&cMine actions'
+    lore:
+      - '&7LMB on an action below removes it'
+      - '&7Page: &f{PAGE}&7/&f{MAX_PAGE}'
+    slot: 3
+
+  add:
+    material: writable_book
+    name: '&aAdd action'
+    lore:
+      - '&7Type a new action line in chat'
+      - '&7Same format as in config.yml:'
+      - '&f[message/title/actionbar/sound]'
+      - '&f[update] &7or &f[update:N] &7- when it triggers'
+    slot: 5
+    on_click: '[action_add_input] {MINE_ID}'
+
+  prev_page:
+    material: arrow
+    name: '&ePrevious page'
+    slot: 48
+    on_click: '[actions_page] {MINE_ID} -1'
+
+  next_page:
+    material: arrow
+    name: '&eNext page'
+    slot: 50
+    on_click: '[actions_page] {MINE_ID} 1'

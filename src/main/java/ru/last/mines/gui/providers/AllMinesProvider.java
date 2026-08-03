@@ -1,19 +1,22 @@
 package ru.last.mines.gui.providers;
 
+import dev.by1337.bmenu.slot.component.MenuClickType;
+import dev.by1337.item.ItemModel;
+import dev.by1337.bmenu.slot.impl.SimpleSlotContent;
+
 import dev.by1337.bmenu.loader.MenuConfig;
 import dev.by1337.bmenu.menu.DefaultMenu;
 import dev.by1337.bmenu.menu.Menu;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.Material;
 import dev.by1337.yaml.YamlMap;
-import dev.by1337.yaml.YamlValue;
-import ru.last.mines.api.LastMinesProvider;
-import ru.last.mines.models.Mine;
-import ru.last.mines.utils.ColorUtils;
+import ru.last.mines.LastMines;
+import ru.last.mines.api.*;
+import ru.last.mines.models.*;
+import ru.last.mines.utils.*;
 import me.clip.placeholderapi.PlaceholderAPI;
 import java.util.*;
 
@@ -24,11 +27,10 @@ public class AllMinesProvider extends DefaultMenu {
     public AllMinesProvider(MenuConfig config, Player viewer, @Nullable Menu previousMenu) {
         super(config, viewer, previousMenu);
     }
-    
+
+    @SuppressWarnings("deprecation")
     @Override
-    protected void syncItems() {
-        super.syncItems();
-        
+    protected void generate() {
         slotToMine.clear();
         YamlMap map = config.yaml();
         if (!map.has("mines_list")) return;
@@ -57,41 +59,45 @@ public class AllMinesProvider extends DefaultMenu {
             if (mat == null) mat = Material.STONE;
             ItemStack item = new ItemStack(mat);
             ItemMeta meta = item.getItemMeta();
+            boolean papiEnabled = org.bukkit.Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
             if (meta != null) {
                 String dName = name.replace("{MINE_ID}", mine.getId());
-                dName = PlaceholderAPI.setPlaceholders(viewer, dName);
+                if (papiEnabled) dName = PlaceholderAPI.setPlaceholders(viewer, dName);
                 meta.setDisplayName(ColorUtils.colorString(dName));
-                
+
                 List<String> dLore = new ArrayList<>();
                 for (String l : lore) {
                     String line = l.replace("{MINE_ID}", mine.getId());
-                    line = PlaceholderAPI.setPlaceholders(viewer, line);
+                    if (papiEnabled) line = PlaceholderAPI.setPlaceholders(viewer, line);
                     dLore.add(ColorUtils.colorString(line));
                 }
                 meta.setLore(dLore);
                 item.setItemMeta(meta);
             }
-            getInventory().setItem(slot, item);
+            layers.getBaseLayer()[slot] = new SimpleSlotContent(ItemModel.fromItemStack(item)) {
+                @Override
+                public void doClick(Menu menu, Player player, MenuClickType type) {
+                    YamlMap listMap = config.yaml().get("mines_list").asYamlMap().orDefault(new YamlMap());
+                    String key = "on_" + type.name().toLowerCase() + "_click";
+                    if (!listMap.has(key)) key = "on_click";
+                    if (listMap.has(key)) {
+                        Object cmdRaw = listMap.get(key).getRaw();
+                        List<String> commands = new ArrayList<>();
+                        if (cmdRaw instanceof List<?> l) {
+                            for (Object o : l) commands.add(o.toString());
+                        } else if (cmdRaw instanceof String s) {
+                            commands.add(s);
+                        }
+                        for (String cmd : commands) {
+                            if (cmd.contains("[open]")) {
+                                LastMines.get().getGuiManager().openMenu(viewer, mine.getId());
+                            }
+                        }
+                    }
+                }
+            };
             slotToMine.put(slot, mine.getId());
         }
-    }
-    
-    @Override
-    public void onClick(InventoryClickEvent e) {
-        if (slotToMine.containsKey(e.getRawSlot())) {
-            e.setCancelled(true);
-            String mineId = slotToMine.get(e.getRawSlot());
-            YamlMap map = config.yaml();
-            if (map.has("mines_list")) {
-                YamlMap listMap = map.get("mines_list").asYamlMap().orDefault(new YamlMap());
-                String onClick = listMap.get("on_click").asString("");
-                if (onClick.contains("[open]")) {
-                    ru.last.mines.LastMines.getInstance().getGuiManager().openMenu(viewer, mineId);
-                }
-            }
-            return;
-        }
-        super.onClick(e);
     }
 
     private List<Integer> parseSlots(String slotsStr) {

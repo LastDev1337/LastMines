@@ -8,7 +8,7 @@ public class ColorUtils {
 
     public static Component color(String text) {
         if (text == null || text.isEmpty()) return Component.empty();
-        return MiniMessage.deserialize(text);
+        return MiniMessage.deserialize(text.replace("\\n", "\n"));
     }
 
     public static String colorString(String text) {

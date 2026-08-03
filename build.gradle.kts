@@ -2,11 +2,11 @@ plugins {
     id("java-library")
     id("maven-publish")
     id("xyz.jpenilla.run-paper") version "3.0.2"
-    id("com.gradleup.shadow") version "9.4.2"
+    id("com.gradleup.shadow") version "9.6.1"
 }
 
 group = "ru.last.mines"
-version = "0.1"
+version = "0.2"
 
 repositories {
     mavenCentral()
@@ -19,27 +19,27 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
-    compileOnly("dev.by1337.core:BLibV2:1.7.3") // BLibV2
-    compileOnly("me.clip:placeholderapi:2.12.2") // PlaceholderAPI
-    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.5") {
+    compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
+    compileOnly("dev.by1337.core:BLibV2:1.7.6") // BLibV2
+    compileOnly("dev.by1337.bmenu:BMenu:2.5") // BMenu
+    compileOnly("me.clip:placeholderapi:2.12.3") // PlaceholderAPI
+    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.17") {
         exclude(group = "com.google.guava", module = "guava")
         exclude(group = "com.google.code.gson", module = "gson")
         exclude(group = "it.unimi.dsi", module = "fastutil")
     }
-    compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.2.5") {
+    compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.4.2") {
         exclude(group = "com.google.guava", module = "guava")
         exclude(group = "com.google.code.gson", module = "gson")
         exclude(group = "it.unimi.dsi", module = "fastutil")
     }
-    compileOnly("com.sk89q.worldedit:worldedit-core:7.2.5") {
+    compileOnly("com.sk89q.worldedit:worldedit-core:7.4.2") {
         exclude(group = "com.google.guava", module = "guava")
         exclude(group = "com.google.code.gson", module = "gson")
         exclude(group = "it.unimi.dsi", module = "fastutil")
     }
-    compileOnly("com.github.decentsoftware-eu:decentholograms:2.8.6") // DecentHolograms
-    compileOnly("dev.by1337.bmenu:BMenu:2.3") // BMenu
-    compileOnly("de.oliver:FancyHolograms:2.4.0") // FancyHolograms
+    compileOnly("com.github.decentsoftware-eu:decentholograms:2.8.9") // DecentHolograms
+    compileOnly("de.oliver:FancyHolograms:2.10.0") // FancyHolograms
     implementation("org.bstats:bstats-bukkit:3.2.1") // bStats
 }
 
@@ -62,7 +62,7 @@ tasks {
 }
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 
 tasks.withType<JavaCompile> {

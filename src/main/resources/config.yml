@@ -1,5 +1,9 @@
+# Мультиязычность / Multilingualism
+# Поддерживается в 0.2 версии: ru (Русская), en (English)
+language: ru
+
 debug:
-  enable: true
+  enable: false
 
   level:
     info:

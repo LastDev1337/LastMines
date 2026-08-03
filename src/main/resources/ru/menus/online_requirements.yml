@@ -1,0 +1,151 @@
+id: lastmines:online_requirements
+provider: lastmines:online_requirements
+type: chest
+size: 54
+title: '&8Онлайн-условия &7{MINE_ID}'
+
+items:
+  back:
+    material: arrow
+    name: '&cНазад'
+    slot: 53
+    on_click: '[open] lastmines:main'
+
+  toggle:
+    slot: 4
+    oneOf:
+      - on_view: '{ONLINE_ENABLE} == false'
+        material: gray_dye
+        name: '&7Условие выключено'
+        lore:
+          - '&7Шахта работает всегда'
+          - '&7Нажмите, чтобы включить'
+        on_click:
+          - '[online_toggle] {MINE_ID}'
+      - on_view: '{ONLINE_ENABLE} == true'
+        material: lime_dye
+        name: '&aУсловие включено'
+        lore:
+          - '&7Автосброс работает, только если'
+          - '&7онлайн игроков в диапазоне ниже'
+          - '&7Нажмите, чтобы выключить'
+        on_click:
+          - '[online_toggle] {MINE_ID}'
+
+  min:
+    material: red_stained_glass_pane
+    name: '&cМинимум игроков: &f{ONLINE_MIN}'
+    slot: 11
+  minus_3:
+    material: red_concrete
+    slot: 19
+    name: '&c-3'
+    on_click:
+      - '[online_min_edit] {MINE_ID} -3'
+  minus_2:
+    material: red_concrete
+    slot: 20
+    name: '&c-2'
+    on_click:
+      - '[online_min_edit] {MINE_ID} -2'
+  minus_1:
+    material: red_concrete
+    slot: 21
+    name: '&c-1'
+    on_click:
+      - '[online_min_edit] {MINE_ID} -1'
+  minus_25:
+    material: red_concrete
+    slot: 28
+    name: '&c-25'
+    on_click:
+      - '[online_min_edit] {MINE_ID} -25'
+  minus_10:
+    material: red_concrete
+    slot: 29
+    name: '&c-10'
+    on_click:
+      - '[online_min_edit] {MINE_ID} -10'
+  minus_5:
+    material: red_concrete
+    slot: 30
+    name: '&c-5'
+    on_click:
+      - '[online_min_edit] {MINE_ID} -5'
+  minus_50:
+    material: red_concrete
+    slot: 39
+    name: '&c-50'
+    on_click:
+      - '[online_min_edit] {MINE_ID} -50'
+  minus_100:
+    material: red_concrete
+    slot: 38
+    name: '&c-100'
+    on_click:
+      - '[online_min_edit] {MINE_ID} -100'
+  minus_500:
+    material: red_concrete
+    slot: 37
+    name: '&c-500'
+    on_click:
+      - '[online_min_edit] {MINE_ID} -500'
+
+  max:
+    material: lime_stained_glass_pane
+    name: '&aМаксимум игроков: &f{ONLINE_MAX}'
+    slot: 15
+  plus_3:
+    material: lime_concrete
+    slot: 23
+    name: '&a+3'
+    on_click:
+      - '[online_max_edit] {MINE_ID} 3'
+  plus_2:
+    material: lime_concrete
+    slot: 24
+    name: '&a+2'
+    on_click:
+      - '[online_max_edit] {MINE_ID} 2'
+  plus_1:
+    material: lime_concrete
+    slot: 25
+    name: '&a+1'
+    on_click:
+      - '[online_max_edit] {MINE_ID} 1'
+  plus_25:
+    material: lime_concrete
+    slot: 32
+    name: '&a+25'
+    on_click:
+      - '[online_max_edit] {MINE_ID} 25'
+  plus_10:
+    material: lime_concrete
+    slot: 33
+    name: '&a+10'
+    on_click:
+      - '[online_max_edit] {MINE_ID} 10'
+  plus_5:
+    material: lime_concrete
+    slot: 34
+    name: '&a+5'
+    on_click:
+      - '[online_max_edit] {MINE_ID} 5'
+  plus_50:
+    material: lime_concrete
+    slot: 41
+    name: '&a+50'
+    on_click:
+      - '[online_max_edit] {MINE_ID} 50'
+  plus_100:
+    material: lime_concrete
+    slot: 42
+    name: '&a+100'
+    on_click:
+      - '[online_max_edit] {MINE_ID} 100'
+  plus_500:
+    material: lime_concrete
+    slot: 43
+    name: '&a+500'
+    on_click:
+      - '[online_max_edit] {MINE_ID} 500'

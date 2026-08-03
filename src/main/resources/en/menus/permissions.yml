@@ -1,0 +1,63 @@
+id: lastmines:permissions
+provider: lastmines:permissions
+type: chest
+size: 27
+title: '&8Permissions &7{MINE_ID}'
+
+items:
+  back:
+    material: arrow
+    name: '&cBack'
+    slot: 26
+    on_click: '[open] lastmines:main'
+
+  info:
+    material: written_book
+    all_flags: true
+    name: '&fPermissions'
+    lore:
+      - '&7Here you can configure the permissions'
+      - '&7for mine &f{MINE_ID}'
+    slot: 4
+
+  enable:
+    slot: 11
+    oneOf:
+      - on_view: '{STATUS} == false'
+        material: red_dye
+        name: '&fBreak permission status'
+        lore:
+          - '&7Permissions are <red>disabled</red> for this mine'
+          - '&7Click to enable'
+        on_click:
+          - '[perm] enable {MINE_ID} true'
+      - on_view: '{STATUS} == true'
+        material: lime_dye
+        name: '&fBreak permission status'
+        lore:
+          - '&7Permissions are <green>enabled</green> for this mine'
+          - '&7Click to disable'
+        on_click:
+          - '[perm] enable {MINE_ID} false'
+
+  value:
+    material: paper
+    slot: 13
+    name: '&fBreak permission node'
+    lore:
+      - '&fCurrent permission: &b{PERM_VALUE}'
+      - '&fClick to change it'
+    on_click:
+      - '[perm] value {MINE_ID}'
+
+  messages:
+    material: clock
+    slot: 15
+    name: '&fMessages'
+    lore:
+      - '&7All messages that trigger when a'
+      - '&7player has no permission for the mine!'
+      - ''
+      - '&7Click to open the list'
+    on_click:
+      - '[open] lastmines:permission_messages'

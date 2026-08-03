@@ -1,0 +1,38 @@
+id: lastmines:all_blocks
+provider: lastmines:all_blocks
+type: chest
+size: 54
+title: '&8All blocks &7(page {PAGE}/{MAX_PAGE})'
+
+# Which slots the block grid occupies (as many blocks per page as there are slots)
+slots: "0-44"
+
+items:
+  back:
+    material: arrow
+    name: '&cBack'
+    slot: 53
+    on_click: '[open] lastmines:blocks'
+
+  prev_page:
+    material: arrow
+    name: '&ePrevious page'
+    slot: 48
+    on_click:
+      - '[all_blocks_page] {MINE_ID} -1'
+
+  info:
+    material: book
+    name: '&bAll blocks in the game'
+    lore:
+      - '&7Click a block to add it'
+      - '&7to the current mine list'
+      - '&7(10% chance by default)'
+    slot: 49
+
+  next_page:
+    material: arrow
+    name: '&eNext page'
+    slot: 50
+    on_click:
+      - '[all_blocks_page] {MINE_ID} 1'

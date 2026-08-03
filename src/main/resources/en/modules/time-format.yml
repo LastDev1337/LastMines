@@ -1,0 +1,74 @@
+
+defaults_views:
+  all: "default"
+  holograms: "clock"
+  messages: "detail"
+
+formats:
+  default:
+    formats:
+      years: "%years%y"
+      months: "%months%mo"
+      weeks: "%weeks%w"
+      days: "%days%d"
+      hours: "%hours%h"
+      minutes: "%minutes%m"
+      seconds: "%seconds%s"
+    types:
+      years: "year"
+      months: "month"
+      weeks: "week"
+      days: "day"
+      hours: "hour"
+      minutes: "minute"
+      seconds: "second"
+
+  clock:
+    formats:
+      years: "%years%:%months%:%days%:%hours%:%minutes%:%seconds%"
+      months: "%months%:%days%:%hours%:%minutes%:%seconds%"
+      weeks: "%days%:%hours%:%minutes%:%seconds%"
+      days: "%days%:%hours%:%minutes%:%seconds%"
+      hours: "%hours%:%minutes%:%seconds%"
+      minutes: "%minutes%:%seconds%"
+      seconds: "00:%seconds%"
+    types: {}
+
+  detail:
+    formats:
+      years: "%years% %months% %days% %hours% %minutes% %seconds%"
+      months: "%months% %days% %hours% %minutes% %seconds%"
+      weeks: "%weeks% %days% %hours% %minutes% %seconds%"
+      days: "%days% %hours% %minutes% %seconds%"
+      hours: "%hours% %minutes% %seconds%"
+      minutes: "%minutes% %seconds%"
+      seconds: "%seconds%"
+    types:
+      years:
+        form_1: "year"
+        form_2: "years"
+        form_5: "years"
+      months:
+        form_1: "month"
+        form_2: "months"
+        form_5: "months"
+      weeks:
+        form_1: "week"
+        form_2: "weeks"
+        form_5: "weeks"
+      days:
+        form_1: "day"
+        form_2: "days"
+        form_5: "days"
+      hours:
+        form_1: "hour"
+        form_2: "hours"
+        form_5: "hours"
+      minutes:
+        form_1: "minute"
+        form_2: "minutes"
+        form_5: "minutes"
+      seconds:
+        form_1: "second"
+        form_2: "seconds"
+        form_5: "seconds"

@@ -1,0 +1,127 @@
+id: lastmines:reset_time
+provider: lastmines:reset_time
+type: chest
+size: 54
+title: '&8Reset timer &7{MINE_ID}'
+
+items:
+  back:
+    material: arrow
+    name: '&cBack'
+    slot: 53
+    on_click: '[open] lastmines:main'
+
+  info:
+    material: clock
+    name: '&fReset time: &b{RESET_TIME} sec.'
+    slot: 13
+
+  minus_1:
+    material: red_concrete
+    name: '&c-1 sec.'
+    slot: 21
+    on_click:
+      - '[reset_time_edit] {MINE_ID} -1'
+  minus_2:
+    material: red_concrete
+    name: '&c-2 sec.'
+    slot: 20
+    on_click:
+      - '[reset_time_edit] {MINE_ID} -2'
+  minus_3:
+    material: red_concrete
+    name: '&c-3 sec.'
+    slot: 19
+    on_click:
+      - '[reset_time_edit] {MINE_ID} -3'
+  minus_5:
+    material: red_concrete
+    name: '&c-5 sec.'
+    slot: 30
+    on_click:
+      - '[reset_time_edit] {MINE_ID} -5'
+  minus_10:
+    material: red_concrete
+    name: '&c-10 sec.'
+    slot: 29
+    on_click:
+      - '[reset_time_edit] {MINE_ID} -10'
+  minus_15:
+    material: red_concrete
+    name: '&c-15 sec.'
+    slot: 28
+    on_click:
+      - '[reset_time_edit] {MINE_ID} -15'
+  minus_30:
+    material: red_concrete
+    name: '&c-30 sec.'
+    slot: 39
+    on_click:
+      - '[reset_time_edit] {MINE_ID} -30'
+  minus_45:
+    material: red_concrete
+    name: '&c-45 sec.'
+    slot: 38
+    on_click:
+      - '[reset_time_edit] {MINE_ID} -45'
+  minus_60:
+    material: red_concrete
+    name: '&c-60 sec.'
+    slot: 37
+    on_click:
+      - '[reset_time_edit] {MINE_ID} -60'
+
+  plus_1:
+    material: lime_concrete
+    name: '&a+1 sec.'
+    slot: 23
+    on_click:
+      - '[reset_time_edit] {MINE_ID} 1'
+  plus_2:
+    material: lime_concrete
+    name: '&a+2 sec.'
+    slot: 24
+    on_click:
+      - '[reset_time_edit] {MINE_ID} 2'
+  plus_3:
+    material: lime_concrete
+    name: '&a+3 sec.'
+    slot: 25
+    on_click:
+      - '[reset_time_edit] {MINE_ID} 3'
+  plus_5:
+    material: lime_concrete
+    name: '&a+5 sec.'
+    slot: 32
+    on_click:
+      - '[reset_time_edit] {MINE_ID} 5'
+  plus_10:
+    material: lime_concrete
+    name: '&a+10 sec.'
+    slot: 33
+    on_click:
+      - '[reset_time_edit] {MINE_ID} 10'
+  plus_15:
+    material: lime_concrete
+    name: '&a+15 sec.'
+    slot: 34
+    on_click:
+      - '[reset_time_edit] {MINE_ID} 15'
+  plus_30:
+    material: lime_concrete
+    name: '&a+30 sec.'
+    slot: 41
+    on_click:
+      - '[reset_time_edit] {MINE_ID} 30'
+  plus_45:
+    material: lime_concrete
+    name: '&a+45 sec.'
+    slot: 42
+    on_click:
+      - '[reset_time_edit] {MINE_ID} 45'
+  plus_60:
+    material: lime_concrete
+    name: '&a+60 sec.'
+    slot: 43
+    on_click:
+      - '[reset_time_edit] {MINE_ID} 60'

@@ -30,7 +30,7 @@ public class Delete extends AbstractSubCommand {
 
         plugin.getActionManager().deleteMine(id);
 
-        sender.sendMessage(plugin.getConfigManager().getMessages().getPrefix() + "Шахта §a" + id + " §fуспешно удалена.");
+        sender.sendMessage(plugin.getConfigManager().getMessages().getPrefix() + "Шахта " + id + " успешно удалена.");
     }
 
     @Override

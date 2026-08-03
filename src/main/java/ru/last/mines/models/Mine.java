@@ -1,26 +1,35 @@
 package ru.last.mines.models;
 
+import dev.by1337.yaml.YamlMap;
+import dev.by1337.yaml.YamlValue;
+import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.*;
+import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.scheduler.BukkitRunnable;
+import ru.last.mines.LastMines;
+import ru.last.mines.api.events.*;
+import ru.last.mines.utils.Sounds;
+import ru.last.mines.utils.time.TimeUtils;
+import ru.last.mines.utils.ColorUtils;
+import ru.last.mines.utils.time.TimeFormatter;
+
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
-import dev.by1337.yaml.YamlMap;
-import dev.by1337.yaml.YamlValue;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.scheduler.BukkitTask;
-import ru.last.mines.LastMines;
-import ru.last.mines.api.events.*;
-
+import java.io.File;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Mine {
     private final LastMines plugin;
+    private final YamlMap sourceMap;
     private final String id;
     private final String name;
     private final World world;
@@ -32,28 +41,34 @@ public class Mine {
     
     private final List<MineBlock> blocks = new ArrayList<>();
     private final List<MineRarity> rarities = new ArrayList<>();
-    
+
     private final Map<Integer, List<String>> updateActions = new HashMap<>();
     private final List<String> resetActions = new ArrayList<>();
+    private List<String> rawActions = new ArrayList<>();
     
-    private final boolean permEnable;
-    private final String permValue;
-    private final List<String> permMessages;
-    
-    private final boolean onlineEnable;
-    private final int onlineMin;
-    private final int onlineMax;
-    
-    private final boolean tpEnable;
-    private final Location tpPos;
+    private boolean permEnable;
+    private String permValue;
+    private List<String> permMessages;
 
-    private final boolean holoEnable;
-    private final String holoProvider;
-    private final Location holoOffset;
-    private final List<String> holoTexts;
+    private boolean enchantEnable;
+    private final Map<String, Integer> requiredEnchants = new LinkedHashMap<>();
+    private final List<String> enchantFailActions;
+
+    private boolean onlineEnable;
+    private int onlineMin;
+    private int onlineMax;
+
+    private boolean tpEnable;
+    private Location tpPos;
+
+    private boolean holoEnable;
+    private String holoProvider;
+    private Location holoOffset;
+    private List<String> holoTexts;
     private final YamlMap holoMap;
 
-    private final int resetTime;
+    private int resetTime;
+    private boolean stopped;
     private BukkitTask task;
     private int timeLeft;
     
@@ -77,6 +92,7 @@ public class Mine {
 
     public Mine(LastMines plugin, String id, YamlMap map) {
         this.plugin = plugin;
+        this.sourceMap = map;
         this.id = id;
         this.name = map.get("name").asString(id);
         this.world = Bukkit.getWorld(map.get("world").asString("world"));
@@ -101,13 +117,14 @@ public class Mine {
                 String rId = rarityMap.get("id").asString("");
                 double rChance = rarityMap.get("chance").asDouble(100.0);
                 String rName = rarityMap.get("name").asString(rId).replace("&", "§");
-                
+                String rIcon = rarityMap.has("icon") ? rarityMap.get("icon").asString(null) : null;
+
                 List<MineBlock> rBlocks = new ArrayList<>();
                 for (Object blockValRaw : getListOrEmpty(rarityMap.get("blocks"))) {
                     YamlMap blockMap = YamlValue.wrap(blockValRaw).asYamlMap().getOrThrow();
                     rBlocks.add(parseBlock(blockMap));
                 }
-                rarities.add(new MineRarity(rId, rChance, rName, rBlocks));
+                rarities.add(new MineRarity(rId, rChance, rName, rBlocks, rIcon));
             }
             if (!rarities.isEmpty()) {
                 this.currentRarity = rollRarity();
@@ -115,55 +132,23 @@ public class Mine {
             }
         }
         
-        java.util.regex.Pattern p = java.util.regex.Pattern.compile("(?i)^(?:\\[update[^\\]]*\\]\\s*)?(\\[actionbar\\]|\\[message\\]|\\[title\\]|\\[sound\\])\\s*(?:\\[radius:-?\\d+\\]\\s*)?(\\d+)\\s+(true|false)\\s+(.*)");
+        reparseActions(getListOrEmpty(map.get("actions")).stream().map(v -> YamlValue.wrap(v).asString("")).toList());
 
-        for (Object actionValRaw : getListOrEmpty(map.get("actions"))) {
-            String act = YamlValue.wrap(actionValRaw).asString("");
-            
-            java.util.regex.Matcher m = p.matcher(act);
-            if (m.matches()) {
-                PeriodicAction pa = new PeriodicAction();
-                boolean repeat = Boolean.parseBoolean(m.group(3));
-                int val = Integer.parseInt(m.group(2));
-                
-                if (repeat) {
-                    pa.interval = val;
-                    pa.repeat = true;
-                    pa.initialDuration = -1;
-                } else {
-                    pa.interval = 1;
-                    pa.repeat = false;
-                    pa.initialDuration = val;
-                }
-                pa.durationLeft = pa.initialDuration;
-                pa.counter = pa.interval;
-                pa.active = true;
-                
-                String toRemove = m.group(2) + " " + m.group(3) + " ";
-                int idx = act.indexOf(toRemove);
-                if (idx != -1) {
-                    pa.action = act.substring(0, idx) + act.substring(idx + toRemove.length());
-                } else {
-                    pa.action = act;
-                }
-                periodicActions.add(pa);
-                continue;
-            }
-            
-            if (act.contains("[update:")) {
-                try {
-                    String timeStr = act.substring(act.indexOf("[update:") + 8, act.indexOf("]"));
-                    int time = ru.last.mines.utils.TimeUtils.parseToSeconds(timeStr);
-                    updateActions.computeIfAbsent(time, k -> new ArrayList<>()).add(act);
-                } catch (Exception ignored) {}
-            } else if (act.contains("[update]")) { resetActions.add(act); }
-        }
-        
         YamlMap permMap = map.get("permissions").asYamlMap().orDefault(new YamlMap());
         this.permEnable = permMap.get("enable").asBool(false);
         this.permValue = permMap.get("value").asString("");
         this.permMessages = getListOrEmpty(permMap.get("messages")).stream().map(v -> YamlValue.wrap(v).asString("")).toList();
-        
+
+        YamlMap enchantMap = map.get("enchant_requirements").asYamlMap().orDefault(new YamlMap());
+        this.enchantEnable = enchantMap.get("enable").asBool(false);
+        YamlMap enchListMap = enchantMap.get("enchantments").asYamlMap().orDefault(new YamlMap());
+        for (String key : enchListMap.getRaw().keySet()) {
+            requiredEnchants.put(key.toLowerCase(Locale.ROOT), enchListMap.get(key).asInt(1));
+        }
+        List<String> defaultEnchantActions = List.of("[message] &cВаша кирка недостаточно зачарована для этой автошахты!");
+        List<String> parsedEnchantActions = getListOrEmpty(enchantMap.get("actions")).stream().map(v -> YamlValue.wrap(v).asString("")).toList();
+        this.enchantFailActions = parsedEnchantActions.isEmpty() ? defaultEnchantActions : parsedEnchantActions;
+
         YamlMap onlineMap = map.get("online").asYamlMap().orDefault(new YamlMap());
         this.onlineEnable = onlineMap.get("enable").asBool(false);
         this.onlineMin = onlineMap.get("min").asInt(0);
@@ -176,17 +161,83 @@ public class Mine {
         this.holoMap = map.get("hologram").asYamlMap().orDefault(new YamlMap());
         this.holoEnable = holoMap.get("enable").asBool(false);
         this.holoProvider = holoMap.get("provider").asString("Vanilla");
-        this.holoOffset = parseLocation(world, holoMap.get("offset").asString("0;0;0"));
+        if (holoMap.has("offset")) {
+            YamlValue offsetVal = holoMap.get("offset");
+            if (offsetVal.getRaw() instanceof java.util.Map) {
+                YamlMap offsetMap = offsetVal.asYamlMap().getOrThrow();
+                double x = offsetMap.get("x").asDouble(0.0);
+                double y = offsetMap.get("y").asDouble(0.0);
+                double z = offsetMap.get("z").asDouble(0.0);
+                this.holoOffset = new Location(world, x, y, z);
+            } else {
+                this.holoOffset = parseLocation(world, offsetVal.asString("0;0;0"));
+            }
+        } else {
+            this.holoOffset = new Location(world, 0, 100, 0);
+        }
         this.holoTexts = getListOrEmpty(holoMap.get("texts")).stream().map(v -> YamlValue.wrap(v).asString("")).toList();
 
-        this.resetTime = ru.last.mines.utils.TimeUtils.parseToSeconds(map.get("reset_time").asString("5m"));
+        this.resetTime = TimeUtils.parseToSeconds(map.get("reset_time").asString("5m"));
         this.timeLeft = this.resetTime;
+        this.stopped = map.get("stopped").asBool(false);
 
         startTasks();
         createHologram();
         resetMine();
     }
-    
+
+    /**
+     * Репарсер всех старых экшенов в новые
+     */
+    public void reparseActions(List<String> raw) {
+        this.rawActions = new ArrayList<>(raw);
+        periodicActions.clear();
+        updateActions.clear();
+        resetActions.clear();
+
+        Pattern p = Pattern.compile("(?i)^(?:\\[update[^]]*]\\s*)?(\\[actionbar]|\\[message]|\\[title]|\\[sound])\\s*(?:\\[radius:-?\\d+]\\s*)?(\\d+)\\s+(true|false)\\s+(.*)");
+
+        for (String act : raw) {
+            Matcher m = p.matcher(act);
+            if (m.matches()) {
+                PeriodicAction pa = new PeriodicAction();
+                boolean repeat = Boolean.parseBoolean(m.group(3));
+                int val = Integer.parseInt(m.group(2));
+
+                if (repeat) {
+                    pa.interval = val;
+                    pa.repeat = true;
+                    pa.initialDuration = -1;
+                } else {
+                    pa.interval = 1;
+                    pa.repeat = false;
+                    pa.initialDuration = val;
+                }
+                pa.durationLeft = pa.initialDuration;
+                pa.counter = pa.interval;
+                pa.active = true;
+
+                String toRemove = m.group(2) + " " + m.group(3) + " ";
+                int idx = act.indexOf(toRemove);
+                if (idx != -1) {
+                    pa.action = act.substring(0, idx) + act.substring(idx + toRemove.length());
+                } else {
+                    pa.action = act;
+                }
+                periodicActions.add(pa);
+                continue;
+            }
+
+            if (act.contains("[update:")) {
+                try {
+                    String timeStr = act.substring(act.indexOf("[update:") + 8, act.indexOf("]"));
+                    int time = TimeUtils.parseToSeconds(timeStr);
+                    updateActions.computeIfAbsent(time, k -> new ArrayList<>()).add(act);
+                } catch (Exception ignored) {}
+            } else if (act.contains("[update]")) { resetActions.add(act); }
+        }
+    }
+
     private MineBlock parseBlock(YamlMap blockMap) {
         String blockId = blockMap.get("id").asString("minecraft:stone").replace("minecraft:", "").toUpperCase();
         double chance = blockMap.has("chance") ? blockMap.get("chance").asDouble(100.0) : 0.0;
@@ -220,12 +271,104 @@ public class Mine {
             chance = 100.0;
         }
 
-        List<String> drops = getListOrEmpty(blockMap.get("drop")).stream()
-                .map(v -> YamlValue.wrap(v).asString("").replace("minecraft:", "").toUpperCase())
+        List<DropItem> drops = getListOrEmpty(blockMap.get("drop")).stream()
+                .map(this::parseDropItem)
+                .filter(Objects::nonNull)
                 .toList();
         return new MineBlock(Material.matchMaterial(blockId), chance, min, max, drops);
     }
-    
+
+    private DropItem parseDropItem(Object raw) {
+        YamlValue val = YamlValue.wrap(raw);
+        if (val.getRaw() instanceof java.util.Map) {
+            YamlMap dropMap = val.asYamlMap().getOrThrow();
+            String matName = dropMap.get("id").asString("").replace("minecraft:", "").toUpperCase();
+            Material mat = Material.matchMaterial(matName);
+            if (mat == null) return null;
+            double chance = dropMap.get("chance").asDouble(100.0);
+            boolean fortune = dropMap.get("fortune").asBool(false);
+            return new DropItem(mat, chance, fortune);
+        }
+        String matName = val.asString("").replace("minecraft:", "").toUpperCase();
+        Material mat = Material.matchMaterial(matName);
+        return mat == null ? null : new DropItem(mat, 100.0, false);
+    }
+
+    private Map<String, Object> serializeBlock(MineBlock mb) {
+        Map<String, Object> out = new LinkedHashMap<>();
+        out.put("id", mb.material() != null ? mb.material().name().toLowerCase(Locale.ROOT) : "stone");
+        if (mb.min() >= 0 && mb.max() >= mb.min()) {
+            Map<String, Object> limit = new LinkedHashMap<>();
+            limit.put("min", mb.min());
+            limit.put("max", mb.max());
+            out.put("limit", limit);
+        } else {
+            out.put("chance", mb.chance());
+        }
+        List<Map<String, Object>> dropList = new ArrayList<>();
+        for (DropItem di : mb.drops()) {
+            Map<String, Object> dm = new LinkedHashMap<>();
+            dm.put("id", di.material().name().toLowerCase(Locale.ROOT));
+            dm.put("chance", di.chance());
+            dm.put("fortune", di.fortune());
+            dropList.add(dm);
+        }
+        out.put("drop", dropList);
+        return out;
+    }
+
+    public void save() {
+        if (mode == MineMode.BLOCKS) {
+            List<Map<String, Object>> blockList = new ArrayList<>();
+            for (MineBlock mb : blocks) blockList.add(serializeBlock(mb));
+            sourceMap.set("blocks", blockList);
+        } else if (mode == MineMode.RARITY) {
+            List<Map<String, Object>> rarityList = new ArrayList<>();
+            for (MineRarity r : rarities) {
+                Map<String, Object> rm = new LinkedHashMap<>();
+                rm.put("id", r.id());
+                rm.put("chance", r.chance());
+                rm.put("name", r.name());
+                if (r.icon() != null) rm.put("icon", r.icon());
+                List<Map<String, Object>> blockList = new ArrayList<>();
+                for (MineBlock mb : r.blocks()) blockList.add(serializeBlock(mb));
+                rm.put("blocks", blockList);
+                rarityList.add(rm);
+            }
+            sourceMap.set("rarity", rarityList);
+        }
+
+        sourceMap.set("hologram.texts", holoTexts);
+        sourceMap.set("hologram.enable", holoEnable);
+        sourceMap.set("hologram.provider", holoProvider);
+        if (holoOffset != null) {
+            sourceMap.set("hologram.offset", holoOffset.getX() + ";" + holoOffset.getY() + ";" + holoOffset.getZ());
+        }
+        sourceMap.set("permissions.enable", permEnable);
+        sourceMap.set("permissions.value", permValue);
+        sourceMap.set("permissions.messages", permMessages);
+        sourceMap.set("reset_time", resetTime);
+        sourceMap.set("stopped", stopped);
+        sourceMap.set("enchant_requirements.enable", enchantEnable);
+        sourceMap.set("enchant_requirements.enchantments", new LinkedHashMap<>(requiredEnchants));
+        sourceMap.set("online.enable", onlineEnable);
+        sourceMap.set("online.min", onlineMin);
+        sourceMap.set("online.max", onlineMax);
+        sourceMap.set("teleport.enable", tpEnable);
+        if (tpPos != null) {
+            sourceMap.set("teleport.pos", tpPos.getX() + ";" + tpPos.getY() + ";" + tpPos.getZ() + ";" + tpPos.getYaw() + ";" + tpPos.getPitch());
+        }
+        sourceMap.set("actions", rawActions);
+
+        File file = new File(plugin.getDataFolder(), "mines" + File.separator + id + ".yml");
+        try {
+            Files.writeString(file.toPath(), sourceMap.saveToString(), StandardCharsets.UTF_8);
+        } catch (java.io.IOException e) {
+            plugin.getDebugger().error("Не удалось сохранить шахту " + id, e);
+        }
+    }
+
+
     private MineRarity rollRarity() {
         if (rarities.isEmpty()) return null;
         double total = rarities.stream().mapToDouble(MineRarity::chance).sum();
@@ -235,7 +378,7 @@ public class Mine {
             current += rarity.chance();
             if (r <= current) return rarity;
         }
-        return rarities.get(0);
+        return rarities.getFirst();
     }
 
     private List<Object> getListOrEmpty(YamlValue node) {
@@ -249,7 +392,9 @@ public class Mine {
         String[] split = s.split("[;,]");
         if (split.length < 3) return new Location(w, 0, 100, 0);
         try {
-            return new Location(w, Double.parseDouble(split[0]), Double.parseDouble(split[1]), Double.parseDouble(split[2]));
+            float yaw = split.length >= 4 ? Float.parseFloat(split[3]) : 0f;
+            float pitch = split.length >= 5 ? Float.parseFloat(split[4]) : 0f;
+            return new Location(w, Double.parseDouble(split[0]), Double.parseDouble(split[1]), Double.parseDouble(split[2]), yaw, pitch);
         } catch (Exception e) { return new Location(w, 0, 100, 0); }
     }
 
@@ -258,7 +403,7 @@ public class Mine {
         task = Bukkit.getScheduler().runTaskTimer(plugin, this::tick, 20L, 20L);
     }
 
-    private org.bukkit.scheduler.BukkitTask resetTask;
+    private BukkitTask resetTask;
 
     public void stopTasks() {
         if (task != null) task.cancel();
@@ -266,19 +411,22 @@ public class Mine {
     }
     
     private void tick() {
+        if (stopped) {
+            updateHologram();
+            return;
+        }
         if (onlineEnable) {
             int online = Bukkit.getOnlinePlayers().size();
             if (online < onlineMin || online > onlineMax) return;
         }
 
-        for (int i = 0; i < periodicActions.size(); i++) {
-            PeriodicAction pa = periodicActions.get(i);
+        for (PeriodicAction pa : periodicActions) {
             if (!pa.active) continue;
-            
+
             pa.counter--;
             if (pa.counter <= 0) {
                 executeAction(pa.action);
-                
+
                 if (pa.repeat) {
                     pa.counter = pa.interval;
                 } else {
@@ -346,11 +494,11 @@ public class Mine {
         str = str.replace("{BLOCKS_LEFT}", String.valueOf(physicalBlocksCount));
         str = str.replace("{BLOCKS_MAX}", String.valueOf(maxPhysicalBlocksCount));
         
-        str = str.replace("%time%", ru.last.mines.utils.TimeFormatter.format(timeLeft * 1000L, "default"));
-        str = str.replace("%time_detail%", ru.last.mines.utils.TimeFormatter.format(timeLeft * 1000L, "detail"));
-        str = str.replace("%time:detail%", ru.last.mines.utils.TimeFormatter.format(timeLeft * 1000L, "detail"));
-        str = str.replace("%time_clock%", ru.last.mines.utils.TimeFormatter.format(timeLeft * 1000L, "clock"));
-        str = str.replace("%time:clock%", ru.last.mines.utils.TimeFormatter.format(timeLeft * 1000L, "clock"));
+        str = str.replace("%time%", TimeFormatter.format(timeLeft * 1000L, "default"));
+        str = str.replace("%time_detail%", TimeFormatter.format(timeLeft * 1000L, "detail"));
+        str = str.replace("%time:detail%", TimeFormatter.format(timeLeft * 1000L, "detail"));
+        str = str.replace("%time_clock%", TimeFormatter.format(timeLeft * 1000L, "clock"));
+        str = str.replace("%time:clock%", TimeFormatter.format(timeLeft * 1000L, "clock"));
         
         return str;
     }
@@ -359,7 +507,7 @@ public class Mine {
     private void executeAction(String action) {
         action = replacePlaceholders(action);
         
-        int radius = -2; // Default is -2 (no radius specified)
+        int radius = -2;
         if (action.contains("[radius:")) {
             try {
                 int start = action.indexOf("[radius:");
@@ -389,7 +537,7 @@ public class Mine {
                 double distance = Math.sqrt(dx*dx + dy*dy + dz*dz);
                 
                 if (finalRadius == -1) {
-                    return distance == 0; // Exactly inside the AABB
+                    return distance == 0; // AABB
                 }
                 
                 return distance <= finalRadius;
@@ -404,7 +552,7 @@ public class Mine {
                 if (org.bukkit.Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
                     parsedMsg = me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(p, parsedMsg);
                 }
-                p.sendMessage(ru.last.mines.utils.ColorUtils.colorString(parsedMsg));
+                p.sendMessage(ColorUtils.colorString(parsedMsg));
             });
         } else if (cleanAction.startsWith("[title]")) {
             String raw = cleanAction.replaceFirst("\\[title]\\s*", "");
@@ -434,18 +582,14 @@ public class Mine {
             
             targetPlayers.forEach(p -> {
                 String pTitleStr = rawTitleStr;
-                if (org.bukkit.Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-                    pTitleStr = me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(p, pTitleStr);
+                if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+                    pTitleStr = PlaceholderAPI.setPlaceholders(p, pTitleStr);
                 }
-                pTitleStr = ru.last.mines.utils.ColorUtils.colorString(pTitleStr);
-                
+                pTitleStr = ColorUtils.colorString(pTitleStr);
+
                 String title = pTitleStr;
                 String subtitle = "";
-                if (pTitleStr.contains("\\n")) {
-                    String[] split = pTitleStr.split("\\\\n");
-                    title = split[0];
-                    subtitle = split.length > 1 ? split[1] : "";
-                } else if (pTitleStr.contains("\n")) {
+                if (pTitleStr.contains("\n")) {
                     String[] split = pTitleStr.split("\n");
                     title = split[0];
                     subtitle = split.length > 1 ? split[1] : "";
@@ -456,20 +600,22 @@ public class Mine {
             String msg = cleanAction.replaceFirst("\\[actionbar]\\s*", "").replace("&", "§");
             targetPlayers.forEach(p -> {
                 String parsedMsg = msg;
-                if (org.bukkit.Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-                    parsedMsg = me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(p, parsedMsg);
+                if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+                    parsedMsg = PlaceholderAPI.setPlaceholders(p, parsedMsg);
                 }
-                String finalMsg = ru.last.mines.utils.ColorUtils.colorString(parsedMsg);
-                p.spigot().sendMessage(net.md_5.bungee.api.ChatMessageType.ACTION_BAR, net.md_5.bungee.api.chat.TextComponent.fromLegacyText(finalMsg));
+                String finalMsg = ColorUtils.colorString(parsedMsg);
+                p.sendActionBar(ColorUtils.colorString(finalMsg));
             });
         } else if (cleanAction.startsWith("[sound]")) {
             String soundStr = cleanAction.replaceFirst("\\[sound]\\s*", "");
             try {
                 String[] split = soundStr.split(" ");
-                org.bukkit.Sound sound = org.bukkit.Sound.valueOf(split[0].toUpperCase());
-                float volume = split.length > 1 ? Float.parseFloat(split[1]) : 1f;
-                float pitch = split.length > 2 ? Float.parseFloat(split[2]) : 1f;
-                targetPlayers.forEach(p -> p.playSound(p.getLocation(), sound, volume, pitch));
+                Sound sound = Sounds.parseSound(split[0]);
+                if (sound != null) {
+                    float volume = split.length > 1 ? Float.parseFloat(split[1]) : 1f;
+                    float pitch = split.length > 2 ? Float.parseFloat(split[2]) : 1f;
+                    targetPlayers.forEach(p -> p.playSound(p.getLocation(), sound, volume, pitch));
+                }
             } catch (Exception ignored) {}
         }
     }
@@ -491,8 +637,8 @@ public class Mine {
         int maxX = Math.max(pos1.getBlockX(), pos2.getBlockX());
         int maxY = Math.max(pos1.getBlockY(), pos2.getBlockY());
         int maxZ = Math.max(pos1.getBlockZ(), pos2.getBlockZ());
-        
-        maxPhysicalBlocksCount = (maxX - minX + 1) * (maxY - minY + 1) * (maxZ - minZ + 1);
+
+        int XY1 = (maxX - minX + 1) * (maxY - minY + 1) * (maxZ - minZ + 1);
 
         List<MineBlock> targetBlocks = getCurrentBlocks();
         if (targetBlocks.isEmpty()) return;
@@ -508,9 +654,8 @@ public class Mine {
             pa.counter = pa.interval;
         }
         
-        java.util.Map<Integer, Material> limitedPlacements = new java.util.HashMap<>();
-        int volume = (maxX - minX + 1) * (maxY - minY + 1) * (maxZ - minZ + 1);
-        java.util.Random rnd = new java.util.Random();
+        Map<Integer, Material> limitedPlacements = new HashMap<>();
+        Random rnd = new Random();
         
         for (MineBlock mb : targetBlocks) {
             if (mb.min() >= 0 && mb.max() >= mb.min()) {
@@ -518,7 +663,7 @@ public class Mine {
                 for (int i = 0; i < count; i++) {
                     int attempts = 0;
                     while (attempts < 50) {
-                        int rIdx = rnd.nextInt(volume);
+                        int rIdx = rnd.nextInt(XY1);
                         if (!limitedPlacements.containsKey(rIdx)) {
                             limitedPlacements.put(rIdx, mb.material());
                             break;
@@ -529,7 +674,7 @@ public class Mine {
             }
         }
 
-        resetTask = new org.bukkit.scheduler.BukkitRunnable() {
+        resetTask = new BukkitRunnable() {
             int x = minX;
             int y = minY;
             int z = minZ;
@@ -553,9 +698,9 @@ public class Mine {
                                 Block b = world.getBlockAt(x, y, z);
                                 if (b.getType() != mat) {
                                     b.setType(mat, false);
-                                    if (mat != Material.AIR) {
-                                        physicalBlocksCount++;
-                                    }
+                                }
+                                if (mat != Material.AIR) {
+                                    physicalBlocksCount++;
                                 }
                             }
                             z++;
@@ -573,8 +718,9 @@ public class Mine {
                     x++;
                 }
 
+                maxPhysicalBlocksCount = physicalBlocksCount;
                 isResetting = false;
-                
+
                 Bukkit.getPluginManager().callEvent(new MineResetEvent(Mine.this));
                 
                 this.cancel();
@@ -612,30 +758,54 @@ public class Mine {
     }
     
     public void deleteHologram() {
-        if (!holoEnable) return;
         plugin.getHologramManager().delete(this);
     }
 
     public String getId() { return id; }
     public String getName() { return name; }
+    public World getWorld() { return world; }
+    public MineMode getMode() { return mode; }
     public int getTimeLeft() { return timeLeft; }
     public void setTimeLeft(int timeLeft) { this.timeLeft = timeLeft; }
     public Location getHoloOffset() { return holoOffset; }
+    public void setHoloOffset(Location loc) { this.holoOffset = loc; }
     public List<String> getHoloTexts() { return holoTexts.stream().map(this::replacePlaceholders).toList(); }
+    public List<String> getRawHoloTexts() { return holoTexts; }
     public String getHoloProvider() { return holoProvider; }
-    
+    public void setHoloProvider(String provider) { this.holoProvider = provider; }
+    public void setHoloEnable(boolean b) { this.holoEnable = b; }
+
+    public boolean isOnlineEnable() { return onlineEnable; }
+    public void setOnlineEnable(boolean b) { this.onlineEnable = b; }
+    public int getOnlineMin() { return onlineMin; }
+    public void setOnlineMin(int min) { this.onlineMin = Math.max(0, min); }
+    public int getOnlineMax() { return onlineMax; }
+    public void setOnlineMax(int max) { this.onlineMax = Math.max(0, max); }
+
+    public List<String> getRawActions() { return rawActions; }
+
+
     public int getPhysicalBlocksCount() { return physicalBlocksCount; }
     public int getMaxPhysicalBlocksCount() { return maxPhysicalBlocksCount; }
     public void decrementPhysicalBlocks() { if (physicalBlocksCount > 0) physicalBlocksCount--; }
-    public void setPhysicalBlocksCount(int count) { this.physicalBlocksCount = count; }
+
+    public void setHoloTexts(List<String> list) { this.holoTexts = list; }
 
     public Location getPos1() { return pos1; }
     public Location getPos2() { return pos2; }
     
     public Location getTpPos() { return tpPos; }
+    public void setTpPos(Location loc) { this.tpPos = loc; }
     public boolean isTpEnable() { return tpEnable; }
+    public void setTpEnable(boolean b) { this.tpEnable = b; }
     public int getResetTime() { return resetTime; }
-    
+    public void setResetTime(int seconds) {
+        this.resetTime = Math.max(1, seconds);
+        if (timeLeft > this.resetTime) timeLeft = this.resetTime;
+    }
+    public boolean isStopped() { return stopped; }
+    public void setStopped(boolean stopped) { this.stopped = stopped; }
+
     public List<MineRarity> getRarities() { return rarities; }
 
     public boolean setNextRarity(String rarityId) {
@@ -649,11 +819,31 @@ public class Mine {
         return false;
     }
 
-    public boolean isHoloEnable() { return !holoEnable; }
+    public boolean isHoloEnable() { return holoEnable; }
     public YamlMap getHoloMap() { return holoMap; }
     public boolean isPermEnable() { return permEnable; }
+    public void setPermEnable(boolean b) { this.permEnable = b; }
     public String getPermValue() { return permValue; }
+    public void setPermValue(String s) { this.permValue = s; }
     public List<String> getPermMessages() { return permMessages; }
+    public void setPermMessages(List<String> list) { this.permMessages = list; }
+
+    public boolean isEnchantEnable() { return enchantEnable; }
+    public void setEnchantEnable(boolean b) { this.enchantEnable = b; }
+    public Map<String, Integer> getRequiredEnchants() { return requiredEnchants; }
+    public List<String> getEnchantFailActions() { return enchantFailActions; }
+
+    @SuppressWarnings("deprecation")
+    public boolean meetsEnchantRequirements(ItemStack tool) {
+        if (!enchantEnable || requiredEnchants.isEmpty()) return true;
+        for (Map.Entry<String, Integer> entry : requiredEnchants.entrySet()) {
+            Enchantment ench = Registry.ENCHANTMENT.get(NamespacedKey.minecraft(entry.getKey()));
+            if (ench == null) continue;
+            int level = tool != null ? tool.getEnchantmentLevel(ench) : 0;
+            if (level < entry.getValue()) return false;
+        }
+        return true;
+    }
 
     public boolean isInMine(Location loc) {
         if (loc.getWorld() != world) return false;

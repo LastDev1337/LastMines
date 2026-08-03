@@ -17,7 +17,7 @@ public class Near extends AbstractSubCommand {
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage("§cТолько для игроков!");
+            plugin.getConfigManager().getMessages().getOnlyPlayers().send(sender);
             return;
         }
 

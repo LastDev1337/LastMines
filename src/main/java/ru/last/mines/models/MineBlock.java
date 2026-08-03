@@ -8,5 +8,5 @@ public record MineBlock(
         double chance,
         int min,
         int max,
-        List<String> drops
+        List<DropItem> drops
 ) { }

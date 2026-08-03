@@ -1,19 +1,24 @@
 package ru.last.mines.gui.providers;
 
+import ru.last.mines.LastMines;
+
+import dev.by1337.bmenu.slot.component.MenuClickType;
+import dev.by1337.item.ItemModel;
+import dev.by1337.bmenu.slot.impl.SimpleSlotContent;
+
 import dev.by1337.bmenu.loader.MenuConfig;
 import dev.by1337.bmenu.menu.DefaultMenu;
 import dev.by1337.bmenu.menu.Menu;
+import dev.by1337.yaml.YamlMap;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.Material;
-import dev.by1337.yaml.YamlMap;
-import ru.last.mines.api.LastMinesProvider;
-import ru.last.mines.models.Mine;
-import ru.last.mines.models.MineRarity;
-import ru.last.mines.utils.ColorUtils;
+import ru.last.mines.api.*;
+import ru.last.mines.gui.ClickCommandResolver;
+import ru.last.mines.models.*;
+import ru.last.mines.utils.*;
 import java.util.*;
 
 public class RaritiesProvider extends DefaultMenu {
@@ -22,11 +27,15 @@ public class RaritiesProvider extends DefaultMenu {
 
     public RaritiesProvider(MenuConfig config, Player viewer, @Nullable Menu previousMenu) {
         super(config, viewer, previousMenu);
+        String mineId = LastMines.get().getGuiManager().getViewingMines().get(viewer.getUniqueId());
+        if (mineId != null) {
+            this.addArgument("MINE_ID", mineId);
+        }
     }
-    
+
+    @SuppressWarnings("deprecation")
     @Override
-    protected void syncItems() {
-        super.syncItems();
+    protected void generate() {
         
         slotToRarity.clear();
         YamlMap map = config.yaml();
@@ -46,7 +55,7 @@ public class RaritiesProvider extends DefaultMenu {
             }
         }
         
-        String mineId = ru.last.mines.LastMines.getInstance().getGuiManager().getViewingMines().get(viewer.getUniqueId());
+        String mineId = LastMines.get().getGuiManager().getViewingMines().get(viewer.getUniqueId());
         if (mineId == null) return;
         Mine mine = LastMinesProvider.getApi().getMine(mineId);
         if (mine == null) return;
@@ -57,7 +66,8 @@ public class RaritiesProvider extends DefaultMenu {
             MineRarity mr = rarities.get(i);
             int slot = slots.get(i);
             
-            Material mat = Material.matchMaterial(materialName);
+            Material mat = mr.icon() != null ? Material.matchMaterial(mr.icon()) : null;
+            if (mat == null) mat = Material.matchMaterial(materialName);
             if (mat == null) mat = Material.NETHER_STAR;
             ItemStack item = new ItemStack(mat);
             ItemMeta meta = item.getItemMeta();
@@ -76,7 +86,16 @@ public class RaritiesProvider extends DefaultMenu {
                 meta.setLore(dLore);
                 item.setItemMeta(meta);
             }
-            getInventory().setItem(slot, item);
+            layers.getBaseLayer()[slot] = new SimpleSlotContent(ItemModel.fromItemStack(item)) {
+                @Override
+                public void doClick(Menu menu, Player player, MenuClickType type) {
+                    YamlMap listMap = config.yaml().get("rarities_list").asYamlMap().orDefault(new YamlMap());
+                    ClickCommandResolver.resolveAndRun(menu, listMap, type, Map.of(
+                            "{RARITY_ID}", mr.id(),
+                            "{MINE_ID}", mine.getId()
+                    ));
+                }
+            };
             slotToRarity.put(slot, mr);
         }
     }

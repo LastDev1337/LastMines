@@ -5,7 +5,7 @@ import eu.decentsoftware.holograms.api.holograms.Hologram;
 import org.bukkit.Location;
 import ru.last.mines.holograms.*;
 import ru.last.mines.models.*;
-import ru.last.mines.utils.*;
+import ru.last.mines.utils.time.TimeFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,11 +16,13 @@ public class DecentHoloProvider implements HologramProvider {
     public void create(Mine mine) {
         String holoName = "lastmines_" + mine.getId();
         Hologram holo = DHAPI.getHologram(holoName);
-        if (holo == null) {
-            Location loc = mine.getHoloOffset();
-            if (loc == null) return;
-            DHAPI.createHologram(holoName, loc, applyPlaceholders(mine, mine.getHoloTexts()));
+        if (holo != null) {
+            holo.delete();
         }
+        Location loc = mine.getHoloOffset();
+        if (loc == null) return;
+        holo = DHAPI.createHologram(holoName, loc, applyPlaceholders(mine, mine.getHoloTexts()));
+        holo.setSaveToFile(false);
     }
 
     @Override
@@ -43,7 +45,7 @@ public class DecentHoloProvider implements HologramProvider {
 
     @Override
     public void removeAll() {
-        // DecentHolograms automatic removed all holograms
+        // DecentHolograms автоматически удаляет все голограммы
     }
 
     private List<String> applyPlaceholders(Mine mine, List<String> lines) {

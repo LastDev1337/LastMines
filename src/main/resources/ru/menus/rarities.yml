@@ -1,0 +1,47 @@
+id: lastmines:rarities
+provider: lastmines:rarities
+type: chest
+size: 54
+title: '&8Редкости шахты &7{MINE_ID}'
+
+rarities_list:
+  slots: 10-16,19-25,28-34,37-43
+  material: nether_star
+  name: "&eРедкость &f{RARITY_NAME}"
+  lore:
+    - "&7ID редкости: &f{RARITY_ID}"
+    - "&7Шанс спавна: &f{CHANCE}%"
+    - ""
+    - "&eЛКМ: &7+1% шанс"
+    - "&eПКМ: &7-1% шанс"
+    - "&cСКМ: &7Удалить редкость"
+  on_left_click: "[rarity_edit] {MINE_ID} {RARITY_ID} chance +1"
+  on_right_click: "[rarity_edit] {MINE_ID} {RARITY_ID} chance -1"
+  on_middle_click: "[rarity_edit] {MINE_ID} {RARITY_ID} remove"
+
+items:
+  back:
+    material: arrow
+    name: '&cНазад'
+    slot: 53
+    on_click: '[open] lastmines:main'
+
+  info:
+    material: map
+    name: '&eРедкости шахты'
+    lore:
+      - '&7Здесь вы можете настраивать редкости'
+      - '&7для автошахты &f{MINE_ID}'
+      - ''
+      - '&7Шанс редкости — тоже &fвес&7, а не %.'
+      - '&7Блоки внутри каждой редкости'
+      - '&7настраиваются отдельно, как в режиме БЛОКИ'
+    slot: 4
+
+  add_rarity:
+    material: book
+    name: '&aДобавить редкость'
+    lore:
+      - '&7Ввести ID новой редкости в чат'
+    slot: 49
+    on_click: '[rarity_add_input] {MINE_ID}'

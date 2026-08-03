@@ -1,19 +1,14 @@
 name: LastMines
-version: '0.1'
+version: '${version}'
 main: ru.last.mines.LastMines
-api-version: '1.16'
+api-version: '1.21'
 
 depend: [ BLib ]
-softdepend: [ PlaceholderAPI, BMenu, WorldGuard, WorldEdit, DecentHolograms, FancyHolograms ]
+softdepend: [ PlaceholderAPI, BMenu, WorldEdit, DecentHolograms, FancyHolograms ]
 
 author: Last
-description: Плагин на автошахты с большой кастомизацией и гибкой настройкой на 1.16.5 - 26.1.2 версиях
+description: Плагин на автошахты с большой кастомизацией и гибкой настройкой, поддерживает версии 1.21 - 26.2
 website: https://laststudio.space
-
-commands:
-  lastmines:
-    aliases: [lmines, lmine, lm]
-    permission: lastmines.admin
 
 permissions:
   lastmines.admin:

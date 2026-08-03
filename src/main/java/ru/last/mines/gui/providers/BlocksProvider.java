@@ -1,19 +1,25 @@
 package ru.last.mines.gui.providers;
 
+import dev.by1337.bmenu.slot.component.MenuClickType;
+import dev.by1337.item.ItemModel;
+import dev.by1337.bmenu.slot.impl.SimpleSlotContent;
+
 import dev.by1337.bmenu.loader.MenuConfig;
 import dev.by1337.bmenu.menu.DefaultMenu;
 import dev.by1337.bmenu.menu.Menu;
+import dev.by1337.yaml.YamlMap;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.Material;
-import dev.by1337.yaml.YamlMap;
-import ru.last.mines.api.LastMinesProvider;
-import ru.last.mines.models.Mine;
-import ru.last.mines.models.MineBlock;
-import ru.last.mines.utils.ColorUtils;
+import ru.last.mines.LastMines;
+import ru.last.mines.api.*;
+import ru.last.mines.gui.ClickCommandResolver;
+import ru.last.mines.models.*;
+import ru.last.mines.utils.*;
+
 import java.util.*;
 
 public class BlocksProvider extends DefaultMenu {
@@ -22,12 +28,14 @@ public class BlocksProvider extends DefaultMenu {
 
     public BlocksProvider(MenuConfig config, Player viewer, @Nullable Menu previousMenu) {
         super(config, viewer, previousMenu);
+        String mineId = LastMines.get().getGuiManager().getViewingMines().get(viewer.getUniqueId());
+        if (mineId != null) {
+            this.addArgument("MINE_ID", mineId);
+        }
     }
-    
+
     @Override
-    protected void syncItems() {
-        super.syncItems();
-        
+    protected void generate() {
         slotToBlock.clear();
         YamlMap map = config.yaml();
         if (!map.has("blocks_list")) return;
@@ -45,7 +53,7 @@ public class BlocksProvider extends DefaultMenu {
             }
         }
         
-        String mineId = ru.last.mines.LastMines.getInstance().getGuiManager().getViewingMines().get(viewer.getUniqueId());
+        String mineId = LastMines.get().getGuiManager().getViewingMines().get(viewer.getUniqueId());
         if (mineId == null) return;
         Mine mine = LastMinesProvider.getApi().getMine(mineId);
         if (mine == null) return;
@@ -59,19 +67,30 @@ public class BlocksProvider extends DefaultMenu {
             ItemStack item = new ItemStack(mb.material() == null ? Material.STONE : mb.material());
             ItemMeta meta = item.getItemMeta();
             if (meta != null) {
-                String dName = name.replace("{MATERIAL}", item.getType().name());
-                meta.setDisplayName(ColorUtils.colorString(dName));
-                
-                List<String> dLore = new ArrayList<>();
+                String materialTag = "<lang:" + item.getType().translationKey() + ">";
+
+                String dName = name.replace("{MATERIAL}", materialTag);
+                meta.displayName(ColorUtils.color(dName));
+
+                List<Component> dLore = new ArrayList<>();
                 for (String l : lore) {
-                    String line = l.replace("{MATERIAL}", item.getType().name())
+                    String line = l.replace("{MATERIAL}", materialTag)
                                    .replace("{CHANCE}", String.valueOf(mb.chance()));
-                    dLore.add(ColorUtils.colorString(line));
+                    dLore.add(ColorUtils.color(line));
                 }
-                meta.setLore(dLore);
+                meta.lore(dLore);
                 item.setItemMeta(meta);
             }
-            getInventory().setItem(slot, item);
+            layers.getBaseLayer()[slot] = new SimpleSlotContent(ItemModel.fromItemStack(item)) {
+                @Override
+                public void doClick(Menu menu, Player player, MenuClickType type) {
+                    YamlMap listMap = config.yaml().get("blocks_list").asYamlMap().orDefault(new YamlMap());
+                    ClickCommandResolver.resolveAndRun(menu, listMap, type, Map.of(
+                            "{MATERIAL}", item.getType().name(),
+                            "{MINE_ID}", mine.getId()
+                    ));
+                }
+            };
             slotToBlock.put(slot, mb);
         }
     }

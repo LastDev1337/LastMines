@@ -1,0 +1,33 @@
+id: lastmines:block_drop_items
+provider: lastmines:block_drop_items
+type: chest
+size: 54
+title: '&8Block drop &f{MATERIAL} &7{MINE_ID}'
+
+drop_items_list:
+  slots: "10-16, 19-25, 28-34, 37-43"
+  name: "&e{DROP_MATERIAL}"
+  lore:
+    - "&7Chance: &f{CHANCE}%"
+    - "&7Fortune affects it: &f{FORTUNE}"
+    - ""
+    - "&eLMB: &7Configure chance/fortune"
+    - "&cRMB: &7Remove item"
+
+items:
+  back:
+    material: arrow
+    name: '&cBack'
+    slot: 45
+    on_click:
+      - '[open_block_settings] {MINE_ID} {MATERIAL}'
+
+  edit_items:
+    material: chest
+    name: '&6Add/remove items'
+    lore:
+      - '&7Open the drop editor'
+      - '&7(arrange items like in a chest)'
+    slot: 49
+    on_click:
+      - '[block_drops] {MINE_ID} {MATERIAL}'

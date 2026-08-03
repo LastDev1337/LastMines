@@ -27,7 +27,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
         loadSubCommands();
     }
 
-    private void loadSubCommands() {
+    public void loadSubCommands() {
         subCommands.clear();
         try {
             boolean commandsEnabled = plugin.getConfigManager().getMainConfig().getModules().isCommandsEnabled();

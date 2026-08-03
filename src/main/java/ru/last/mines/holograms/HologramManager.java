@@ -31,17 +31,15 @@ public class HologramManager {
         }
     }
 
-    private HologramProvider getProvider(String name) {
-        return providers.get(name.toLowerCase());
-    }
+    private HologramProvider getProvider(String name) { return providers.get(name.toLowerCase()); }
 
     public void create(Mine mine) {
-        if (mine.isHoloEnable()) return;
+        if (!mine.isHoloEnable()) return;
         String providerName = mine.getHoloProvider();
         HologramProvider provider = getProvider(providerName);
 
         if (provider == null && (providerName.equalsIgnoreCase("vanilla") || providerName.equalsIgnoreCase("fancyholograms"))) {
-            plugin.getDebugLogger().warn("Шахта " + mine.getId() + " использует голограммы " + providerName + ", но они не поддерживаются на этой версии игры (требуется 1.19.4+)! Автоматически переключаемся на DecentHolograms.");
+            plugin.getDebugger().warn("Шахта " + mine.getId() + " использует голограммы " + providerName + ", но они не поддерживаются на этой версии игры (требуется 1.19.4+)! Автоматически переключаемся на DecentHolograms.");
             providerName = "decentholograms";
             provider = getProvider(providerName);
         }
@@ -49,12 +47,12 @@ public class HologramManager {
         if (provider != null) {
             provider.create(mine);
         } else {
-            plugin.getDebugLogger().error("Шахта " + mine.getId() + " не смогла создать голограмму: провайдер " + providerName + " не найден!");
+            plugin.getDebugger().error("Шахта " + mine.getId() + " не смогла создать голограмму: провайдер " + providerName + " не найден!");
         }
     }
 
     public void update(Mine mine) {
-        if (mine.isHoloEnable()) return;
+        if (!mine.isHoloEnable()) return;
         String providerName = mine.getHoloProvider();
         HologramProvider provider = getProvider(providerName);
         if (provider == null && (providerName.equalsIgnoreCase("vanilla") || providerName.equalsIgnoreCase("fancyholograms"))) {

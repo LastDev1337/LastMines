@@ -1,0 +1,43 @@
+id: lastmines:teleport_settings
+provider: lastmines:teleport_settings
+type: chest
+size: 27
+title: '&8Mine teleport &7{MINE_ID}'
+
+items:
+  back:
+    material: arrow
+    name: '&cBack'
+    slot: 26
+    on_click:
+      - '[open] lastmines:main'
+
+  toggle:
+    slot: 11
+    oneOf:
+      - on_view: '{TP_ENABLE} == false'
+        material: gray_dye
+        name: '&7Teleport disabled'
+        lore:
+          - '&7Click to enable'
+        on_click:
+          - '[tp_toggle] {MINE_ID}'
+      - on_view: '{TP_ENABLE} == true'
+        material: lime_dye
+        name: '&aTeleport enabled'
+        lore:
+          - '&7Current point: &f{TP_POS}'
+          - '&7Click to disable'
+        on_click:
+          - '[tp_toggle] {MINE_ID}'
+
+  set:
+    material: ender_pearl
+    name: '&aSet point here'
+    lore:
+      - '&7Stand where players should'
+      - '&7be teleported to, and click'
+      - '&7Current point: &f{TP_POS}'
+    slot: 15
+    on_click:
+      - '[tp_set] {MINE_ID}'

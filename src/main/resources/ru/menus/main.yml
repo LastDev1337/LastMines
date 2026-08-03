@@ -1,0 +1,206 @@
+id: lastmines:main
+provider: lastmines:main
+type: chest
+size: 54
+title: '&8Управление шахтой &7{MINE_ID}'
+
+items:
+  back:
+    material: arrow
+    slot: 53
+    name: '&cНазад'
+    on_click: '[open] lastmines:all_mines'
+
+  delete:
+    material: redstone_block
+    name: '&4Удалить шахту'
+    lore:
+      - '&7Нажмите, чтобы удалить'
+      - '&7эту шахту безвозвратно'
+    slot: 3
+    on_click:
+      - '[open] lastmines:delete_confirm'
+
+  info:
+    material: deepslate_diamond_ore
+    slot: 4
+    tick_speed: 20
+    on_tick: '[update]'
+    oneOf:
+      - on_view: '{MODE} == BLOCKS'
+        name: '&fИнформация о шахте'
+        lore:
+          - '&7ID: &f{MINE_ID}'
+          - '&7Блоков: &f%lastmines_blocks_{MINE_ID}%'
+          - '&7Заполнена на &f%lastmines_blocks_current_count_{MINE_ID}%/%lastmines_blocks_max_count_{MINE_ID}%'
+          - '&7Обновление через &f%lastmines_time_detail_{MINE_ID}%'
+      - on_view: '{MODE} == BLOCKS'
+        name: '&fИнформация о шахте'
+        lore:
+          - '&fID: &7{MINE_ID}'
+          - '&fБлоков: &7%lastmines_blocks_{MINE_ID}%'
+          - '&fРедкостей: &7%lastmines_rarities_{MINE_ID}%'
+
+  toggle_stop:
+    slot: 5
+    oneOf:
+      - on_view: '{STOPPED} == false'
+        material: redstone_torch
+        name: '&fШахта &aработает'
+        lore:
+          - '&7Автосброс включён'
+          - '&7Нажмите, чтобы остановить'
+        on_click:
+          - '[mine_toggle_stop] {MINE_ID}'
+      - on_view: '{STOPPED} == true'
+        material: lever
+        name: '&fШахта &cостановлена'
+        lore:
+          - '&7Автосброс на паузе'
+          - '&7(блоки всё ещё можно ломать)'
+          - '&7Нажмите, чтобы запустить'
+        on_click:
+          - '[mine_toggle_stop] {MINE_ID}'
+
+  blocks:
+    material: cobblestone
+    name: '&fБлоки шахты'
+    lore:
+      - '&fНажмите, чтобы настроить блоки'
+    slot: 19
+    on_click:
+      - '[open] lastmines:blocks'
+
+  rarities:
+    slot: 21
+    oneOf:
+      - on_view: '{MODE} == RARITY'
+        material: nether_star
+        name: '&eРедкости шахты'
+        lore:
+          - '&7Нажмите, чтобы настроить редкости'
+        on_click:
+          - '[open] lastmines:rarities'
+      - name: '&cРедкости шахты'
+        material: barrier
+        lore:
+          - '&4Данный раздел доступен'
+          - '&4только с <u>RARITY</u> модом!'
+        on_click:
+          - sound: entity.villager.no 0.8 1
+
+  mode_switch:
+    slot: 23
+    oneOf:
+      - on_view: '{MODE} == BLOCKS'
+        material: diamond_ore
+        name: '&bРежим: &fБЛОКИ'
+        lore:
+          - '&7Один список блоков с шансами'
+          - '&7Нажмите, чтобы переключить на РЕДКОСТИ'
+          - '&c(текущие блоки станут редкостью "default")'
+        on_click:
+          - '[mode_switch] {MINE_ID} RARITY'
+      - on_view: '{MODE} == RARITY'
+        material: nether_star
+        name: '&eРежим: &fРЕДКОСТИ'
+        lore:
+          - '&7Несколько наборов блоков (редкостей)'
+          - '&7Нажмите, чтобы переключить на БЛОКИ'
+          - '&c(останутся блоки только первой редкости!)'
+        on_click:
+          - '[mode_switch] {MINE_ID} BLOCKS'
+
+  holograms:
+    material: armor_stand
+    name: '&dГолограммы'
+    lore:
+      - '&7Нажмите, чтобы настроить голограммы'
+    slot: 25
+    on_click:
+      - '[open] lastmines:holograms'
+
+  actions:
+    material: command_block
+    name: '&cДействия'
+    lore:
+      - '&7Нажмите, чтобы настроить действия'
+    slot: 29
+    on_click:
+      - '[open] lastmines:actions'
+
+  permissions:
+    material: written_book
+    all_flags: true
+    name: '&6Права доступа'
+    lore:
+      - '&7Нажмите, чтобы настроить права'
+    slot: 31
+    on_click:
+      - '[open] lastmines:permissions'
+
+  reset_time:
+    material: clock
+    name: '&bТаймер сброса'
+    lore:
+      - '&7Нажмите, чтобы настроить'
+      - '&7время между сбросами'
+    slot: 33
+    on_click:
+      - '[open] lastmines:reset_time'
+
+  enchants:
+    material: enchanted_book
+    name: '&bЗачарования кирки'
+    lore:
+      - '&7Требования к зачарованиям'
+      - '&7инструмента для добычи блоков'
+    slot: 37
+    on_click:
+      - '[open] lastmines:enchants'
+
+  teleport:
+    material: ender_pearl
+    name: '&aТелепорт на шахту'
+    lore:
+      - '&7Нажмите, чтобы телепортироваться'
+    slot: 39
+    on_click:
+      - '[tp_mine] {MINE_ID} %player_name%'
+
+  online:
+    material: player_head
+    name: '&aКто на шахте'
+    lore:
+      - '&7Список игроков, которые сейчас'
+      - '&7находятся на этой автошахте'
+    on_click:
+      - '[open] lastmines:online'
+
+  teleport_settings:
+    material: compass
+    name: '&aНастройки телепорта'
+    lore:
+      - '&7Точка и вкл/выкл телепорта'
+    slot: 41
+    on_click:
+      - '[open] lastmines:teleport_settings'
+
+  online_requirements:
+    material: player_head
+    name: '&eОнлайн-условия'
+    lore:
+      - '&7Мин./макс. игроков на сервере'
+      - '&7для работы автосброса'
+    slot: 43
+    on_click:
+      - '[open] lastmines:online_requirements'
+
+  reset:
+    material: bedrock
+    name: '&cСбросить шахту'
+    lore:
+      - '&7Нажмите, чтобы принудительно сбросить'
+    slot: 49
+    on_click:
+      - '[reset_mine] {MINE_ID}'

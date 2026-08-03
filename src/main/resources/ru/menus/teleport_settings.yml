@@ -1,0 +1,43 @@
+id: lastmines:teleport_settings
+provider: lastmines:teleport_settings
+type: chest
+size: 27
+title: '&8Телепорт шахты &7{MINE_ID}'
+
+items:
+  back:
+    material: arrow
+    name: '&cНазад'
+    slot: 26
+    on_click:
+      - '[open] lastmines:main'
+
+  toggle:
+    slot: 11
+    oneOf:
+      - on_view: '{TP_ENABLE} == false'
+        material: gray_dye
+        name: '&7Телепорт выключен'
+        lore:
+          - '&7Нажмите, чтобы включить'
+        on_click:
+          - '[tp_toggle] {MINE_ID}'
+      - on_view: '{TP_ENABLE} == true'
+        material: lime_dye
+        name: '&aТелепорт включён'
+        lore:
+          - '&7Текущая точка: &f{TP_POS}'
+          - '&7Нажмите, чтобы выключить'
+        on_click:
+          - '[tp_toggle] {MINE_ID}'
+
+  set:
+    material: ender_pearl
+    name: '&aУстановить точку сюда'
+    lore:
+      - '&7Встаньте туда, куда должны'
+      - '&7телепортироваться игроки, и нажмите'
+      - '&7Текущая точка: &f{TP_POS}'
+    slot: 15
+    on_click:
+      - '[tp_set] {MINE_ID}'

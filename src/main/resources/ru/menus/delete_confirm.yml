@@ -1,0 +1,24 @@
+id: lastmines:delete_confirm
+provider: lastmines:delete_confirm
+type: chest
+size: 9
+title: '&4Удалить шахту {MINE_ID}?'
+
+items:
+  confirm:
+    material: lime_stained_glass_pane
+    name: '&a&lПОДТВЕРДИТЬ'
+    lore:
+      - '&7Шахта &f{MINE_ID} &7будет удалена навсегда'
+    slot: 2
+    on_click:
+      - '[delete_mine] {MINE_ID}'
+      - '[open] lastmines:all_mines'
+
+  cancel:
+    material: red_stained_glass_pane
+    name: '&c&lОТМЕНА'
+    lore:
+      - '&7Вернуться назад'
+    slot: 6
+    on_click: '[open] lastmines:main'

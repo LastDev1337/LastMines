@@ -23,23 +23,50 @@ public class MineManager {
         if (!folder.exists() || folder.listFiles() == null || Objects.requireNonNull(folder.listFiles()).length == 0) {
             if (!folder.exists()) folder.mkdirs();
             try {
-                plugin.saveResource("mines/blocks.yml", true);
-                plugin.saveResource("mines/rarity.yml", true);
-            } catch (Exception e) { plugin.getDebugLogger().error("Не удалось создать стандартные шахты", e); }
+                plugin.getConfigManager().extractLangResource("mines/blocks.yml");
+                plugin.getConfigManager().extractLangResource("mines/rarity.yml");
+            } catch (Exception e) { plugin.getDebugger().error("Не удалось создать стандартные шахты", e); }
         }
 
         File[] files = folder.listFiles((d, name) -> name.endsWith(".yml"));
         if (files == null) return;
 
         for (File file : files) {
-            try {
-                YamlMap map = YamlMap.load(file);
-                Mine mine = new Mine(plugin, file.getName().replace(".yml", ""), map);
-                mines.put(mine.getId(), mine);
-                Bukkit.getPluginManager().callEvent(new MineLoadEvent(mine));
-                plugin.getDebugLogger().info("Загружена шахта: " + mine.getId());
-            } catch (Exception e) { plugin.getDebugLogger().error("Не удалось загрузить шахту " + file.getName(), e); }
+            loadFile(file, 0);
         }
+    }
+
+    private void loadFile(File file, int attempt) {
+        try {
+            YamlMap map = YamlMap.load(file);
+            String worldName = map.get("world").asString("world");
+
+            if (Bukkit.getWorld(worldName) == null) {
+                if (attempt >= 10) {
+                    plugin.getDebugger().error("Мир '" + worldName + "' для шахты " + file.getName() + " так и не загрузился за 10 секунд, шахта пропущена.");
+                    return;
+                }
+                plugin.getDebugger().warn("Мир '" + worldName + "' для шахты " + file.getName() + " ещё не загружен, повтор через 1 сек. (" + (attempt + 1) + "/10)...");
+                Bukkit.getScheduler().runTaskLater(plugin, () -> loadFile(file, attempt + 1), 20L);
+                return;
+            }
+
+            Mine mine = new Mine(plugin, file.getName().replace(".yml", ""), map);
+            mines.put(mine.getId(), mine);
+            Bukkit.getPluginManager().callEvent(new MineLoadEvent(mine));
+            plugin.getDebugger().info("Загружена шахта: " + mine.getId());
+        } catch (Exception e) { plugin.getDebugger().error("Не удалось загрузить шахту " + file.getName(), e); }
+    }
+
+    public void reloadOne(String id) {
+        Mine old = mines.remove(id);
+        if (old != null) {
+            Bukkit.getPluginManager().callEvent(new MineUnloadEvent(old));
+            old.stopTasks();
+            old.deleteHologram();
+        }
+        File file = new File(plugin.getDataFolder(), "mines" + File.separator + id + ".yml");
+        if (file.exists()) loadFile(file, 0);
     }
 
     public void unloadAll() {

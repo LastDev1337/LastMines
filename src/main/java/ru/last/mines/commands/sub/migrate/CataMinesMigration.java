@@ -14,15 +14,17 @@ import java.util.LinkedHashMap;
 public class CataMinesMigration {
 
     public static void migrate(LastMines plugin, CommandSender sender) {
+        String prefix = plugin.getConfigManager().getMessages().getPrefix();
+
         File cataFolder = new File(plugin.getDataFolder().getParentFile(), "CataMines/mines");
         if (!cataFolder.exists() || !cataFolder.isDirectory()) {
-            sender.sendMessage(plugin.getConfigManager().getMessages().getPrefix() + "§cПапка plugins/CataMines/mines не найдена!");
+            sender.sendMessage(prefix + "§cПапка plugins/CataMines/mines не найдена!");
             return;
         }
 
         File[] files = cataFolder.listFiles((dir, name) -> name.endsWith(".yml"));
         if (files == null || files.length == 0) {
-            sender.sendMessage(plugin.getConfigManager().getMessages().getPrefix() + "§cНет файлов для миграции в plugins/CataMines/mines/");
+            sender.sendMessage(prefix + "§cНет файлов для миграции в plugins/CataMines/mines/");
             return;
         }
 
@@ -128,11 +130,11 @@ public class CataMinesMigration {
         }
         
         if (migrated > 0) {
-            sender.sendMessage(plugin.getConfigManager().getMessages().getPrefix() + "§aУспешно мигрировано " + migrated + " шахт из CataMines!");
+            sender.sendMessage(prefix + "§aУспешно мигрировано " + migrated + " шахт из CataMines!");
             plugin.getMineManager().loadAll();
-            sender.sendMessage(plugin.getConfigManager().getMessages().getPrefix() + "§aШахты загружены!");
+            sender.sendMessage(prefix + "§aШахты загружены!");
         } else {
-            sender.sendMessage(plugin.getConfigManager().getMessages().getPrefix() + "§cНе удалось мигрировать ни одной шахты.");
+            sender.sendMessage(prefix + "§cНе удалось мигрировать ни одной шахты.");
         }
     }
 }

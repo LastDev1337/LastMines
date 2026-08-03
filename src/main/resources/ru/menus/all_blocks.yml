@@ -1,0 +1,38 @@
+id: lastmines:all_blocks
+provider: lastmines:all_blocks
+type: chest
+size: 54
+title: '&8Все блоки &7(стр. {PAGE}/{MAX_PAGE})'
+
+# В каких слотах располагается сетка блоков (сколько слотов - столько блоков на странице)
+slots: "0-44"
+
+items:
+  back:
+    material: arrow
+    name: '&cНазад'
+    slot: 53
+    on_click: '[open] lastmines:blocks'
+
+  prev_page:
+    material: arrow
+    name: '&eПредыдущая страница'
+    slot: 48
+    on_click:
+      - '[all_blocks_page] {MINE_ID} -1'
+
+  info:
+    material: book
+    name: '&bВсе блоки игры'
+    lore:
+      - '&7Нажмите на блок, чтобы добавить'
+      - '&7его в список текущей шахты'
+      - '&7(шанс 10% по умолчанию)'
+    slot: 49
+
+  next_page:
+    material: arrow
+    name: '&eСледующая страница'
+    slot: 50
+    on_click:
+      - '[all_blocks_page] {MINE_ID} 1'

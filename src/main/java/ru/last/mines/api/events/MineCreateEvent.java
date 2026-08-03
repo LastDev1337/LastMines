@@ -1,10 +1,9 @@
 package ru.last.mines.api.events;
 
 import org.jetbrains.annotations.NotNull;
-import ru.last.mines.models.Mine;
-
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import ru.last.mines.models.Mine;
 
 public class MineCreateEvent extends Event {
     private static final HandlerList HANDLERS = new HandlerList();
@@ -14,7 +13,6 @@ public class MineCreateEvent extends Event {
     public MineCreateEvent(Mine mine) { this.mine = mine; }
 
     public Mine getMine() { return mine; }
-
-    @Override
-    public @NotNull HandlerList getHandlers() { return HANDLERS; }
+    @Override public @NotNull HandlerList getHandlers() { return HANDLERS; }
+    public static HandlerList getHandlerList() { return HANDLERS; }
 }

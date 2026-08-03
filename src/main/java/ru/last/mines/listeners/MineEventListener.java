@@ -15,6 +15,6 @@ public class MineEventListener implements Listener {
         String mineId = e.getMine().getId();
         String oldRarityId = e.getOldRarity() != null ? e.getOldRarity().id() : "none";
         String newRarityId = e.getNewRarity() != null ? e.getNewRarity().id() : "none";
-        plugin.getDebugLogger().info("Mine " + mineId + " updated rarity from " + oldRarityId + " to " + newRarityId);
+        plugin.getDebugger().info("Mine " + mineId + " updated rarity from " + oldRarityId + " to " + newRarityId);
     }
 }

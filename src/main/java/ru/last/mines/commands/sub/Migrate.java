@@ -7,6 +7,7 @@ import ru.last.mines.commands.sub.migrate.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @SubCommand(name = "migrate", aliases = {"mgrt"})
 public class Migrate extends AbstractSubCommand {
@@ -35,7 +36,7 @@ public class Migrate extends AbstractSubCommand {
     @Override
     public List<String> tabComplete(CommandSender sender, String[] args) {
         if (args.length == 2) {
-            return List.of("CataMines", "AutoMine", "RealMines").stream()
+            return Stream.of("CataMines", "AutoMine", "RealMines")
                     .filter(s -> s.toLowerCase().startsWith(args[1].toLowerCase()))
                     .collect(Collectors.toList());
         }

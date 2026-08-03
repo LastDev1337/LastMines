@@ -5,7 +5,6 @@ import ru.last.mines.models.Mine;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
-import ru.last.mines.models.Mine;
 import ru.last.mines.models.MineRarity;
 
 public class MineUpdateRarityEvent extends Event {
@@ -21,13 +20,8 @@ public class MineUpdateRarityEvent extends Event {
     }
 
     public Mine getMine() { return mine; }
-
     public MineRarity getOldRarity() { return oldRarity; }
-
     public MineRarity getNewRarity() { return newRarity; }
-
-    @Override
-    public @NotNull HandlerList getHandlers() { return handlers; }
-
+    @Override public @NotNull HandlerList getHandlers() { return handlers; }
     public static HandlerList getHandlerList() { return handlers; }
 }

@@ -1,0 +1,73 @@
+commands:
+  help:
+    enable: true
+    tab-completer: true
+    aliases:
+      - "?"
+
+  create:
+    enable: true
+    tab-completer: true
+    aliases:
+      - "add"
+
+  delete:
+    enable: true
+    tab-completer: true
+    aliases:
+      - "remove"
+      - "del"
+
+  list:
+    enable: true
+    tab-completer: true
+    aliases:
+      - "ls"
+
+  gui:
+    enable: true
+    tab-completer: true
+    aliases:
+      - "menu"
+
+  update:
+    enable: true
+    tab-completer: true
+    aliases:
+      - "upd"
+
+  reset:
+    enable: true
+    tab-completer: true
+    aliases:
+      - "rs"
+
+  resettimer:
+    enable: true
+    tab-completer: true
+    aliases:
+      - "timer"
+
+  tp:
+    enable: true
+    tab-completer: true
+    aliases:
+      - "teleport"
+
+  migrate:
+    enable: true
+    tab-completer: true
+    aliases:
+      - "migration"
+
+  reload:
+    enable: true
+    tab-completer: true
+    aliases:
+      - "rl"
+
+  language:
+    enable: true
+    tab-completer: true
+    aliases:
+      - "lang"

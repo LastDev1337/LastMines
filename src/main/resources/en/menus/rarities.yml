@@ -1,0 +1,47 @@
+id: lastmines:rarities
+provider: lastmines:rarities
+type: chest
+size: 54
+title: '&8Mine rarities &7{MINE_ID}'
+
+rarities_list:
+  slots: 10-16,19-25,28-34,37-43
+  material: nether_star
+  name: "&eRarity &f{RARITY_NAME}"
+  lore:
+    - "&7Rarity ID: &f{RARITY_ID}"
+    - "&7Spawn chance: &f{CHANCE}%"
+    - ""
+    - "&eLMB: &7+1% chance"
+    - "&eRMB: &7-1% chance"
+    - "&cMMB: &7Remove rarity"
+  on_left_click: "[rarity_edit] {MINE_ID} {RARITY_ID} chance +1"
+  on_right_click: "[rarity_edit] {MINE_ID} {RARITY_ID} chance -1"
+  on_middle_click: "[rarity_edit] {MINE_ID} {RARITY_ID} remove"
+
+items:
+  back:
+    material: arrow
+    name: '&cBack'
+    slot: 53
+    on_click: '[open] lastmines:main'
+
+  info:
+    material: map
+    name: '&eMine rarities'
+    lore:
+      - '&7Here you can configure the rarities'
+      - '&7for mine &f{MINE_ID}'
+      - ''
+      - '&7Rarity chance is also a &fweight&7, not a %.'
+      - '&7Blocks within each rarity'
+      - '&7are configured separately, same as in BLOCKS mode'
+    slot: 4
+
+  add_rarity:
+    material: book
+    name: '&aAdd rarity'
+    lore:
+      - '&7Type the new rarity ID in chat'
+    slot: 49
+    on_click: '[rarity_add_input] {MINE_ID}'

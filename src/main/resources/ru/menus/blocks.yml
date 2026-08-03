@@ -1,0 +1,66 @@
+id: lastmines:blocks
+provider: lastmines:blocks
+type: chest
+size: 54
+title: '&8Блоки шахты &7{MINE_ID}'
+
+blocks_list:
+  slots: 10-16,19-25,28-34,37-43
+  name: "&fБлок &b{MATERIAL}"
+  lore:
+    - "&7Шанс спавна: &f{CHANCE}%"
+    - ""
+    - "&eНажмите, чтобы настроить"
+  on_click:
+    - "[open_block_settings] {MINE_ID} {MATERIAL}"
+
+items:
+  back:
+    material: arrow
+    name: '&cНазад'
+    slot: 53
+    on_click: '[open] lastmines:main'
+
+  info:
+    material: diamond_pickaxe
+    name: '&bБлоки'
+    item_flags:
+      - HIDE_ATTRIBUTES
+    lore:
+      - '&7Список блоков в автошахте'
+      - '&7&f{MINE_ID}'
+      - ''
+      - '&7Шанс — это &fвес&7, а не обязательно %.'
+      - '&7Камень 80 + уголь 20 = как и'
+      - '&7камень 8 + уголь 2 (то же 80/20)'
+    slot: 4
+
+  add_block:
+    material: nether_star
+    name: '&aДобавить блок'
+    lore:
+      - '&7Поместите предмет в руку'
+      - '&7и нажмите сюда, чтобы добавить'
+      - '&7его в шахту (шанс: 10%)'
+    slot: 48
+    on_click: '[block_add] {MINE_ID}'
+
+  browse_all_blocks:
+    material: chest
+    name: '&aВсе блоки игры'
+    lore:
+      - '&7Открыть список всех блоков'
+      - '&7этой версии сервера и выбрать'
+    slot: 49
+    on_click:
+      - '[open] lastmines:all_blocks'
+
+  add_block_by_name:
+    material: book
+    name: '&aДобавить блок по названию'
+    lore:
+      - '&7Ввести название материала в чат'
+      - '&7(предмет в руке не нужен)'
+    slot: 50
+    on_click:
+      - '[block_add_input] {MINE_ID}'

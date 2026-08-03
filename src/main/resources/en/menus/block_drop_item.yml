@@ -1,0 +1,97 @@
+id: lastmines:block_drop_item
+provider: lastmines:block_drop_item
+type: chest
+size: 36
+title: '&8Drop settings &f{DROP_MATERIAL}'
+
+items:
+  back:
+    material: arrow
+    name: '&cBack'
+    slot: 27
+    on_click:
+      - '[open_drop_items] {MINE_ID} {MATERIAL}'
+
+  info:
+    material: '{DROP_MATERIAL}'
+    name: '&b{DROP_MATERIAL}'
+    lore:
+      - '&7Drop chance: &f{CHANCE}%'
+      - '&7Fortune affects it: &f{FORTUNE}'
+      - ''
+      - '&cMMB: &7Remove item from the drop'
+    slot: 13
+    on_middle_click:
+      - '[drop_item_edit] {MINE_ID} {MATERIAL} {DROP_MATERIAL} remove'
+      - '[open_drop_items] {MINE_ID} {MATERIAL}'
+
+  fortune_toggle:
+    material: nether_star
+    name: '&eToggle "fortune affects it"'
+    lore:
+      - '&7Currently: &f{FORTUNE}'
+      - '&7If enabled, the Fortune enchantment'
+      - '&7on the pickaxe increases the amount'
+    slot: 15
+    on_click:
+      - '[drop_item_edit] {MINE_ID} {MATERIAL} {DROP_MATERIAL} fortune'
+
+  chance_1:
+    material: lime_dye
+    name: '&a1%'
+    lore:
+      - '&eLMB: &a+1%'
+      - '&eRMB: &c-1%'
+    slot: 19
+    on_left_click:
+      - '[drop_item_edit] {MINE_ID} {MATERIAL} {DROP_MATERIAL} chance +1'
+    on_right_click:
+      - '[drop_item_edit] {MINE_ID} {MATERIAL} {DROP_MATERIAL} chance -1'
+
+  chance_5:
+    material: lime_dye
+    name: '&a5%'
+    lore:
+      - '&eLMB: &a+5%'
+      - '&eRMB: &c-5%'
+    slot: 20
+    on_left_click:
+      - '[drop_item_edit] {MINE_ID} {MATERIAL} {DROP_MATERIAL} chance +5'
+    on_right_click:
+      - '[drop_item_edit] {MINE_ID} {MATERIAL} {DROP_MATERIAL} chance -5'
+
+  chance_10:
+    material: lime_dye
+    name: '&a10%'
+    lore:
+      - '&eLMB: &a+10%'
+      - '&eRMB: &c-10%'
+    slot: 21
+    on_left_click:
+      - '[drop_item_edit] {MINE_ID} {MATERIAL} {DROP_MATERIAL} chance +10'
+    on_right_click:
+      - '[drop_item_edit] {MINE_ID} {MATERIAL} {DROP_MATERIAL} chance -10'
+
+  chance_25:
+    material: lime_dye
+    name: '&a25%'
+    lore:
+      - '&eLMB: &a+25%'
+      - '&eRMB: &c-25%'
+    slot: 23
+    on_left_click:
+      - '[drop_item_edit] {MINE_ID} {MATERIAL} {DROP_MATERIAL} chance +25'
+    on_right_click:
+      - '[drop_item_edit] {MINE_ID} {MATERIAL} {DROP_MATERIAL} chance -25'
+
+  chance_100:
+    material: lime_dye
+    name: '&a100%'
+    lore:
+      - '&eLMB: &a+100%'
+      - '&eRMB: &c-100%'
+    slot: 24
+    on_left_click:
+      - '[drop_item_edit] {MINE_ID} {MATERIAL} {DROP_MATERIAL} chance +100'
+    on_right_click:
+      - '[drop_item_edit] {MINE_ID} {MATERIAL} {DROP_MATERIAL} chance -100'

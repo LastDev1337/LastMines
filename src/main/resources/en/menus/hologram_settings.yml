@@ -1,0 +1,50 @@
+id: lastmines:hologram_settings
+provider: lastmines:hologram_settings
+type: chest
+size: 27
+title: '&8Hologram settings &7{MINE_ID}'
+
+items:
+  back:
+    material: arrow
+    name: '&cBack'
+    slot: 26
+    on_click: '[open] lastmines:holograms'
+
+  toggle:
+    slot: 11
+    oneOf:
+      - on_view: '{HOLO_ENABLE} == false'
+        material: gray_dye
+        name: '&cHologram disabled'
+        lore:
+          - '&7Click to enable'
+        on_click:
+          - '[holo_toggle] {MINE_ID}'
+      - on_view: '{HOLO_ENABLE} == true'
+        material: lime_dye
+        name: '&aHologram enabled'
+        lore:
+          - '&7Click to disable'
+        on_click:
+          - '[holo_toggle] {MINE_ID}'
+
+  provider:
+    material: armor_stand
+    name: '&bProvider: &f{HOLO_PROVIDER}'
+    lore:
+      - '&7Vanilla / DecentHolograms / FancyHolograms'
+      - '&7Click to cycle'
+    slot: 13
+    on_click: '[holo_cycle_provider] {MINE_ID}'
+
+  set_offset:
+    material: ender_pearl
+    name: '&aSet position here'
+    lore:
+      - '&7Stand where the hologram'
+      - '&7should hang, and click'
+      - '&7Current position: &f{HOLO_POS}'
+    slot: 15
+    on_click:
+      - '[holo_set_offset] {MINE_ID}'

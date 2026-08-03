@@ -10,7 +10,8 @@ import org.bukkit.entity.TextDisplay;
 import org.joml.Vector3f;
 import ru.last.mines.holograms.*;
 import ru.last.mines.models.*;
-import ru.last.mines.utils.*;
+import ru.last.mines.utils.time.TimeFormatter;
+import ru.last.mines.utils.time.TimeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,10 @@ public class FancyHoloProvider implements HologramProvider {
         HologramManager manager = FancyHologramsPlugin.get().getHologramManager();
         String holoName = "lastmines_" + mine.getId();
 
-        if (manager.getHologram(holoName).isPresent()) return;
+        manager.getHologram(holoName).ifPresent(hologram -> {
+            hologram.deleteHologram();
+            manager.removeHologram(hologram);
+        });
 
         Location loc = mine.getHoloOffset();
         if (loc == null || loc.getWorld() == null) return;
@@ -36,7 +40,9 @@ public class FancyHoloProvider implements HologramProvider {
                 data.setVisibilityDistance(holoMap.get("visibility_distance").asInt(-1));
             }
             if (holoMap.has("persistent")) {
-                data.setPersistent(holoMap.get("persistent").asBool(true));
+                data.setPersistent(holoMap.get("persistent").asBool(false));
+            } else {
+                data.setPersistent(false);
             }
             if (holoMap.has("scale_x") || holoMap.has("scale_y") || holoMap.has("scale_z")) {
                 Vector3f scale = new Vector3f(
@@ -101,7 +107,7 @@ public class FancyHoloProvider implements HologramProvider {
 
     @Override
     public void removeAll() {
-        // FancyHolograms automatic removed all holograms
+        // FancyHolograms автоматически удаляет все голограммы
     }
 
     private List<String> applyPlaceholders(Mine mine, List<String> lines) {

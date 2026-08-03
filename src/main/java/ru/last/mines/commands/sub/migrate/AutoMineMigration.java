@@ -13,9 +13,11 @@ import java.util.LinkedHashMap;
 public class AutoMineMigration {
 
     public static void migrate(LastMines plugin, CommandSender sender) {
+        String prefix = plugin.getConfigManager().getMessages().getPrefix();
+
         File autoMinesFile = new File(plugin.getDataFolder().getParentFile(), "AutoMine/AutoMines.yml");
         if (!autoMinesFile.exists()) {
-            sender.sendMessage(plugin.getConfigManager().getMessages().getPrefix() + "§cФайл plugins/AutoMine/AutoMines.yml не найден!");
+            sender.sendMessage(prefix + "§cФайл plugins/AutoMine/AutoMines.yml не найден!");
             return;
         }
 
@@ -23,7 +25,7 @@ public class AutoMineMigration {
         try {
             config = YamlMap.load(autoMinesFile);
         } catch (Exception e) {
-            sender.sendMessage(plugin.getConfigManager().getMessages().getPrefix() + "§cОшибка чтения AutoMines.yml!");
+            sender.sendMessage(prefix + "§cОшибка чтения AutoMines.yml!");
             return;
         }
 
@@ -31,7 +33,7 @@ public class AutoMineMigration {
         try { autoMinesSec = config.get("AutoMines").asYamlMap().orDefault(null); } catch (Exception ignored) {}
         
         if (autoMinesSec == null) {
-            sender.sendMessage(plugin.getConfigManager().getMessages().getPrefix() + "§cВ AutoMines.yml нет секции AutoMines!");
+            sender.sendMessage(prefix + "§cВ AutoMines.yml нет секции AutoMines!");
             return;
         }
 
@@ -101,24 +103,25 @@ public class AutoMineMigration {
                         newConfig.set("blocks", newBlocks);
                     } else {
                         newConfig.set("mode", "RARITY");
-                        Map<String, Object> raritiesSec = new LinkedHashMap<>();
+                        List<Map<String, Object>> raritiesList = new ArrayList<>();
                         for (String typeKey : types.getRaw().keySet()) {
                             YamlMap tSec = types.get(typeKey).asYamlMap().orDefault(null);
                             if (tSec == null) continue;
-                            
+
                             double chance = tSec.get("chance").asDouble(10.0);
                             String name = tSec.get("name").asString(typeKey);
-                            
+
                             Map<String, Object> rSec = new LinkedHashMap<>();
+                            rSec.put("id", typeKey);
                             rSec.put("chance", chance);
                             rSec.put("name", name);
-                            
+
                             List<String> blockList = new ArrayList<>();
                             Object rawList = tSec.get("blockList").getRaw();
                             if (rawList instanceof List<?> list) {
                                 for (Object o : list) blockList.add(String.valueOf(o));
                             }
-                            
+
                             List<Map<String, Object>> newBlocks = new ArrayList<>();
                             for (String b : blockList) {
                                 String[] split = b.split(":");
@@ -135,9 +138,9 @@ public class AutoMineMigration {
                                 }
                             }
                             rSec.put("blocks", newBlocks);
-                            raritiesSec.put(typeKey, rSec);
+                            raritiesList.add(rSec);
                         }
-                        newConfig.set("rarities", raritiesSec);
+                        newConfig.set("rarity", raritiesList);
                     }
                 }
 
@@ -150,11 +153,11 @@ public class AutoMineMigration {
         }
 
         if (migrated > 0) {
-            sender.sendMessage(plugin.getConfigManager().getMessages().getPrefix() + "§aУспешно мигрировано " + migrated + " шахт из AutoMine!");
+            sender.sendMessage(prefix + "§aУспешно мигрировано " + migrated + " шахт из AutoMine!");
             plugin.getMineManager().loadAll();
-            sender.sendMessage(plugin.getConfigManager().getMessages().getPrefix() + "§aШахты загружены!");
+            sender.sendMessage(prefix + "§aШахты загружены!");
         } else {
-            sender.sendMessage(plugin.getConfigManager().getMessages().getPrefix() + "§cНе удалось мигрировать ни одной шахты.");
+            sender.sendMessage(prefix + "§cНе удалось мигрировать ни одной шахты.");
         }
     }
 }

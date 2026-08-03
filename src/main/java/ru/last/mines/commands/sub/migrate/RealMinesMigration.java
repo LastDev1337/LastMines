@@ -13,15 +13,17 @@ import java.util.LinkedHashMap;
 public class RealMinesMigration {
 
     public static void migrate(LastMines plugin, CommandSender sender) {
+        String prefix = plugin.getConfigManager().getMessages().getPrefix();
+
         File rmFolder = new File(plugin.getDataFolder().getParentFile(), "RealMines/mines");
         if (!rmFolder.exists() || !rmFolder.isDirectory()) {
-            sender.sendMessage(plugin.getConfigManager().getMessages().getPrefix() + "§cПапка plugins/RealMines/mines не найдена!");
+            sender.sendMessage(prefix + "§cПапка plugins/RealMines/mines не найдена!");
             return;
         }
 
         File[] files = rmFolder.listFiles((dir, name) -> name.endsWith(".yml"));
         if (files == null || files.length == 0) {
-            sender.sendMessage(plugin.getConfigManager().getMessages().getPrefix() + "§cНет файлов для миграции в plugins/RealMines/mines/");
+            sender.sendMessage(prefix + "§cНет файлов для миграции в plugins/RealMines/mines/");
             return;
         }
 
@@ -112,11 +114,11 @@ public class RealMinesMigration {
         }
 
         if (migrated > 0) {
-            sender.sendMessage(plugin.getConfigManager().getMessages().getPrefix() + "§aУспешно мигрировано " + migrated + " шахт из RealMines!");
+            sender.sendMessage(prefix + "§aУспешно мигрировано " + migrated + " шахт из RealMines!");
             plugin.getMineManager().loadAll();
-            sender.sendMessage(plugin.getConfigManager().getMessages().getPrefix() + "§aШахты загружены!");
+            sender.sendMessage(prefix + "§aШахты загружены!");
         } else {
-            sender.sendMessage(plugin.getConfigManager().getMessages().getPrefix() + "§cНе удалось мигрировать ни одной шахты.");
+            sender.sendMessage(prefix + "§cНе удалось мигрировать ни одной шахты.");
         }
     }
 }

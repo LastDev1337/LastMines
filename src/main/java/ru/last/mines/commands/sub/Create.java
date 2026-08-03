@@ -1,5 +1,7 @@
 package ru.last.mines.commands.sub;
 
+import dev.by1337.yaml.YamlMap;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -10,8 +12,11 @@ import ru.last.mines.config.models.*;
 import ru.last.mines.hooks.*;
 import ru.last.mines.models.*;
 import ru.last.mines.LastMines;
+import ru.last.mines.utils.ColorUtils;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 @SubCommand(name = "create", aliases = {"c", "crt"})
 public class Create extends AbstractSubCommand {
@@ -21,11 +26,11 @@ public class Create extends AbstractSubCommand {
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage("§cКоманда только для игроков!");
+            plugin.getConfigManager().getMessages().getOnlyPlayers().send(sender);
             return;
         }
         if (args.length < 2) {
-            sender.sendMessage("§cИспользование: /lastmines create <id>");
+            sender.sendMessage(ColorUtils.colorString("<red>Использование: /lastmines create <id>"));
             return;
         }
 
@@ -44,14 +49,14 @@ public class Create extends AbstractSubCommand {
         try {
             File file = new File(plugin.getDataFolder() + "/mines", id + ".yml");
             if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
-            dev.by1337.yaml.YamlMap config = DefaultMine.generate(id, sel[0], sel[1]);
+            YamlMap config = DefaultMine.generate(id, sel[0], sel[1]);
             try {
-                java.nio.file.Files.writeString(file.toPath(), config.saveToString(), java.nio.charset.StandardCharsets.UTF_8);
+                Files.writeString(file.toPath(), config.saveToString(), StandardCharsets.UTF_8);
                 Mine mine = new Mine(plugin, id, config);
                 plugin.getMineManager().getMines().put(id, mine);
                 mine.createHologram();
             } catch (Exception e) {
-                plugin.getDebugLogger().error("Не удалось создать автошахту " + id, e);
+                plugin.getDebugger().error("Не удалось создать автошахту " + id, e);
                 player.sendMessage("§cПроизошла ошибка при создании автошахты. Проверьте консоль.");
                 return;
             }
@@ -64,7 +69,7 @@ public class Create extends AbstractSubCommand {
             if (Bukkit.getPluginManager().getPlugin("BMenu") != null) {
                 plugin.getGuiManager().openMenu(player, id);
             } else {
-                sender.sendMessage("§cBMenu не установлен, GUI недоступно!");
+                plugin.getConfigManager().getMessages().getGuiNotInstalled().send(sender);
             }
         } catch (Exception ex) {
             ex.printStackTrace();

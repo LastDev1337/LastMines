@@ -1,0 +1,119 @@
+name: default
+world: world
+
+# Wiki: https://wiki.laststudio.space/lastmines/modes.html
+# BLOCKS - accepts only blocks (effectively a single rarity)
+# RARITY - accepts several rarities, each with its own blocks
+mode: BLOCKS
+
+# Wiki: https://wiki.laststudio.space/lastmines/geometry.html
+# If you have WorldEdit or FAWE installed, you can select the last 2 points
+# and the plugin will automatically create a mine with those points
+positions:
+  one: '0;100;0'
+  two: '5;105;5'
+
+# Wiki: https://wiki.laststudio.space/lastmines/blocks.html
+blocks:
+  # Available ID types (case-insensitive):
+  # minecraft:<ID>, <ID>
+  #
+  # Soon: eb:<ID>, executableblocks:<ID> (ExecutableBlocks)
+  - id: minecraft:stone
+    chance: 100.0
+    drop:
+      # Available ID types (case-insensitive):
+      # minecraft:<ID>, <ID>
+      #
+      # Soon: li:<ID>, lastitems:<ID> (LastItems), ei:<ID>, executableitems:<ID> (ExecutableItems), eb:<ID>, executableblocks:<ID> (ExecutableBlocks)
+      - 'stone'
+
+# Wiki: https://wiki.laststudio.space/lastmines/actions.html
+actions:
+  # chat messages
+  # [message] [event] <text>
+  # messages when a few seconds remain until reset
+  - '[message] [update:15] &fThe mine will reset in 15 seconds'
+  - '[message] [update:10] &fThe mine will reset in 10 seconds'
+  - '[message] [update:5] &fThe mine will reset in 5 seconds'
+  - '[message] [update:3] &fThe mine will reset in 3 seconds'
+  - '[message] [update:2] &fThe mine will reset in 2 seconds'
+  - '[message] [update:1] &fThe mine will reset in 1 second'
+  # message when the mine has already been reset
+  - '[message] [update] &fThe mine has been reset!'
+  - '[message] [update] &f \n&fCurrent rarity: %rarity:this%\n&fNext rarity: %rarity:next%'
+  # sounds
+  # [sound] [event plugin] <name> <?volume (default 1.0)> <?pitch (default 1.0)>
+  - '[sound] [update:15] ui.button.click 0.8 1'
+  - '[sound] [update:10] ui.button.click 0.8 1.0'
+  - '[sound] [update:5] ui.button.click 0.8 1.0'
+  - '[sound] [update:3] ui.button.click 0.8 1.0'
+  - '[sound] [update:2] ui.button.click 0.8 1.0'
+  - '[sound] [update:1] ui.button.click 0.8 1.0'
+  - '[sound] [update] entity.villager.yes 0.8 0.5'
+  # actionbar
+  # [actionbar] [event plugin] <time> <update text? (false/true> <text>
+  - '[actionbar] [update:15] 1 false &fThe mine will reset in 15 seconds'
+  - '[actionbar] [update:10] 1 false &fThe mine will reset in 10 seconds'
+  - '[actionbar] [update:5] 1 false &fThe mine will reset in 5 seconds'
+  - '[actionbar] [update:3] 1 false &fThe mine will reset in 3 seconds'
+  - '[actionbar] [update:2] 1 false &fThe mine will reset in 2 seconds'
+  - '[actionbar] [update:1] 1 false &fThe mine will reset in 1 second'
+  - '[actionbar] [update] 1 false &fThe mine has been reset! Teleport with &6/warp mine'
+  # title
+  # [title] [event plugin] "<title>\n<subtitle>" <in;stay;keep (default 20;40;20)>
+  - '[title] [update:15] "&fThe mine will reset in 15 seconds" 20;45;15'
+  - '[title] [update:10] "&fThe mine will reset in 10 seconds" 20;45;15'
+  - '[title] [update:5] "&fThe mine will reset in 5 seconds" 20;45;15'
+  - '[title] [update:3] "&fThe mine will reset in 3 seconds" 20;45;15'
+  - '[title] [update:2] "&fThe mine will reset in 2 seconds" 20;45;15'
+  - '[title] [update:1] "&fThe mine will reset in 1 second" 20;45;15'
+  # here it's 20;40;20 since no time was written
+  - '[title] [update] "&fThe mine has been reset!\nTeleport with &6/warp mine"'
+
+# Wiki: https://wiki.laststudio.space/lastmines/permissions.html
+permissions:
+  enable: true
+  value: 'lastmines.mine.default'
+  messages:
+    - '[message] &cYou do not have permission to break this mine!'
+    # - message: '&cYou do not have permission to break this mine!'
+    # - '&cYou do not have permission to break this mine!'
+    #
+    # Time can be measured in seconds (s, sec, second, seconds) or ticks (t/tick/ticks/ms/millisecond/milliseconds/)
+    # false - means the actionbar will not update (this is everywhere, but here true won't work at all since well there's no logic ^-^)
+    # - '[actionbar] 3s false &cYou do not have permission to break this mine!'
+    # - actionbar: '&cYou do not have permission to break this mine!'
+    #
+    # If no time is written, the default is 20;40;20
+    # - '[title] "&6LastMines\n&cYou have no permission!" 20;45;15'
+    # - title: '"&6LastMines\n&cYou have no permission!" 20;45;15'
+
+# Wiki: https://wiki.laststudio.space/lastmines/online.html
+online:
+  enable: true
+  min: 1
+  max: 1000
+
+# Wiki: https://wiki.laststudio.space/lastmines/teleport.html
+teleport:
+  enable: true
+  # x;y;z;yaw;pitch
+  pos: '-1;100.0;-1;0.0;0.0'
+
+# Wiki: https://wiki.laststudio.space/lastmines/holograms.html
+hologram:
+  enable: true
+  # DecentHolograms, FancyHolograms, Vanilla (TextDisplay)
+  provider: Vanilla
+  offset: '5;106;5' # 'x,y,z' | 'x;y;z'
+  # or
+  # offset:
+  #   x: 5
+  #   y: 106
+  #   z: 5
+  texts:
+    - '&6Mine with blocks only'
+    - '&fTime until reset: <gold>%time:detail%</gold>'
+    - ''
+    - '&fMade with &6LastMines &c<3 &7(laststudio.space)'

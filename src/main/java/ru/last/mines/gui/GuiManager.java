@@ -16,6 +16,14 @@ import java.util.Map;
 import java.util.UUID;
 
 public class GuiManager {
+    public static final String[] DEFAULT_MENUS = {
+            "main.yml", "blocks.yml", "rarities.yml", "holograms.yml", "actions.yml",
+            "permissions.yml", "online.yml", "all_mines.yml", "block_settings.yml",
+            "reset_time.yml", "delete_confirm.yml", "block_drop_items.yml", "block_drop_item.yml",
+            "enchants.yml", "online_requirements.yml", "teleport_settings.yml", "hologram_settings.yml",
+            "all_blocks.yml", "permission_messages.yml"
+    };
+
     private final LastMines plugin;
     private MenuSubLoader subLoader;
     private FileWatcher fileWatcher;
@@ -32,16 +40,8 @@ public class GuiManager {
             menuDir.mkdirs();
         }
 
-        File defaultMenu = new File(menuDir, "main.yml");
-        if (!defaultMenu.exists()) {
-            plugin.saveResource("menus/main.yml", false);
-            plugin.saveResource("menus/blocks.yml", false);
-            plugin.saveResource("menus/rarities.yml", false);
-            plugin.saveResource("menus/holograms.yml", false);
-            plugin.saveResource("menus/actions.yml", false);
-            plugin.saveResource("menus/permissions.yml", false);
-            plugin.saveResource("menus/online.yml", false);
-            plugin.saveResource("menus/all_mines.yml", false);
+        for (String name : DEFAULT_MENUS) {
+            plugin.getConfigManager().extractLangResource("menus/" + name);
         }
 
         GuiProviderRegistry.register();
@@ -60,9 +60,9 @@ public class GuiManager {
             try {
                 if (subLoader != null) {
                     subLoader.reload();
-                    plugin.getDebugLogger().info("GUI конфигурации перезагружены!");
+                    plugin.getDebugger().info("GUI конфигурации перезагружены!");
                 }
-            } catch (Exception ex) { plugin.getDebugLogger().error("Ошибка при перезагрузке GUI", ex); }
+            } catch (Exception ex) { plugin.getDebugger().error("Ошибка при перезагрузке GUI", ex); }
         });
     }
 
@@ -103,7 +103,7 @@ public class GuiManager {
             
             menu.open();
         } catch (Exception e) {
-            plugin.getDebugLogger().error("Failed to open main menu", e);
+            plugin.getDebugger().error("Failed to open main menu", e);
             player.sendMessage("§cНе удалось открыть меню автошахты. Проверьте консоль.");
         }
     }

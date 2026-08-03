@@ -1,0 +1,33 @@
+id: lastmines:block_drop_items
+provider: lastmines:block_drop_items
+type: chest
+size: 54
+title: '&8Дроп блока &f{MATERIAL} &7{MINE_ID}'
+
+drop_items_list:
+  slots: "10-16, 19-25, 28-34, 37-43"
+  name: "&e{DROP_MATERIAL}"
+  lore:
+    - "&7Шанс: &f{CHANCE}%"
+    - "&7Фортуна влияет: &f{FORTUNE}"
+    - ""
+    - "&eЛКМ: &7Настроить шанс/фортуну"
+    - "&cПКМ: &7Удалить предмет"
+
+items:
+  back:
+    material: arrow
+    name: '&cНазад'
+    slot: 45
+    on_click:
+      - '[open_block_settings] {MINE_ID} {MATERIAL}'
+
+  edit_items:
+    material: chest
+    name: '&6Добавить/убрать предметы'
+    lore:
+      - '&7Открыть редактор дропа'
+      - '&7(расставить предметы как в сундуке)'
+    slot: 49
+    on_click:
+      - '[block_drops] {MINE_ID} {MATERIAL}'

@@ -1,5 +1,12 @@
 package ru.last.mines.listeners;
 
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
+import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
+import ru.last.mines.utils.ColorUtils;
+import ru.last.mines.utils.Sounds;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.Location;
@@ -13,16 +20,20 @@ import ru.last.mines.api.*;
 import ru.last.mines.api.events.*;
 import ru.last.mines.models.*;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 public class BlockListener implements Listener {
 
-    public BlockListener() { }
+    private static final Enchantment FORTUNE = Registry.ENCHANTMENT.get(NamespacedKey.minecraft("fortune"));
+
+    public BlockListener() {}
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent e) {
         Player player = e.getPlayer();
-        org.bukkit.block.Block block = e.getBlock();
+        Block block = e.getBlock();
         Location loc = block.getLocation();
-        
+
         Mine mine = LastMinesProvider.getApi().getMineAt(loc);
         if (mine != null) {
             MineBlockBreakEvent apiEvent = new MineBlockBreakEvent(player, mine, block);
@@ -39,19 +50,31 @@ public class BlockListener implements Listener {
                 }
                 return;
             }
-            
+
+            ItemStack tool = player.getInventory().getItemInMainHand();
+            if (!mine.meetsEnchantRequirements(tool)) {
+                e.setCancelled(true);
+                for (String msg : mine.getEnchantFailActions()) {
+                    executePlayerAction(player, msg, mine);
+                }
+                return;
+            }
+
             mine.decrementPhysicalBlocks();
-            
+
             Material blockType = block.getType();
             for (MineBlock mb : mine.getCurrentBlocks()) {
                 if (mb.material() == blockType) {
                     if (mb.drops() != null && !mb.drops().isEmpty()) {
                         e.setDropItems(false);
-                        for (String dropStr : mb.drops()) {
-                            Material dropMat = Material.matchMaterial(dropStr);
-                            if (dropMat != null) {
-                                loc.getWorld().dropItemNaturally(loc, new ItemStack(dropMat));
+                        int fortuneLevel = FORTUNE != null ? tool.getEnchantmentLevel(FORTUNE) : 0;
+                        for (DropItem drop : mb.drops()) {
+                            if (ThreadLocalRandom.current().nextDouble(100.0) >= drop.chance()) continue;
+                            int quantity = 1;
+                            if (drop.fortune() && fortuneLevel > 0) {
+                                quantity += ThreadLocalRandom.current().nextInt(fortuneLevel + 1);
                             }
+                            loc.getWorld().dropItemNaturally(loc, new ItemStack(drop.material(), quantity));
                         }
                     }
                     break;
@@ -64,7 +87,7 @@ public class BlockListener implements Listener {
     private void executePlayerAction(Player player, String cleanAction, Mine mine) {
         cleanAction = mine.replacePlaceholders(cleanAction);
         if (cleanAction.startsWith("[message]")) {
-            String msg = cleanAction.replaceFirst("\\[message]\\s*", "").replace("&", "§");
+            String msg = cleanAction.replaceFirst("\\[message]\\s*", "").replace("&", "§").replace("\\n", "\n");
             player.sendMessage(msg);
         } else if (cleanAction.startsWith("[title]")) {
             String raw = cleanAction.replaceFirst("\\[title]\\s*", "");
@@ -107,18 +130,20 @@ public class BlockListener implements Listener {
                 msg = split[2];
             }
             msg = msg.replace("&", "§");
-            player.spigot().sendMessage(net.md_5.bungee.api.ChatMessageType.ACTION_BAR, net.md_5.bungee.api.chat.TextComponent.fromLegacyText(msg));
+            player.sendActionBar(ColorUtils.colorString(msg));
         } else if (cleanAction.startsWith("[sound]")) {
             String soundStr = cleanAction.replaceFirst("\\[sound]\\s*", "");
             try {
                 String[] split = soundStr.split(" ");
-                Sound sound = Sound.valueOf(split[0].toUpperCase());
-                float volume = split.length > 1 ? Float.parseFloat(split[1]) : 1f;
-                float pitch = split.length > 2 ? Float.parseFloat(split[2]) : 1f;
-                player.playSound(player.getLocation(), sound, volume, pitch);
+                Sound sound = Sounds.parseSound(split[0]);
+                if (sound != null) {
+                    float volume = split.length > 1 ? Float.parseFloat(split[1]) : 1f;
+                    float pitch = split.length > 2 ? Float.parseFloat(split[2]) : 1f;
+                    player.playSound(player.getLocation(), sound, volume, pitch);
+                }
             } catch (Exception ignored) {}
         } else {
-            player.sendMessage(cleanAction.replace("&", "§"));
+            player.sendMessage(cleanAction.replace("&", "§").replace("\\n", "\n"));
         }
     }
 }

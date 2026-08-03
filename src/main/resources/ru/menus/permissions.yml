@@ -1,0 +1,63 @@
+id: lastmines:permissions
+provider: lastmines:permissions
+type: chest
+size: 27
+title: '&8Права доступа &7{MINE_ID}'
+
+items:
+  back:
+    material: arrow
+    name: '&cНазад'
+    slot: 26
+    on_click: '[open] lastmines:main'
+
+  info:
+    material: written_book
+    all_flags: true
+    name: '&fПрава доступа'
+    lore:
+      - '&7Здесь вы можете настраивать права доступа'
+      - '&7для автошахты &f{MINE_ID}'
+    slot: 4
+
+  enable:
+    slot: 11
+    oneOf:
+      - on_view: '{STATUS} == false'
+        material: red_dye
+        name: '&fСтатус на ломание шахты'
+        lore:
+          - '&7Права <red>выключены</red> для данной шахты'
+          - '&7Нажмите, чтобы включить'
+        on_click:
+          - '[perm] enable {MINE_ID} true'
+      - on_view: '{STATUS} == true'
+        material: lime_dye
+        name: '&fСтатус на ломание шахты'
+        lore:
+          - '&7Права <green>включены</green> для данной шахты'
+          - '&7Нажмите, чтобы выключить'
+        on_click:
+          - '[perm] enable {MINE_ID} false'
+
+  value:
+    material: paper
+    slot: 13
+    name: '&fПраво на ломание шахты'
+    lore:
+      - '&fТекущее право: &b{PERM_VALUE}'
+      - '&fНажмите, чтобы поменять'
+    on_click:
+      - '[perm] value {MINE_ID}'
+
+  messages:
+    material: clock
+    slot: 15
+    name: '&fСообщения'
+    lore:
+      - '&7Здесь будут все сообщения, которые будут'
+      - '&7работать когда у игрока нету прав на шахту!'
+      - ''
+      - '&7Нажмите, чтобы открыть список'
+    on_click:
+      - '[open] lastmines:permission_messages'

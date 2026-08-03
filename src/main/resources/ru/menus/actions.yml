@@ -1,0 +1,47 @@
+id: lastmines:actions
+provider: lastmines:actions
+type: chest
+size: 54
+title: '&8Действия &7{MINE_ID}'
+
+actions_list:
+  slots: 10-16,19-25,28-34,37-43
+  name: "&f{INDEX}. &7{ACTION}"
+
+items:
+  back:
+    material: arrow
+    name: '&cНазад'
+    slot: 53
+    on_click: '[open] lastmines:main'
+
+  info:
+    material: command_block
+    name: '&cДействия шахты'
+    lore:
+      - '&7ЛКМ по действию в списке ниже — удалить его'
+      - '&7Страница: &f{PAGE}&7/&f{MAX_PAGE}'
+    slot: 3
+
+  add:
+    material: writable_book
+    name: '&aДобавить действие'
+    lore:
+      - '&7Ввести новую строку действия в чат'
+      - '&7Формат тот же, что и в config.yml:'
+      - '&f[message/title/actionbar/sound]'
+      - '&f[update] &7или &f[update:N] &7- когда сработает'
+    slot: 5
+    on_click: '[action_add_input] {MINE_ID}'
+
+  prev_page:
+    material: arrow
+    name: '&eПредыдущая страница'
+    slot: 48
+    on_click: '[actions_page] {MINE_ID} -1'
+
+  next_page:
+    material: arrow
+    name: '&eСледующая страница'
+    slot: 50
+    on_click: '[actions_page] {MINE_ID} 1'

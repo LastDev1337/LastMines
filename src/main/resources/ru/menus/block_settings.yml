@@ -1,0 +1,152 @@
+id: lastmines:block_settings
+provider: lastmines:block_settings
+type: chest
+size: 54
+title: '&8Настройка блока &7{MINE_ID}'
+
+items:
+  back:
+    material: arrow
+    name: '&cНазад'
+    slot: 53
+    on_click: '[open] lastmines:blocks'
+
+  block_info:
+    material: '{MATERIAL}'
+    name: '&b{MATERIAL}'
+    lore:
+      - '&7Шанс: &f{CHANCE}%'
+      - '&7Лимит: &f{LIMIT}'
+      - ''
+      - '&eЛКМ: &7Ввести шанс в чат'
+      - '&eПКМ: &7Ввести лимит в чат'
+      - '&cСКМ: &7Удалить блок'
+    slot: 13
+    on_left_click:
+      - '[chance_input] {MINE_ID} {MATERIAL}'
+    on_right_click:
+      - '[limit_input] {MINE_ID} {MATERIAL}'
+    on_middle_click:
+      - '[block_edit] {MINE_ID} {MATERIAL} remove'
+      - '[open] lastmines:blocks'
+
+  minus0_01:
+    material: red_concrete
+    name: '&c+0.01%'
+    slot: 19
+    on_click:
+      - '[block_edit] {MINE_ID} {MATERIAL} chance -0.01'
+  minus0_1:
+    material: red_concrete
+    name: '&c-0.1%'
+    slot: 20
+    on_click:
+      - '[block_edit] {MINE_ID} {MATERIAL} chance -0.1'
+  minus0_5:
+    material: red_concrete
+    name: '&c-0.5%'
+    slot: 21
+    on_click:
+      - '[block_edit] {MINE_ID} {MATERIAL} chance -0.5'
+  minus1:
+    material: red_concrete
+    name: '&c-1%'
+    slot: 28
+    on_click:
+      - '[block_edit] {MINE_ID} {MATERIAL} chance -1'
+  minus5:
+    material: red_concrete
+    name: '&c-5%'
+    slot: 29
+    on_click:
+      - '[block_edit] {MINE_ID} {MATERIAL} chance -5'
+  minus10:
+    material: red_concrete
+    name: '&c-10%'
+    slot: 30
+    on_click:
+      - '[block_edit] {MINE_ID} {MATERIAL} chance -10'
+  minus25:
+    material: red_concrete
+    name: '&c-25%'
+    slot: 37
+    on_click:
+      - '[block_edit] {MINE_ID} {MATERIAL} chance -25'
+  minus50:
+    material: red_concrete
+    name: '&c-50%'
+    slot: 38
+    on_click:
+      - '[block_edit] {MINE_ID} {MATERIAL} chance -50'
+  minus100:
+    material: red_concrete
+    name: '&c-100%'
+    slot: 39
+    on_click:
+      - '[block_edit] {MINE_ID} {MATERIAL} chance -100'
+
+  plus0_01:
+    material: lime_concrete
+    name: '&a+0.01%'
+    slot: 23
+    on_click:
+      - '[block_edit] {MINE_ID} {MATERIAL} chance +0.01'
+  plus0_1:
+    material: lime_concrete
+    name: '&a+0.1%'
+    slot: 24
+    on_click:
+      - '[block_edit] {MINE_ID} {MATERIAL} chance +0.1'
+  plus0_5:
+    material: lime_concrete
+    name: '&a+0.5%'
+    slot: 25
+    on_click:
+      - '[block_edit] {MINE_ID} {MATERIAL} chance +0.5'
+  plus1:
+    material: lime_concrete
+    name: '&a+1%'
+    slot: 32
+    on_click:
+      - '[block_edit] {MINE_ID} {MATERIAL} chance +1'
+  plus5:
+    material: lime_concrete
+    name: '&a+5%'
+    slot: 33
+    on_click:
+      - '[block_edit] {MINE_ID} {MATERIAL} chance +5'
+  plus10:
+    material: lime_concrete
+    name: '&a+10%'
+    slot: 34
+    on_click:
+      - '[block_edit] {MINE_ID} {MATERIAL} chance +10'
+  plus25:
+    material: lime_concrete
+    name: '&a+25%'
+    slot: 41
+    on_click:
+      - '[block_edit] {MINE_ID} {MATERIAL} chance +25'
+  plus50:
+    material: lime_concrete
+    name: '&a+50%'
+    slot: 42
+    on_click:
+      - '[block_edit] {MINE_ID} {MATERIAL} chance +50'
+  plus100:
+    material: lime_concrete
+    name: '&a+100%'
+    slot: 43
+    on_click:
+      - '[block_edit] {MINE_ID} {MATERIAL} chance +100'
+
+  custom_drops:
+    material: chest
+    name: '&6Кастомный дроп'
+    lore:
+      - '&7Настроить кастомный дроп'
+      - '&7для этого блока.'
+      - '&7Откроется сундук — просто'
+      - '&7расставьте предметы и сохраните.'
+    slot: 8
+    on_click: '[block_drops] {MINE_ID} {MATERIAL}'

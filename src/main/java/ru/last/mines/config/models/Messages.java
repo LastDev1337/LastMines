@@ -4,6 +4,7 @@ import dev.by1337.yaml.YamlMap;
 import ru.last.mines.utils.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Messages {
@@ -24,6 +25,17 @@ public class Messages {
     private final Message listHeader;
     private final Message listFormat;
     private final Message updateSuccess;
+    
+    private final Message chanceExceeded;
+    private final Message inputChance;
+    private final Message inputLimit;
+    private final Message inputTimeout;
+    private final Message invalidNumber;
+
+    private final Message languageUsage;
+    private final Message languageInvalid;
+    private final Message languageSet;
+
     private final List<String> help;
 
     public Messages(YamlMap map) {
@@ -45,7 +57,17 @@ public class Messages {
         this.listFormat = new Message(map.get("list-format").asString("&8- &e%mine% &7(Осталось: %time% сек)"));
         this.updateSuccess = new Message(prefix + map.get("update-success").asString("&aШахта &e%mine% &aпринудительно обновлена!"));
         
-        List<String> defHelp = java.util.Arrays.asList(
+        this.chanceExceeded = new Message(prefix + map.get("chance-exceeded").asString("&cОбщий шанс не может превышать 100%!"));
+        this.inputChance = new Message(prefix + map.get("input-chance").asString("&eНапишите шанс в чат (0.0001 - 100). &7У вас есть 1 минута."));
+        this.inputLimit = new Message(prefix + map.get("input-limit").asString("&eНапишите лимит в чат (1 - 64). &7У вас есть 1 минута."));
+        this.inputTimeout = new Message(prefix + map.get("input-timeout").asString("&cВремя на ввод вышло!"));
+        this.invalidNumber = new Message(prefix + map.get("invalid-number").asString("&cНеверный формат числа!"));
+
+        this.languageUsage = new Message(prefix + map.get("language-usage").asString("&eИспользование: &f/lastmines language <lang>&e. Доступные: &f%languages%&e. Текущий: &f%current%"));
+        this.languageInvalid = new Message(prefix + map.get("language-invalid").asString("&cОшибка: язык &e%lang% &cне поддерживается! Доступные: &f%languages%"));
+        this.languageSet = new Message(prefix + map.get("language-set").asString("&aЯзык плагина изменён на &e%lang%&a."));
+
+        List<String> defHelp = Arrays.asList(
             "&8&m--------------------------------------",
             "  &e&lLastMines &7- Помощь",
             " ",
@@ -58,6 +80,7 @@ public class Messages {
             "&8- &a/lastmines migrate <plugin> &7- Мигрировать шахты из других плагинов",
             "&8- &a/lastmines update <id> [rarity] [next] &7- Принудительно обновить шахту или сменить редкость",
             "&8- &a/lastmines reload &7- Перезагрузить конфигурацию",
+            "&8- &a/lastmines language <lang> &7- Сменить язык плагина",
             "&8&m--------------------------------------"
         );
         this.help = new ArrayList<>();
@@ -87,5 +110,16 @@ public class Messages {
     public Message getListHeader() { return listHeader; }
     public Message getListFormat() { return listFormat; }
     public Message getUpdateSuccess() { return updateSuccess; }
+    
+    public Message getChanceExceeded() { return chanceExceeded; }
+    public Message getInputChance() { return inputChance; }
+    public Message getInputLimit() { return inputLimit; }
+    public Message getInputTimeout() { return inputTimeout; }
+    public Message getInvalidNumber() { return invalidNumber; }
+
+    public Message getLanguageUsage() { return languageUsage; }
+    public Message getLanguageInvalid() { return languageInvalid; }
+    public Message getLanguageSet() { return languageSet; }
+
     public List<String> getHelp() { return help; }
 }

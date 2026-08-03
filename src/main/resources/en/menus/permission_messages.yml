@@ -1,0 +1,47 @@
+id: lastmines:permission_messages
+provider: lastmines:permission_messages
+type: chest
+size: 54
+title: '&8No-permission messages &7{MINE_ID}'
+
+messages_list:
+  slots: 10-16,19-25,28-34,37-43
+  name: "&f{INDEX}. &7{ACTION}"
+
+items:
+  back:
+    material: arrow
+    name: '&cBack'
+    slot: 53
+    on_click: '[open] lastmines:permissions'
+
+  info:
+    material: written_book
+    name: '&fNo-permission messages'
+    lore:
+      - '&7These actions trigger for a player'
+      - '&7who has no permission to break this mine'
+      - '&7Page: &f{PAGE}&7/&f{MAX_PAGE}'
+    slot: 3
+
+  add:
+    material: writable_book
+    name: '&aAdd message'
+    lore:
+      - '&7Type a new action line in chat'
+      - '&7Same format as in config.yml:'
+      - '&f[message/title/actionbar/sound]'
+    slot: 5
+    on_click: '[perm_message_add_input] {MINE_ID}'
+
+  prev_page:
+    material: arrow
+    name: '&ePrevious page'
+    slot: 48
+    on_click: '[perm_messages_page] {MINE_ID} -1'
+
+  next_page:
+    material: arrow
+    name: '&eNext page'
+    slot: 50
+    on_click: '[perm_messages_page] {MINE_ID} 1'

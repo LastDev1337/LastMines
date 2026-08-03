@@ -1,0 +1,52 @@
+prefix: '<gradient:#ffcc00:#ff9900>[LastMines]</gradient> &r'
+
+# System messages
+no-permission: '&cYou do not have permission to execute this command!'
+reloaded: '&aPlugin configuration and data reloaded successfully!'
+gui-not-installed: '&cError: &eBMenu &cis not installed, so GUI interfaces are unavailable!'
+only-players: '&cThis command can only be executed by players.'
+
+# Mine messages
+mine-reset: '&aMine &e%mine% &awas successfully reset and refilled with new blocks!'
+mine-not-found: '&cError: A mine with that name was not found!'
+mine-exists: '&cError: A mine with ID &e%mine% &calready exists!'
+create-success: '&aCongratulations! Mine &e%mine% &awas created successfully. Use &e/lastmines gui %mine% &ato configure it.'
+select-region: '&cWarning: &7First select a region (using WorldEdit) to create a mine!'
+teleported: '&aSuccess: &7You have been teleported to the spawn point of mine &e%mine%&7.'
+list-empty: '&cThere are currently no created or loaded mines.'
+list-header: '&aList of available mines:'
+list-format: ' &8• <gradient:#00ff87:#60efff>%mine%</gradient> &8- &7Time until reset: &e%time% sec.'
+update-success: '&aMine &e%mine% &awas force-updated by an administrator!'
+
+# Rarities
+update-next-rarity: '&aSystem: &7The next rarity for mine &e%mine% &7has been set to &f%rarity%&7.'
+update-rarity-not-found: '&cError: Rarity &e%rarity% &cdoes not exist, or this mine does not use RARITY mode!'
+
+# Chat block editing
+chance-exceeded: '&cError: The total chance of all blocks cannot exceed &e100%&c! Reduce the chances of other blocks.'
+input-chance: '&e▶ &fEnter the new drop chance in chat &7(from 0.0001 to 100)&f.\n&8(You have 1 minute to enter it)'
+input-limit: '&e▶ &fEnter the new block limit in chat &7(from 1 to 64)&f.\n&8(You have 1 minute to enter it)'
+input-timeout: '&cTime to enter a value has expired! Try again.'
+invalid-number: '&cThe entered value has an invalid number format! Use only digits (and a dot for decimals).'
+
+# Language switch (/lastmines language <lang>)
+language-usage: '&eUsage: &f/lastmines language <lang>&e. Available: &f%languages%&e. Current: &f%current%'
+language-invalid: '&cError: language &e%lang% &cis not supported! Available: &f%languages%'
+language-set: '&aPlugin language changed to &e%lang%&a.'
+
+# Help command
+help:
+  - '&8<st>                                            </st>'
+  - '  <gradient:#ffcc00:#ff9900><b>LastMines</b></gradient> <dark_gray>-</dark_gray> <white>Command help</white>'
+  - ' '
+  - ' &8▪ &e/lastmines help &8- &7Show this message'
+  - ' &8▪ &e/lastmines create <id> &8- &7Create a new mine'
+  - ' &8▪ &e/lastmines reset <id> &8- &7Force reset a mine'
+  - ' &8▪ &e/lastmines gui <id> &8- &7Open the mine control panel'
+  - ' &8▪ &e/lastmines list &8- &7Show the list of all mines'
+  - ' &8▪ &e/lastmines tp <id> &8- &7Teleport to a mine'
+  - ' &8▪ &e/lastmines migrate <plugin> &8- &7Migrate mines from another plugin'
+  - ' &8▪ &e/lastmines update <id> [rarity] [next] &8- &7Update a rarity'
+  - ' &8▪ &e/lastmines reload &8- &7Reload the plugin and configs'
+  - ' &8▪ &e/lastmines language <lang> &8- &7Change the plugin language'
+  - '&8<st>                                            </st>'

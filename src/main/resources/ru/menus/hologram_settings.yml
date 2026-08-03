@@ -1,0 +1,50 @@
+id: lastmines:hologram_settings
+provider: lastmines:hologram_settings
+type: chest
+size: 27
+title: '&8Настройки голограммы &7{MINE_ID}'
+
+items:
+  back:
+    material: arrow
+    name: '&cНазад'
+    slot: 26
+    on_click: '[open] lastmines:holograms'
+
+  toggle:
+    slot: 11
+    oneOf:
+      - on_view: '{HOLO_ENABLE} == false'
+        material: gray_dye
+        name: '&cГолограмма выключена'
+        lore:
+          - '&7Нажмите, чтобы включить'
+        on_click:
+          - '[holo_toggle] {MINE_ID}'
+      - on_view: '{HOLO_ENABLE} == true'
+        material: lime_dye
+        name: '&aГолограмма включена'
+        lore:
+          - '&7Нажмите, чтобы выключить'
+        on_click:
+          - '[holo_toggle] {MINE_ID}'
+
+  provider:
+    material: armor_stand
+    name: '&bПровайдер: &f{HOLO_PROVIDER}'
+    lore:
+      - '&7Vanilla / DecentHolograms / FancyHolograms'
+      - '&7Нажмите, чтобы переключить'
+    slot: 13
+    on_click: '[holo_cycle_provider] {MINE_ID}'
+
+  set_offset:
+    material: ender_pearl
+    name: '&aУстановить позицию сюда'
+    lore:
+      - '&7Встаньте туда, где должна'
+      - '&7висеть голограмма, и нажмите'
+      - '&7Текущая позиция: &f{HOLO_POS}'
+    slot: 15
+    on_click:
+      - '[holo_set_offset] {MINE_ID}'

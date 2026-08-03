@@ -1,0 +1,97 @@
+id: lastmines:block_drop_item
+provider: lastmines:block_drop_item
+type: chest
+size: 36
+title: '&8Настройка дропа &f{DROP_MATERIAL}'
+
+items:
+  back:
+    material: arrow
+    name: '&cНазад'
+    slot: 27
+    on_click:
+      - '[open_drop_items] {MINE_ID} {MATERIAL}'
+
+  info:
+    material: '{DROP_MATERIAL}'
+    name: '&b{DROP_MATERIAL}'
+    lore:
+      - '&7Шанс выпадения: &f{CHANCE}%'
+      - '&7Фортуна влияет: &f{FORTUNE}'
+      - ''
+      - '&cСКМ: &7Удалить предмет из дропа'
+    slot: 13
+    on_middle_click:
+      - '[drop_item_edit] {MINE_ID} {MATERIAL} {DROP_MATERIAL} remove'
+      - '[open_drop_items] {MINE_ID} {MATERIAL}'
+
+  fortune_toggle:
+    material: nether_star
+    name: '&eПереключить "фортуна влияет"'
+    lore:
+      - '&7Сейчас: &f{FORTUNE}'
+      - '&7Если включено, зачарование Фортуна'
+      - '&7на кирке увеличивает количество'
+    slot: 15
+    on_click:
+      - '[drop_item_edit] {MINE_ID} {MATERIAL} {DROP_MATERIAL} fortune'
+
+  chance_1:
+    material: lime_dye
+    name: '&a1%'
+    lore:
+      - '&eЛКМ: &a+1%'
+      - '&eПКМ: &c-1%'
+    slot: 19
+    on_left_click:
+      - '[drop_item_edit] {MINE_ID} {MATERIAL} {DROP_MATERIAL} chance +1'
+    on_right_click:
+      - '[drop_item_edit] {MINE_ID} {MATERIAL} {DROP_MATERIAL} chance -1'
+
+  chance_5:
+    material: lime_dye
+    name: '&a5%'
+    lore:
+      - '&eЛКМ: &a+5%'
+      - '&eПКМ: &c-5%'
+    slot: 20
+    on_left_click:
+      - '[drop_item_edit] {MINE_ID} {MATERIAL} {DROP_MATERIAL} chance +5'
+    on_right_click:
+      - '[drop_item_edit] {MINE_ID} {MATERIAL} {DROP_MATERIAL} chance -5'
+
+  chance_10:
+    material: lime_dye
+    name: '&a10%'
+    lore:
+      - '&eЛКМ: &a+10%'
+      - '&eПКМ: &c-10%'
+    slot: 21
+    on_left_click:
+      - '[drop_item_edit] {MINE_ID} {MATERIAL} {DROP_MATERIAL} chance +10'
+    on_right_click:
+      - '[drop_item_edit] {MINE_ID} {MATERIAL} {DROP_MATERIAL} chance -10'
+
+  chance_25:
+    material: lime_dye
+    name: '&a25%'
+    lore:
+      - '&eЛКМ: &a+25%'
+      - '&eПКМ: &c-25%'
+    slot: 23
+    on_left_click:
+      - '[drop_item_edit] {MINE_ID} {MATERIAL} {DROP_MATERIAL} chance +25'
+    on_right_click:
+      - '[drop_item_edit] {MINE_ID} {MATERIAL} {DROP_MATERIAL} chance -25'
+
+  chance_100:
+    material: lime_dye
+    name: '&a100%'
+    lore:
+      - '&eЛКМ: &a+100%'
+      - '&eПКМ: &c-100%'
+    slot: 24
+    on_left_click:
+      - '[drop_item_edit] {MINE_ID} {MATERIAL} {DROP_MATERIAL} chance +100'
+    on_right_click:
+      - '[drop_item_edit] {MINE_ID} {MATERIAL} {DROP_MATERIAL} chance -100'

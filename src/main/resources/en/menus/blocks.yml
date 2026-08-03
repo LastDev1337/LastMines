@@ -1,0 +1,66 @@
+id: lastmines:blocks
+provider: lastmines:blocks
+type: chest
+size: 54
+title: '&8Mine blocks &7{MINE_ID}'
+
+blocks_list:
+  slots: 10-16,19-25,28-34,37-43
+  name: "&fBlock &b{MATERIAL}"
+  lore:
+    - "&7Spawn chance: &f{CHANCE}%"
+    - ""
+    - "&eClick to configure"
+  on_click:
+    - "[open_block_settings] {MINE_ID} {MATERIAL}"
+
+items:
+  back:
+    material: arrow
+    name: '&cBack'
+    slot: 53
+    on_click: '[open] lastmines:main'
+
+  info:
+    material: diamond_pickaxe
+    name: '&bBlocks'
+    item_flags:
+      - HIDE_ATTRIBUTES
+    lore:
+      - '&7List of blocks in the mine'
+      - '&7&f{MINE_ID}'
+      - ''
+      - '&7Chance is a &fweight&7, not necessarily a %.'
+      - '&7Stone 80 + coal 20 = the same as'
+      - '&7stone 8 + coal 2 (still 80/20)'
+    slot: 4
+
+  add_block:
+    material: nether_star
+    name: '&aAdd block'
+    lore:
+      - '&7Hold an item in your hand'
+      - '&7and click here to add it'
+      - '&7to the mine (chance: 10%)'
+    slot: 48
+    on_click: '[block_add] {MINE_ID}'
+
+  browse_all_blocks:
+    material: chest
+    name: '&aAll blocks in the game'
+    lore:
+      - '&7Open the list of all blocks'
+      - '&7for this server version and pick one'
+    slot: 49
+    on_click:
+      - '[open] lastmines:all_blocks'
+
+  add_block_by_name:
+    material: book
+    name: '&aAdd block by name'
+    lore:
+      - '&7Type the material name in chat'
+      - '&7(no item in hand needed)'
+    slot: 50
+    on_click:
+      - '[block_add_input] {MINE_ID}'
