@@ -7,7 +7,7 @@ depend: [ BLib ]
 softdepend: [ PlaceholderAPI, BMenu, WorldEdit, DecentHolograms, FancyHolograms ]
 
 author: Last
-description: Плагин на автошахты с большой кастомизацией и гибкой настройкой, поддерживает версии 1.21 - 26.2
+# description: Плагин на автошахты с большой кастомизацией и гибкой настройкой, поддерживает версии 1.21 - 26.2
 website: https://laststudio.space
 
 permissions:
