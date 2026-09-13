@@ -48,5 +48,6 @@ help:
   - ' &8▪ &e/lastmines migrate <plugin> &8- &7Migrate mines from another plugin'
   - ' &8▪ &e/lastmines update <id> [rarity] [next] &8- &7Update a rarity'
   - ' &8▪ &e/lastmines reload &8- &7Reload the plugin and configs'
+  - ' &8▪ &e/lastmines defaultmine &8- &7Restore the default mines and reload'
   - ' &8▪ &e/lastmines language <lang> &8- &7Change the plugin language'
   - '&8<st>                                            </st>'

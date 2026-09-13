@@ -74,6 +74,15 @@ commands:
       - "rl"
       - "перезагрузка"
 
+  defaultmine:
+    enable: true
+    tab-completer: true
+    aliases:
+      - "dm"
+      - "dmine"
+      - "dfmine"
+      - "dfm"
+
   language:
     enable: true
     tab-completer: true

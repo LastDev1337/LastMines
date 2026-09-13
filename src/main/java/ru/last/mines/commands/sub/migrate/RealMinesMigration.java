@@ -35,7 +35,11 @@ public class RealMinesMigration {
             try {
                 YamlMap rmConfig = YamlMap.load(file);
                 String name = rmConfig.get("name").asString(file.getName().replace(".yml", ""));
-                
+                if (!ru.last.mines.managers.MineManager.isValidId(name)) {
+                    plugin.getLogger().warning("Пропущена шахта с недопустимым id из RealMines: " + name);
+                    continue;
+                }
+
                 String world = "world";
                 double p1x = 0, p1y = 0, p1z = 0;
                 double p2x = 0, p2y = 0, p2z = 0;

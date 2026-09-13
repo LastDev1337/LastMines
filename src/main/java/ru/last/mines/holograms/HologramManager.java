@@ -27,7 +27,6 @@ public class HologramManager {
                 providers.put("fancyholograms", new FancyHoloProvider());
             }
         } catch (ClassNotFoundException ignored) {
-            // nope
         }
     }
 
@@ -39,7 +38,7 @@ public class HologramManager {
         HologramProvider provider = getProvider(providerName);
 
         if (provider == null && (providerName.equalsIgnoreCase("vanilla") || providerName.equalsIgnoreCase("fancyholograms"))) {
-            plugin.getDebugger().warn("Шахта " + mine.getId() + " использует голограммы " + providerName + ", но они не поддерживаются на этой версии игры (требуется 1.19.4+)! Автоматически переключаемся на DecentHolograms.");
+            plugin.getDebugger().warn("Шахта " + mine.getId() + " использует голограммы " + providerName + ", но они не поддерживаются на этой версии игры (требуется 1.21.5+)! Автоматически переключаемся на DecentHolograms.");
             providerName = "decentholograms";
             provider = getProvider(providerName);
         }

@@ -14,14 +14,14 @@ import ru.last.mines.api.LastMinesProvider;
 import ru.last.mines.models.Mine;
 import ru.last.mines.models.MineBlock;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class LimitInputListener implements Listener {
 
-    private final Map<UUID, InputSession> activeSessions = new HashMap<>();
+    private final Map<UUID, InputSession> activeSessions = new ConcurrentHashMap<>();
 
     public void startSession(Player player, String mineId, String material) {
         UUID uuid = player.getUniqueId();

@@ -27,6 +27,10 @@ public class MainCommand implements CommandExecutor, TabCompleter {
         loadSubCommands();
     }
 
+    public AbstractSubCommand getSubCommand(String name) {
+        return subCommands.get(name.toLowerCase());
+    }
+
     public void loadSubCommands() {
         subCommands.clear();
         try {
@@ -86,7 +90,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 
         AbstractSubCommand help = subCommands.get("help");
         if (help != null) help.execute(sender, args);
-        else sender.sendMessage(ColorUtils.colorString(plugin.getConfigManager().getMessages().getPrefix() + "§cUnknown subcommand!"));
+        else sender.sendMessage(ColorUtils.colorString(plugin.getConfigManager().getMessages().getPrefix() + "&cUnknown subcommand!"));
         return true;
     }
 

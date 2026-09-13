@@ -7,15 +7,20 @@ import dev.by1337.bmenu.io.FileWatcher;
 import dev.by1337.bmenu.loader.MenuSubLoader;
 import dev.by1337.bmenu.menu.Menu;
 import ru.last.mines.LastMines;
+import ru.last.mines.utils.ColorUtils;
+
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.io.File;
 import java.lang.reflect.Proxy;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class GuiManager {
+public class GuiManager implements Listener {
     public static final String[] DEFAULT_MENUS = {
             "main.yml", "blocks.yml", "rarities.yml", "holograms.yml", "actions.yml",
             "permissions.yml", "online.yml", "all_mines.yml", "block_settings.yml",
@@ -27,7 +32,7 @@ public class GuiManager {
     private final LastMines plugin;
     private MenuSubLoader subLoader;
     private FileWatcher fileWatcher;
-    private final Map<UUID, String> viewingMines = new HashMap<>();
+    private final Map<UUID, String> viewingMines = new ConcurrentHashMap<>();
 
     public GuiManager(LastMines plugin) { this.plugin = plugin; }
 
@@ -52,6 +57,13 @@ public class GuiManager {
 
         fileWatcher = new FileWatcher(menuDir, this::onFileChange);
         fileWatcher.startWatching();
+
+        Bukkit.getPluginManager().registerEvents(this, plugin);
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        viewingMines.remove(event.getPlayer().getUniqueId());
     }
 
     private void onFileChange(Path path) {
@@ -102,9 +114,9 @@ public class GuiManager {
             } catch (Exception ignore) {}
             
             menu.open();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             plugin.getDebugger().error("Failed to open main menu", e);
-            player.sendMessage("§cНе удалось открыть меню автошахты. Проверьте консоль.");
+            player.sendMessage(ColorUtils.colorString("<red>Не удалось открыть меню автошахты. Проверьте консоль."));
         }
     }
 }

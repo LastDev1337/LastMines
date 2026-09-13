@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import ru.last.mines.LastMines;
 import ru.last.mines.commands.*;
 import ru.last.mines.models.*;
+import ru.last.mines.utils.ColorUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +18,7 @@ public class ResetTimer extends AbstractSubCommand {
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (args.length < 2) {
-            sender.sendMessage("§cИспользование: /lastmines resettimer <id>");
+            sender.sendMessage(ColorUtils.colorString("<red>Использование: /lastmines resettimer <id>"));
             return;
         }
         String id = args[1];

@@ -107,7 +107,8 @@ items:
         lore:
           - '&7Several sets of blocks (rarities)'
           - '&7Click to switch to BLOCKS'
-          - '&c(only the blocks of the first rarity will remain!)'
+          - '&7(blocks from all rarities are merged into one list,'
+          - '&7rarities are kept and restored when you switch back)'
         on_click:
           - '[mode_switch] {MINE_ID} BLOCKS'
 

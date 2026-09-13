@@ -109,7 +109,8 @@ public class Mine {
         if (this.mode == MineMode.BLOCKS) {
             for (Object blockValRaw : getListOrEmpty(map.get("blocks"))) {
                 YamlMap blockMap = YamlValue.wrap(blockValRaw).asYamlMap().getOrThrow();
-                blocks.add(parseBlock(blockMap));
+                MineBlock parsed = parseBlock(blockMap);
+                if (parsed != null) blocks.add(parsed);
             }
         } else {
             for (Object rarityValRaw : getListOrEmpty(map.get("rarity"))) {
@@ -122,7 +123,8 @@ public class Mine {
                 List<MineBlock> rBlocks = new ArrayList<>();
                 for (Object blockValRaw : getListOrEmpty(rarityMap.get("blocks"))) {
                     YamlMap blockMap = YamlValue.wrap(blockValRaw).asYamlMap().getOrThrow();
-                    rBlocks.add(parseBlock(blockMap));
+                    MineBlock parsed = parseBlock(blockMap);
+                    if (parsed != null) rBlocks.add(parsed);
                 }
                 rarities.add(new MineRarity(rId, rChance, rName, rBlocks, rIcon));
             }
@@ -186,9 +188,6 @@ public class Mine {
         resetMine();
     }
 
-    /**
-     * Репарсер всех старых экшенов в новые
-     */
     public void reparseActions(List<String> raw) {
         this.rawActions = new ArrayList<>(raw);
         periodicActions.clear();
@@ -240,6 +239,11 @@ public class Mine {
 
     private MineBlock parseBlock(YamlMap blockMap) {
         String blockId = blockMap.get("id").asString("minecraft:stone").replace("minecraft:", "").toUpperCase();
+        Material material = Material.matchMaterial(blockId);
+        if (material == null) {
+            plugin.getLogger().warning("[LastMines] Неизвестный материал '" + blockId + "' в шахте " + id + ", блок пропущен.");
+            return null;
+        }
         double chance = blockMap.has("chance") ? blockMap.get("chance").asDouble(100.0) : 0.0;
         int min = -1, max = -1;
         
@@ -275,7 +279,7 @@ public class Mine {
                 .map(this::parseDropItem)
                 .filter(Objects::nonNull)
                 .toList();
-        return new MineBlock(Material.matchMaterial(blockId), chance, min, max, drops);
+        return new MineBlock(material, chance, min, max, drops);
     }
 
     private DropItem parseDropItem(Object raw) {
@@ -454,7 +458,9 @@ public class Mine {
         updateHologram();
     }
     
-    public void forceUpdate() {
+    public boolean forceUpdate() {
+        if (isResetting) return false;
+
         if (tpEnable && tpPos != null) {
             for (Player p : Bukkit.getOnlinePlayers()) {
                 if (isInMine(p.getLocation())) {
@@ -468,13 +474,7 @@ public class Mine {
             nextRarity = rollRarity();
             Bukkit.getPluginManager().callEvent(new MineUpdateRarityEvent(this, oldRarity, currentRarity));
         }
-        resetMine();
-        for (String act : resetActions) {
-            executeAction(act);
-        }
-        timeLeft = resetTime;
-        
-        updateHologram();
+        return resetMine();
     }
     
     public String replacePlaceholders(String str) {
@@ -537,7 +537,7 @@ public class Mine {
                 double distance = Math.sqrt(dx*dx + dy*dy + dz*dz);
                 
                 if (finalRadius == -1) {
-                    return distance == 0; // AABB
+                    return distance == 0;
                 }
                 
                 return distance <= finalRadius;
@@ -622,13 +622,15 @@ public class Mine {
     
     private boolean isResetting = false;
 
-    public void resetMine() {
-        if (pos1 == null || pos2 == null || world == null) return;
-        if (isResetting) return;
-        
+    public boolean isResetting() { return isResetting; }
+
+    public boolean resetMine() {
+        if (pos1 == null || pos2 == null || world == null) return false;
+        if (isResetting) return false;
+
         MinePreResetEvent preResetEvent = new MinePreResetEvent(this);
         Bukkit.getPluginManager().callEvent(preResetEvent);
-        if (preResetEvent.isCancelled()) return;
+        if (preResetEvent.isCancelled()) return false;
 
         int minX = Math.min(pos1.getBlockX(), pos2.getBlockX());
         int minY = Math.min(pos1.getBlockY(), pos2.getBlockY());
@@ -641,8 +643,8 @@ public class Mine {
         int XY1 = (maxX - minX + 1) * (maxY - minY + 1) * (maxZ - minZ + 1);
 
         List<MineBlock> targetBlocks = getCurrentBlocks();
-        if (targetBlocks.isEmpty()) return;
-        
+        if (targetBlocks.isEmpty()) return false;
+
         double totalChance = targetBlocks.stream().mapToDouble(MineBlock::chance).sum();
         
         isResetting = true;
@@ -721,13 +723,20 @@ public class Mine {
                 maxPhysicalBlocksCount = physicalBlocksCount;
                 isResetting = false;
 
+                for (String act : resetActions) {
+                    executeAction(act);
+                }
+                timeLeft = resetTime;
+                updateHologram();
+
                 Bukkit.getPluginManager().callEvent(new MineResetEvent(Mine.this));
-                
+
                 this.cancel();
             }
         }.runTaskTimer(plugin, 0L, 1L);
+        return true;
     }
-    
+
     public List<MineBlock> getCurrentBlocks() {
         if (mode == MineMode.BLOCKS) {
             return blocks;

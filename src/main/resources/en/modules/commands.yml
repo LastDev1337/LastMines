@@ -66,6 +66,15 @@ commands:
     aliases:
       - "rl"
 
+  defaultmine:
+    enable: true
+    tab-completer: true
+    aliases:
+      - "dm"
+      - "dmine"
+      - "dfmine"
+      - "dfm"
+
   language:
     enable: true
     tab-completer: true

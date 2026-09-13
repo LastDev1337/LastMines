@@ -4,6 +4,7 @@ import org.bukkit.command.CommandSender;
 import ru.last.mines.LastMines;
 import ru.last.mines.commands.*;
 import ru.last.mines.models.*;
+import ru.last.mines.utils.ColorUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,7 +18,7 @@ public class Delete extends AbstractSubCommand {
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (args.length < 2) {
-            sender.sendMessage(plugin.getConfigManager().getMessages().getPrefix() + "Использование: /lastmines delete <id>");
+            sender.sendMessage(ColorUtils.colorString(plugin.getConfigManager().getMessages().getPrefix() + "Использование: /lastmines delete <id>"));
             return;
         }
 
@@ -30,7 +31,7 @@ public class Delete extends AbstractSubCommand {
 
         plugin.getActionManager().deleteMine(id);
 
-        sender.sendMessage(plugin.getConfigManager().getMessages().getPrefix() + "Шахта " + id + " успешно удалена.");
+        sender.sendMessage(ColorUtils.colorString(plugin.getConfigManager().getMessages().getPrefix() + "Шахта " + id + " успешно удалена."));
     }
 
     @Override

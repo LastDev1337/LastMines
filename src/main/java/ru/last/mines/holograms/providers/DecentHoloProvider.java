@@ -5,6 +5,7 @@ import eu.decentsoftware.holograms.api.holograms.Hologram;
 import org.bukkit.Location;
 import ru.last.mines.holograms.*;
 import ru.last.mines.models.*;
+import ru.last.mines.utils.ColorUtils;
 import ru.last.mines.utils.time.TimeFormatter;
 
 import java.util.ArrayList;
@@ -45,7 +46,6 @@ public class DecentHoloProvider implements HologramProvider {
 
     @Override
     public void removeAll() {
-        // DecentHolograms автоматически удаляет все голограммы
     }
 
     private List<String> applyPlaceholders(Mine mine, List<String> lines) {
@@ -56,7 +56,7 @@ public class DecentHoloProvider implements HologramProvider {
             } else if (s.contains("%time_reset:clock%")) {
                 s = s.replace("%time_reset:clock%", TimeFormatter.format(mine.getTimeLeft() * 1000L, "clock"));
             } else if (s.contains("%time_reset:default%")) { s = s.replace("%time_reset:default%", TimeFormatter.format(mine.getTimeLeft() * 1000L, "default")); }
-            res.add(s.replace("&", "§").replace("<gold>", "§6").replace("</gold>", ""));
+            res.add(ColorUtils.colorString(s));
         }
         return res;
     }

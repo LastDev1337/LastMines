@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import ru.last.mines.models.*;
 import ru.last.mines.LastMines;
 import ru.last.mines.commands.*;
+import ru.last.mines.utils.ColorUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,12 +33,12 @@ public class Gui extends AbstractSubCommand {
                 plugin.getConfigManager().getMessages().getOnlyPlayers().send(sender);
                 return;
             }
-            if (Bukkit.getPluginManager().getPlugin("BMenu") != null) {
+            if (plugin.getGuiManager() != null) {
                 try {
                     Menu menu = BMenu.menuLoader().create("lastmines:all_mines", (Player) sender, null);
                     menu.open();
-                } catch (Exception e) {
-                    sender.sendMessage("§cНе удалось открыть меню всех шахт. Проверьте консоль.");
+                } catch (Throwable e) {
+                    sender.sendMessage(ColorUtils.colorString("<red>Не удалось открыть меню всех шахт. Проверьте консоль."));
                     e.printStackTrace();
                 }
             } else {
@@ -52,7 +53,7 @@ public class Gui extends AbstractSubCommand {
             return;
         }
 
-        if (Bukkit.getPluginManager().getPlugin("BMenu") != null) {
+        if (plugin.getGuiManager() != null) {
             if (args.length >= 5 && "block_settings".equalsIgnoreCase(args[2])) {
                 Player target = Bukkit.getPlayer(args[3]);
                 String mat = args[4];
@@ -76,8 +77,8 @@ public class Gui extends AbstractSubCommand {
                         menu.addArgument("LIMIT", String.valueOf(limit));
 
                         menu.open();
-                    } catch (Exception e) {
-                        sender.sendMessage("§cНе удалось открыть меню. Проверьте консоль.");
+                    } catch (Throwable e) {
+                        sender.sendMessage(ColorUtils.colorString("<red>Не удалось открыть меню. Проверьте консоль."));
                         e.printStackTrace();
                     }
                 }
@@ -91,8 +92,8 @@ public class Gui extends AbstractSubCommand {
                         menu.addArgument("MINE_ID", id);
                         menu.addArgument("MATERIAL", mat);
                         menu.open();
-                    } catch (Exception e) {
-                        sender.sendMessage("§cНе удалось открыть меню. Проверьте консоль.");
+                    } catch (Throwable e) {
+                        sender.sendMessage(ColorUtils.colorString("<red>Не удалось открыть меню. Проверьте консоль."));
                         e.printStackTrace();
                     }
                 }
@@ -108,8 +109,8 @@ public class Gui extends AbstractSubCommand {
                         menu.addArgument("MATERIAL", mat);
                         menu.addArgument("DROP_MATERIAL", dropMat);
                         menu.open();
-                    } catch (Exception e) {
-                        sender.sendMessage("§cНе удалось открыть меню. Проверьте консоль.");
+                    } catch (Throwable e) {
+                        sender.sendMessage(ColorUtils.colorString("<red>Не удалось открыть меню. Проверьте консоль."));
                         e.printStackTrace();
                     }
                 }
@@ -121,8 +122,8 @@ public class Gui extends AbstractSubCommand {
                         Menu menu = BMenu.menuLoader().create("lastmines:" + args[2].toLowerCase(), target, null);
                         menu.addArgument("MINE_ID", id);
                         menu.open();
-                    } catch (Exception e) {
-                        sender.sendMessage("§cНе удалось открыть меню. Проверьте консоль.");
+                    } catch (Throwable e) {
+                        sender.sendMessage(ColorUtils.colorString("<red>Не удалось открыть меню. Проверьте консоль."));
                         e.printStackTrace();
                     }
                 }

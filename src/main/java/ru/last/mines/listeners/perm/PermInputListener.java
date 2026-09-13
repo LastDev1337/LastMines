@@ -12,12 +12,14 @@ import org.bukkit.scheduler.BukkitTask;
 import ru.last.mines.LastMines;
 import ru.last.mines.api.LastMinesProvider;
 import ru.last.mines.models.Mine;
+import ru.last.mines.utils.ColorUtils;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PermInputListener implements Listener {
 
-    private final Map<UUID, InputSession> activeSessions = new HashMap<>();
+    private final Map<UUID, InputSession> activeSessions = new ConcurrentHashMap<>();
 
     public void startSession(Player player, String mineId, String type) {
         UUID uuid = player.getUniqueId();
@@ -51,7 +53,7 @@ public class PermInputListener implements Listener {
 
             if ("value".equalsIgnoreCase(session.type)) {
                 mine.setPermValue(msg);
-                player.sendMessage("§aУспешно: §7Право доступа для шахты §e" + session.mineId + " §7изменено на §f" + msg + "§7!");
+                player.sendMessage(ColorUtils.colorString("&aУспешно: &fПраво доступа для шахты &e" + session.mineId + " &fизменено на &7" + msg + "&f!"));
             }
 
             mine.save();

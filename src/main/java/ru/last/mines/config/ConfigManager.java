@@ -37,6 +37,12 @@ public class ConfigManager {
             loadConfig(type);
         }
 
+        if (getMainConfig() == null) {
+            plugin.getLogger().severe("config.yml не загружен (см. ошибку выше). Плагин будет отключён.");
+            plugin.getServer().getPluginManager().disablePlugin(plugin);
+            return;
+        }
+
         if (getMainConfig().getModules().isTimeFormatEnabled() && configs.containsKey(ConfigType.TIME_FORMAT)) {
             TimeFormatter.init((YamlMap) configs.get(ConfigType.TIME_FORMAT));
         }
@@ -66,7 +72,6 @@ public class ConfigManager {
         } catch (Exception e) { plugin.getLogger().log(Level.SEVERE, "Не удалось загрузить конфигурацию: " + type.getFileName(), e); }
     }
 
-    // Мультиязычность
     public void extractLangResource(String relativePath) {
         File target = new File(plugin.getDataFolder(), relativePath);
         if (target.exists()) return;

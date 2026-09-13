@@ -7,6 +7,8 @@ import ru.last.mines.commands.*;
 import ru.last.mines.models.*;
 import ru.last.mines.LastMines;
 
+import java.util.Collection;
+
 @SubCommand(name = "list")
 public class List extends AbstractSubCommand {
 
@@ -14,7 +16,7 @@ public class List extends AbstractSubCommand {
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-        java.util.Collection<Mine> mines = plugin.getMineManager().getMines().values();
+        Collection<Mine> mines = plugin.getMineManager().getMines().values();
 
         if (args.length > 1 && sender instanceof Player player) {
             try {

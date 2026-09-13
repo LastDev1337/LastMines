@@ -43,6 +43,10 @@ public class AutoMineMigration {
 
         for (String key : autoMinesSec.getRaw().keySet()) {
             try {
+                if (!ru.last.mines.managers.MineManager.isValidId(key)) {
+                    plugin.getLogger().warning("Пропущена шахта с недопустимым id из AutoMine: " + key);
+                    continue;
+                }
                 YamlMap mineSec = autoMinesSec.get(key).asYamlMap().orDefault(null);
                 if (mineSec == null) continue;
 

@@ -6,6 +6,7 @@ import ru.last.mines.LastMines;
 import ru.last.mines.api.*;
 import ru.last.mines.commands.*;
 import ru.last.mines.models.*;
+import ru.last.mines.utils.ColorUtils;
 
 import java.util.Collection;
 
@@ -23,7 +24,7 @@ public class Near extends AbstractSubCommand {
 
         Mine currentMine = LastMinesProvider.getApi().getMineAt(player);
         if (currentMine != null) {
-            player.sendMessage("§aВы находитесь внутри шахты: §e" + currentMine.getId());
+            player.sendMessage(ColorUtils.colorString("<green>Вы находитесь внутри шахты: <yellow>" + currentMine.getId()));
         }
 
         double radius = 50.0;
@@ -35,11 +36,11 @@ public class Near extends AbstractSubCommand {
 
         Collection<Mine> nearMines = LastMinesProvider.getApi().getMinesInRadius(player.getLocation(), radius);
         if (nearMines.isEmpty()) {
-            player.sendMessage("§cВ радиусе " + radius + " блоков нет шахт.");
+            player.sendMessage(ColorUtils.colorString("<red>В радиусе " + radius + " блоков нет шахт."));
         } else {
-            player.sendMessage("§aШахты в радиусе " + radius + " блоков:");
+            player.sendMessage(ColorUtils.colorString("<green>Шахты в радиусе " + radius + " блоков:"));
             for (Mine m : nearMines) {
-                player.sendMessage("§8- §e" + m.getId());
+                player.sendMessage(ColorUtils.colorString("&8- &e" + m.getId()));
             }
         }
     }

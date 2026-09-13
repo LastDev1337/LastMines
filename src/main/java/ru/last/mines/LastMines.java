@@ -69,6 +69,9 @@ public class LastMines extends JavaPlugin {
 
         this.configManager = new ConfigManager(this);
         this.configManager.loadAll();
+        if (this.configManager.getMainConfig() == null) {
+            return;
+        }
 
         this.blockCatalogManager = new BlockCatalogManager(this);
         this.blockCatalogManager.load();
@@ -94,11 +97,13 @@ public class LastMines extends JavaPlugin {
                 return mainCommand.onTabComplete(sender, this, alias, args);
             }
         };
+        boolean commandRegistered = false;
         try {
             Field commandMapField = getServer().getClass().getDeclaredField("commandMap");
             commandMapField.setAccessible(true);
             CommandMap commandMap = (org.bukkit.command.CommandMap) commandMapField.get(getServer());
             commandMap.register(getName(), bukkitCommand);
+            commandRegistered = true;
         } catch (Exception e) {
             getLogger().severe("Failed to register command via reflection: " + e.getMessage());
         }
@@ -122,10 +127,17 @@ public class LastMines extends JavaPlugin {
         if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new PlaceHook(this).register();
         }
-        
-        if (getServer().getPluginManager().getPlugin("BMenu") != null) {
-            this.guiManager = new GuiManager(this);
-            this.guiManager.register();
+
+        if (getServer().getPluginManager().isPluginEnabled("BMenu")) {
+            try {
+                this.guiManager = new GuiManager(this);
+                this.guiManager.register();
+            } catch (Throwable t) {
+                this.guiManager = null;
+                getLogger().warning("Не удалось включить меню (BMenu недоступен или сломан после перезагрузки): " + t);
+            }
+        } else {
+            this.guiManager = null;
         }
 
         new UpdateChecker(this).check();
@@ -133,7 +145,11 @@ public class LastMines extends JavaPlugin {
         Metrics metrics = new Metrics(this, 31925);
         metrics.addCustomChart(new SimplePie("chart_id", () -> "My value"));
 
-        getLogger().info("enabling successfully!");
+        if (commandRegistered) {
+            getLogger().info("enabling successfully!");
+        } else {
+            getLogger().severe("enabled with errors: /lastmines command is NOT registered, see the error above.");
+        }
     }
 
     @Override
@@ -145,9 +161,6 @@ public class LastMines extends JavaPlugin {
         getLogger().info("disabling successfully!");
     }
 
-    /**
-     Парсер версий с 1.21 до 26.2 чтобы не было конфликтов
-     */
     private static int[] parseVersion(String raw) {
         String v = raw.startsWith("1.") ? raw.substring(2) : raw;
         String[] parts = v.split("\\.");

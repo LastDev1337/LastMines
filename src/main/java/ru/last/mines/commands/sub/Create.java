@@ -1,7 +1,6 @@
 package ru.last.mines.commands.sub;
 
 import dev.by1337.yaml.YamlMap;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -10,6 +9,7 @@ import ru.last.mines.api.events.*;
 import ru.last.mines.commands.*;
 import ru.last.mines.config.models.*;
 import ru.last.mines.hooks.*;
+import ru.last.mines.managers.*;
 import ru.last.mines.models.*;
 import ru.last.mines.LastMines;
 import ru.last.mines.utils.ColorUtils;
@@ -41,6 +41,10 @@ public class Create extends AbstractSubCommand {
         }
 
         String id = args[1];
+        if (!MineManager.isValidId(id)) {
+            sender.sendMessage(ColorUtils.colorString("<red>Недопустимый id автошахты: разрешены только буквы, цифры, '_' и '-'."));
+            return;
+        }
         if (plugin.getMineManager().getMine(id) != null) {
             plugin.getConfigManager().getMessages().getMineExists().send(sender);
             return;
@@ -57,7 +61,7 @@ public class Create extends AbstractSubCommand {
                 mine.createHologram();
             } catch (Exception e) {
                 plugin.getDebugger().error("Не удалось создать автошахту " + id, e);
-                player.sendMessage("§cПроизошла ошибка при создании автошахты. Проверьте консоль.");
+                player.sendMessage(ColorUtils.colorString("<red>Произошла ошибка при создании автошахты. Проверьте консоль."));
                 return;
             }
             
@@ -66,14 +70,14 @@ public class Create extends AbstractSubCommand {
             
             plugin.getConfigManager().getMessages().getCreateSuccess().send(sender, "%mine%", id);
             
-            if (Bukkit.getPluginManager().getPlugin("BMenu") != null) {
+            if (plugin.getGuiManager() != null) {
                 plugin.getGuiManager().openMenu(player, id);
             } else {
                 plugin.getConfigManager().getMessages().getGuiNotInstalled().send(sender);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            sender.sendMessage("§cПроизошла ошибка при создании шахты.");
+            sender.sendMessage(ColorUtils.colorString("<red>Произошла ошибка при создании шахты."));
         }
     }
 }

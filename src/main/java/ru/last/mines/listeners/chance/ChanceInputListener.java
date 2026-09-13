@@ -16,10 +16,11 @@ import ru.last.mines.models.Mine;
 import ru.last.mines.models.MineBlock;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ChanceInputListener implements Listener {
 
-    private final Map<UUID, InputSession> activeSessions = new HashMap<>();
+    private final Map<UUID, InputSession> activeSessions = new ConcurrentHashMap<>();
 
     public void startSession(Player player, String mineId, String material) {
         UUID uuid = player.getUniqueId();
@@ -50,7 +51,7 @@ public class ChanceInputListener implements Listener {
         String msg = PlainTextComponentSerializer.plainText().serialize(event.message()).trim();
         try {
             double chance = Double.parseDouble(msg);
-            if (chance < 0 || chance > 100) throw new NumberFormatException();
+            if (!Double.isFinite(chance) || chance < 0 || chance > 100) throw new NumberFormatException();
 
             Bukkit.getScheduler().runTask(LastMines.get(), () -> {
                 Mine mine = LastMinesProvider.getApi().getMine(session.mineId);

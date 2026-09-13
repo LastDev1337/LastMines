@@ -4,6 +4,7 @@ import org.bukkit.command.CommandSender;
 import ru.last.mines.LastMines;
 import ru.last.mines.commands.*;
 import ru.last.mines.models.*;
+import ru.last.mines.utils.ColorUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,7 +17,8 @@ public class Update extends AbstractSubCommand {
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (args.length < 2) {
-            sender.sendMessage(plugin.getConfigManager().getMessages().getPrefix() + "Использование: /lastmines update <id> [rarity]");
+            sender.sendMessage(ColorUtils.colorString(
+                        plugin.getConfigManager().getMessages().getPrefix() + "Использование: /lastmines update <id> [rarity]"));
             return;
         }
 
@@ -37,14 +39,20 @@ public class Update extends AbstractSubCommand {
             }
             
             plugin.getConfigManager().getMessages().getUpdateNextRarity().send(sender, "%mine%", id, "%rarity%", rarityId);
-            
+
             if (!isNextOnly) {
-                mine.forceUpdate();
-                plugin.getConfigManager().getMessages().getUpdateSuccess().send(sender, "%mine%", id);
+                reportUpdate(sender, mine, id);
             }
         } else {
-            mine.forceUpdate();
+            reportUpdate(sender, mine, id);
+        }
+    }
+
+    private void reportUpdate(CommandSender sender, Mine mine, String id) {
+        if (mine.forceUpdate()) {
             plugin.getConfigManager().getMessages().getUpdateSuccess().send(sender, "%mine%", id);
+        } else {
+            sender.sendMessage(ColorUtils.colorString("<red>Автошахта " + id + " уже сбрасывается."));
         }
     }
 

@@ -9,23 +9,25 @@ import ru.last.mines.LastMines;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class MineManager {
+    private static final java.util.regex.Pattern VALID_ID = java.util.regex.Pattern.compile("[a-zA-Z0-9_-]+");
+
     private final LastMines plugin;
     private final Map<String, Mine> mines = new HashMap<>();
 
     public MineManager(LastMines plugin) { this.plugin = plugin; }
 
+    public static boolean isValidId(String id) {
+        return id != null && VALID_ID.matcher(id).matches();
+    }
+
     public void loadAll() {
         mines.clear();
         File folder = new File(plugin.getDataFolder(), "mines");
-        if (!folder.exists() || folder.listFiles() == null || Objects.requireNonNull(folder.listFiles()).length == 0) {
-            if (!folder.exists()) folder.mkdirs();
-            try {
-                plugin.getConfigManager().extractLangResource("mines/blocks.yml");
-                plugin.getConfigManager().extractLangResource("mines/rarity.yml");
-            } catch (Exception e) { plugin.getDebugger().error("Не удалось создать стандартные шахты", e); }
+        if (!folder.exists()) {
+            folder.mkdirs();
+            extractDefaultMines();
         }
 
         File[] files = folder.listFiles((d, name) -> name.endsWith(".yml"));
@@ -33,6 +35,17 @@ public class MineManager {
 
         for (File file : files) {
             loadFile(file, 0);
+        }
+    }
+
+    public void extractDefaultMines() {
+        File folder = new File(plugin.getDataFolder(), "mines");
+        if (!folder.exists()) folder.mkdirs();
+        try {
+            plugin.getConfigManager().extractLangResource("mines/blocks.yml");
+            plugin.getConfigManager().extractLangResource("mines/rarity.yml");
+        } catch (Exception e) {
+            plugin.getDebugger().error("Не удалось создать стандартные шахты", e);
         }
     }
 

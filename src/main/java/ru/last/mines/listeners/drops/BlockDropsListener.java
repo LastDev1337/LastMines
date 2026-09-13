@@ -63,7 +63,7 @@ public class BlockDropsListener implements Listener {
     private ItemStack backButton() {
         ItemStack item = new ItemStack(Material.ARROW);
         var meta = item.getItemMeta();
-        meta.setDisplayName(ColorUtils.colorString("&cНазад (без сохранения)"));
+        meta.displayName(ColorUtils.color("&cНазад (без сохранения)"));
         item.setItemMeta(meta);
         return item;
     }
@@ -71,7 +71,7 @@ public class BlockDropsListener implements Listener {
     private ItemStack saveButton() {
         ItemStack item = new ItemStack(Material.LIME_STAINED_GLASS);
         var meta = item.getItemMeta();
-        meta.setDisplayName(ColorUtils.colorString("&aСохранить дроп"));
+        meta.displayName(ColorUtils.color("&aСохранить дроп"));
         item.setItemMeta(meta);
         return item;
     }
@@ -83,7 +83,7 @@ public class BlockDropsListener implements Listener {
         if (event.getClickedInventory() == null || !event.getClickedInventory().equals(event.getInventory())) return;
 
         int slot = event.getSlot();
-        if (slot < EDIT_SLOTS) return; // let normal item placement/removal happen freely
+        if (slot < EDIT_SLOTS) return;
 
         event.setCancelled(true);
         Player player = (Player) event.getWhoClicked();

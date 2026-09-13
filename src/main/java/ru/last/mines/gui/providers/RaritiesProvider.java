@@ -65,7 +65,8 @@ public class RaritiesProvider extends DefaultMenu {
         for (int i = 0; i < Math.min(slots.size(), rarities.size()); i++) {
             MineRarity mr = rarities.get(i);
             int slot = slots.get(i);
-            
+            if (slot < 0 || slot >= layers.getBaseLayer().length) continue;
+
             Material mat = mr.icon() != null ? Material.matchMaterial(mr.icon()) : null;
             if (mat == null) mat = Material.matchMaterial(materialName);
             if (mat == null) mat = Material.NETHER_STAR;

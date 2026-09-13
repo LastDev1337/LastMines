@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import ru.last.mines.commands.*;
 import ru.last.mines.models.*;
 import ru.last.mines.LastMines;
+import ru.last.mines.utils.ColorUtils;
 
 @SubCommand(name = "teleport", aliases = {"tp"})
 public class Tp extends AbstractSubCommand {
@@ -15,7 +16,7 @@ public class Tp extends AbstractSubCommand {
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (args.length < 2) {
-            sender.sendMessage(plugin.getConfigManager().getMessages().getPrefix() + "Использование: /lastmines tp <id> [player]");
+            sender.sendMessage(ColorUtils.colorString(plugin.getConfigManager().getMessages().getPrefix() + "Использование: /lastmines tp <id> [player]"));
             return;
         }
 
@@ -32,7 +33,7 @@ public class Tp extends AbstractSubCommand {
         } else if (sender instanceof Player player) { target = player; }
 
         if (target == null) {
-            sender.sendMessage("§cИгрок не найден или команда должна выполняться от имени игрока.");
+            sender.sendMessage(ColorUtils.colorString("<red>Игрок не найден или команда должна выполняться от имени игрока."));
             return;
         }
 

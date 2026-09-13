@@ -10,6 +10,7 @@ import org.bukkit.entity.TextDisplay;
 import org.joml.Vector3f;
 import ru.last.mines.holograms.*;
 import ru.last.mines.models.*;
+import ru.last.mines.utils.ColorUtils;
 import ru.last.mines.utils.time.TimeFormatter;
 import ru.last.mines.utils.time.TimeUtils;
 
@@ -107,7 +108,6 @@ public class FancyHoloProvider implements HologramProvider {
 
     @Override
     public void removeAll() {
-        // FancyHolograms автоматически удаляет все голограммы
     }
 
     private List<String> applyPlaceholders(Mine mine, List<String> lines) {
@@ -118,7 +118,7 @@ public class FancyHoloProvider implements HologramProvider {
             } else if (s.contains("%time_reset:clock%")) {
                 s = s.replace("%time_reset:clock%", TimeFormatter.format(mine.getTimeLeft() * 1000L, "clock"));
             } else if (s.contains("%time_reset:default%")) { s = s.replace("%time_reset:default%", TimeFormatter.format(mine.getTimeLeft() * 1000L, "default")); }
-            res.add(s.replace("&", "§").replace("<gold>", "§6").replace("</gold>", ""));
+            res.add(ColorUtils.colorString(s));
         }
         return res;
     }

@@ -46,7 +46,11 @@ public class CataMinesMigration {
                 if (mineSec == null) continue;
                 
                 String name = mineSec.get("name").asString(file.getName().replace(".yml", ""));
-                
+                if (!ru.last.mines.managers.MineManager.isValidId(name)) {
+                    plugin.getLogger().warning("Пропущена шахта с недопустимым id из CataMines: " + name);
+                    continue;
+                }
+
                 YamlMap regionMap = mineSec.get("region").asYamlMap().orDefault(new YamlMap());
                 String world = regionMap.get("world").asString("world");
                 

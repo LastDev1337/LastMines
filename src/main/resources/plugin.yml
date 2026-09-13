@@ -3,11 +3,10 @@ version: '${version}'
 main: ru.last.mines.LastMines
 api-version: '1.21'
 
-depend: [ BLib ]
+depend: [ LLib ]
 softdepend: [ PlaceholderAPI, BMenu, WorldEdit, DecentHolograms, FancyHolograms ]
 
 author: Last
-# description: Плагин на автошахты с большой кастомизацией и гибкой настройкой, поддерживает версии 1.21 - 26.2
 website: https://laststudio.space
 
 permissions:

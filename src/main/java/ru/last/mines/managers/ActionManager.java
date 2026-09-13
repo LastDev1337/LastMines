@@ -29,8 +29,12 @@ public class ActionManager {
     public ActionManager(LastMines plugin) { this.plugin = plugin; }
 
     public void registerBMenuActions() {
-        if (Bukkit.getPluginManager().getPlugin("BMenu") != null) {
-            ActionsRegister.register(plugin, this);
+        if (Bukkit.getPluginManager().isPluginEnabled("BMenu")) {
+            try {
+                ActionsRegister.register(plugin, this);
+            } catch (Throwable t) {
+                plugin.getLogger().warning("Не удалось зарегистрировать команды BMenu (BMenu недоступен или сломан после перезагрузки): " + t);
+            }
         }
     }
 
@@ -414,21 +418,36 @@ public class ActionManager {
         try {
             YamlMap map = YamlMap.load(file);
             if (target == MineMode.RARITY) {
-                Object blocksRaw = map.getRaw("blocks");
-                List<Object> blocksList = blocksRaw instanceof List<?> l ? new ArrayList<>(l) : new ArrayList<>();
-                Map<String, Object> rarityEntry = new LinkedHashMap<>();
-                rarityEntry.put("id", "default");
-                rarityEntry.put("chance", 100.0);
-                rarityEntry.put("name", "&fОбычная");
-                rarityEntry.put("blocks", blocksList);
-                map.set("rarity", List.of(rarityEntry));
+                Object rarityBackup = map.has("rarity_backup") ? map.getRaw("rarity_backup") : null;
+                if (rarityBackup instanceof List<?> backup && !backup.isEmpty()) {
+                    map.set("rarity", backup);
+                } else {
+                    Object blocksRaw = map.getRaw("blocks");
+                    List<Object> blocksList = blocksRaw instanceof List<?> l ? new ArrayList<>(l) : new ArrayList<>();
+                    Map<String, Object> rarityEntry = new LinkedHashMap<>();
+                    rarityEntry.put("id", "default");
+                    rarityEntry.put("chance", 100.0);
+                    rarityEntry.put("name", "&fОбычная");
+                    rarityEntry.put("blocks", blocksList);
+                    map.set("rarity", List.of(rarityEntry));
+                }
+                map.set("rarity_backup", null);
                 map.set("blocks", null);
             } else {
                 Object rarityRaw = map.getRaw("rarity");
                 List<Object> blocksList = new ArrayList<>();
-                if (rarityRaw instanceof List<?> l && !l.isEmpty() && l.getFirst() instanceof Map<?, ?> firstRarity
-                        && firstRarity.get("blocks") instanceof List<?> bl) {
-                    blocksList = new ArrayList<>(bl);
+                if (rarityRaw instanceof List<?> l) {
+                    Map<Object, Object> merged = new LinkedHashMap<>();
+                    for (Object entry : l) {
+                        if (entry instanceof Map<?, ?> rarity && rarity.get("blocks") instanceof List<?> bl) {
+                            for (Object b : bl) {
+                                Object key = b instanceof Map<?, ?> bm ? bm.get("material") : b;
+                                merged.putIfAbsent(key, b);
+                            }
+                        }
+                    }
+                    blocksList.addAll(merged.values());
+                    if (!l.isEmpty()) map.set("rarity_backup", l);
                 }
                 map.set("blocks", blocksList);
                 map.set("rarity", null);

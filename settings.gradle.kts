@@ -10,3 +10,5 @@ plugins {
 }
 
 rootProject.name = "LastMines"
+
+includeBuild("../LLib")

@@ -12,16 +12,16 @@ import org.bukkit.scheduler.BukkitTask;
 import ru.last.mines.LastMines;
 import ru.last.mines.utils.ColorUtils;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 public class TextInputListener implements Listener {
 
     private record InputSession(Consumer<String> onSubmit, BukkitTask task) {}
 
-    private final Map<UUID, InputSession> activeSessions = new HashMap<>();
+    private final Map<UUID, InputSession> activeSessions = new ConcurrentHashMap<>();
 
     public void startSession(Player player, String prompt, Consumer<String> onSubmit) {
         UUID uuid = player.getUniqueId();

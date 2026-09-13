@@ -24,7 +24,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class BlockListener implements Listener {
 
-    private static final Enchantment FORTUNE = Registry.ENCHANTMENT.get(NamespacedKey.minecraft("fortune"));
+    @SuppressWarnings("deprecation") private static final Enchantment FORTUNE = Registry.ENCHANTMENT.get(NamespacedKey.minecraft("fortune"));
 
     public BlockListener() {}
 
@@ -87,8 +87,8 @@ public class BlockListener implements Listener {
     private void executePlayerAction(Player player, String cleanAction, Mine mine) {
         cleanAction = mine.replacePlaceholders(cleanAction);
         if (cleanAction.startsWith("[message]")) {
-            String msg = cleanAction.replaceFirst("\\[message]\\s*", "").replace("&", "§").replace("\\n", "\n");
-            player.sendMessage(msg);
+            String msg = cleanAction.replaceFirst("\\[message]\\s*", "").replace("\\n", "\n");
+            player.sendMessage(ColorUtils.colorString(msg));
         } else if (cleanAction.startsWith("[title]")) {
             String raw = cleanAction.replaceFirst("\\[title]\\s*", "");
             int startQuote = raw.indexOf('"');
@@ -100,7 +100,6 @@ public class BlockListener implements Listener {
                 times = raw.substring(endQuote + 1).trim();
                 if (times.isEmpty()) times = "20;40;20";
             }
-            titleStr = titleStr.replace("&", "§");
             String title = titleStr;
             String subtitle = "";
             if (titleStr.contains("\\n")) {
@@ -121,7 +120,7 @@ public class BlockListener implements Listener {
                     fadeOut = Integer.parseInt(timeSplit[2]);
                 }
             } catch (Exception ignored) {}
-            player.sendTitle(title, subtitle, fadeIn, stay, fadeOut);
+            player.sendTitle(ColorUtils.colorString(title), ColorUtils.colorString(subtitle), fadeIn, stay, fadeOut);
         } else if (cleanAction.startsWith("[actionbar]")) {
             String raw = cleanAction.replaceFirst("\\[actionbar]\\s*", "");
             String[] split = raw.split(" ", 3);
@@ -129,7 +128,6 @@ public class BlockListener implements Listener {
             if (split.length >= 3) {
                 msg = split[2];
             }
-            msg = msg.replace("&", "§");
             player.sendActionBar(ColorUtils.colorString(msg));
         } else if (cleanAction.startsWith("[sound]")) {
             String soundStr = cleanAction.replaceFirst("\\[sound]\\s*", "");
@@ -143,7 +141,7 @@ public class BlockListener implements Listener {
                 }
             } catch (Exception ignored) {}
         } else {
-            player.sendMessage(cleanAction.replace("&", "§").replace("\\n", "\n"));
+            player.sendMessage(ColorUtils.colorString(cleanAction.replace("\\n", "\n")));
         }
     }
 }

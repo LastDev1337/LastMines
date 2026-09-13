@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "ru.last.mines"
-version = "0.2"
+version = "0.3"
 
 repositories {
     mavenCentral()
@@ -20,9 +20,13 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
-    compileOnly("dev.by1337.core:BLibV2:1.7.6") // BLibV2
-    compileOnly("dev.by1337.bmenu:BMenu:2.5") // BMenu
-    compileOnly("me.clip:placeholderapi:2.12.3") // PlaceholderAPI
+    compileOnly("dev.laststudio.lib:LLib:0.1")
+    compileOnly("dev.by1337.item:ConfigurableItems:1.5.6")
+    compileOnly("dev.by1337.bmenu:BMenu:2.6")
+    compileOnly("dev.by1337.cmd:BCmd:1.4")
+    compileOnly("dev.by1337.plc:BPlaceholder:1.3")
+    compileOnly("dev.by1337.yaml:byaml-bukkit:1.6")
+    compileOnly("me.clip:placeholderapi:2.12.3")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.17") {
         exclude(group = "com.google.guava", module = "guava")
         exclude(group = "com.google.code.gson", module = "gson")
@@ -38,9 +42,9 @@ dependencies {
         exclude(group = "com.google.code.gson", module = "gson")
         exclude(group = "it.unimi.dsi", module = "fastutil")
     }
-    compileOnly("com.github.decentsoftware-eu:decentholograms:2.8.9") // DecentHolograms
-    compileOnly("de.oliver:FancyHolograms:2.10.0") // FancyHolograms
-    implementation("org.bstats:bstats-bukkit:3.2.1") // bStats
+    compileOnly("com.github.decentsoftware-eu:decentholograms:2.8.9")
+    compileOnly("de.oliver:FancyHolograms:2.10.0")
+    implementation("org.bstats:bstats-bukkit:3.2.1")
 }
 
 tasks {

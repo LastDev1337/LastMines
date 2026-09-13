@@ -7,6 +7,5 @@ public record MineRarity(
         double chance,
         String name,
         List<MineBlock> blocks,
-        // optional
         String icon
 ) { }
