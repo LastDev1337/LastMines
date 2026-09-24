@@ -1,7 +1,6 @@
 package ru.last.mines;
 
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandMap;
+import dev.by1337.cmd.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bstats.bukkit.Metrics;
@@ -14,20 +13,11 @@ import ru.last.mines.debug.Debugger;
 import ru.last.mines.gui.GuiManager;
 import ru.last.mines.holograms.HologramManager;
 import ru.last.mines.hooks.PlaceHook;
-import ru.last.mines.listeners.BlockListener;
-import ru.last.mines.listeners.MineEventListener;
-import ru.last.mines.listeners.chance.ChanceInputListener;
-import ru.last.mines.listeners.drop.DragDropListener;
-import ru.last.mines.listeners.drops.BlockDropsListener;
-import ru.last.mines.listeners.limit.LimitInputListener;
-import ru.last.mines.listeners.perm.PermInputListener;
-import ru.last.mines.listeners.text.TextInputListener;
+import ru.last.mines.listeners.Listeners;
+import ru.last.mines.listeners.impl.*;
 import ru.last.mines.managers.ActionManager;
 import ru.last.mines.managers.BlockCatalogManager;
 import ru.last.mines.managers.MineManager;
-
-import java.lang.reflect.Field;
-import java.util.List;
 
 public class LastMines extends JavaPlugin {
 
@@ -40,20 +30,16 @@ public class LastMines extends JavaPlugin {
     private HologramManager hologramManager;
     private Debugger debugger;
     private GuiManager guiManager;
-    private ChanceInputListener chanceInputListener;
-    private LimitInputListener limitInputListener;
-    private PermInputListener permInputListener;
-    private BlockDropsListener blockDropsListener;
-    private TextInputListener textInputListener;
-    private MainCommand mainCommand;
+    private Command<CommandSender> rootCommand;
 
     private static final int[] MIN_VERSION = {21};
-    private static final int[] MAX_VERSION = {26, 2};
+    private static final int[] MAX_VERSION = {26, 3};
 
     @Override
     public void onEnable() {
+        getLogger().info("enabling...");
         if (!isSupportedVersion()) {
-            getLogger().severe("Plugin supported only 1.21 - 26.2 version. Current version (" + getServer().getBukkitVersion() + ") not supported. Plugin disabling...");
+            getLogger().severe("Plugin supported only 1.21 - 26.3 version. Current version (" + getServer().getBukkitVersion() + ") not supported. Plugin disabling...");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
@@ -61,7 +47,6 @@ public class LastMines extends JavaPlugin {
         actionManager = new ActionManager(this);
         actionManager.registerBMenuActions();
         instance = this;
-        getLogger().info("enabling...");
 
         this.debugger = new Debugger();
 
@@ -86,46 +71,23 @@ public class LastMines extends JavaPlugin {
             this.mineManager.loadAll();
         }
 
-        mainCommand = new MainCommand(this);
-        Command bukkitCommand = new Command("lastmines", "LastMines main command", "/lastmines", List.of("mines")) {
-            @Override
-            public boolean execute(CommandSender sender, String label, String[] args) {
-                return mainCommand.onCommand(sender, this, label, args);
-            }
-            @Override
-            public List<String> tabComplete(CommandSender sender, String alias, String[] args) throws IllegalArgumentException {
-                return mainCommand.onTabComplete(sender, this, alias, args);
-            }
-        };
-        boolean commandRegistered = false;
         try {
-            Field commandMapField = getServer().getClass().getDeclaredField("commandMap");
-            commandMapField.setAccessible(true);
-            CommandMap commandMap = (org.bukkit.command.CommandMap) commandMapField.get(getServer());
-            commandMap.register(getName(), bukkitCommand);
-            commandRegistered = true;
+            MainCommand.register(this);
         } catch (Exception e) {
-            getLogger().severe("Failed to register command via reflection: " + e.getMessage());
+            getLogger().severe("Failed to register /lastmines command: " + e.getMessage());
         }
-        getServer().getPluginManager().registerEvents(new BlockListener(), this);
-        getServer().getPluginManager().registerEvents(new MineEventListener(this), this);
-        
-        this.chanceInputListener = new ChanceInputListener();
-        this.limitInputListener = new LimitInputListener();
-        this.permInputListener = new PermInputListener();
-        getServer().getPluginManager().registerEvents(this.chanceInputListener, this);
-        getServer().getPluginManager().registerEvents(this.limitInputListener, this);
-        getServer().getPluginManager().registerEvents(this.permInputListener, this);
-        getServer().getPluginManager().registerEvents(new DragDropListener(), this);
 
-        this.blockDropsListener = new BlockDropsListener();
-        getServer().getPluginManager().registerEvents(this.blockDropsListener, this);
-
-        this.textInputListener = new TextInputListener();
-        getServer().getPluginManager().registerEvents(this.textInputListener, this);
+        try {
+            Listeners.register();
+            getDebugger().info("Listeners registred successfully!");
+        } catch (Exception e) {
+            getLogger().severe("Listeners not registred for error: ");
+            e.printStackTrace();
+        }
 
         if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new PlaceHook(this).register();
+            getDebugger().info("PlaceholderAPI hooked!");
         }
 
         if (getServer().getPluginManager().isPluginEnabled("BMenu")) {
@@ -134,30 +96,30 @@ public class LastMines extends JavaPlugin {
                 this.guiManager.register();
             } catch (Throwable t) {
                 this.guiManager = null;
-                getLogger().warning("Не удалось включить меню (BMenu недоступен или сломан после перезагрузки): " + t);
+                getLogger().warning("BMenu not registred for GUI Managers: " + t);
             }
         } else {
             this.guiManager = null;
+            getLogger().warning("BMenu not found! GUI dont worked");
         }
 
         new UpdateChecker(this).check();
 
         Metrics metrics = new Metrics(this, 31925);
-        metrics.addCustomChart(new SimplePie("chart_id", () -> "My value"));
+        metrics.addCustomChart(new SimplePie("chart_id", () -> "LastMines"));
 
-        if (commandRegistered) {
-            getLogger().info("enabling successfully!");
-        } else {
-            getLogger().severe("enabled with errors: /lastmines command is NOT registered, see the error above.");
-        }
+        getLogger().info("enabling successfully!");
     }
 
     @Override
     public void onDisable() {
         getLogger().info("disabling...");
+
+        MainCommand.unregister(this);
         if (this.mineManager != null) { this.mineManager.unloadAll(); }
         if (this.hologramManager != null) { this.hologramManager.unloadAll(); }
         if (this.guiManager != null) { this.guiManager.unregister(); }
+
         getLogger().info("disabling successfully!");
     }
 
@@ -187,7 +149,7 @@ public class LastMines extends JavaPlugin {
         String mcVersion = bukkitVersion.split("-")[0];
         int[] parsed = parseVersion(mcVersion);
         if (parsed == null) {
-            getLogger().warning("Не удалось распознать версию сервера (" + bukkitVersion + "), пропускаю проверку совместимости.");
+            getLogger().warning("Unable to detect the server version (" + bukkitVersion + "), skipping the compatibility check.");
             return true;
         }
         return compareVersions(parsed, MIN_VERSION) >= 0 && compareVersions(parsed, MAX_VERSION) <= 0;
@@ -201,11 +163,6 @@ public class LastMines extends JavaPlugin {
     public HologramManager getHologramManager() { return hologramManager; }
     public Debugger getDebugger() { return debugger; }
     public GuiManager getGuiManager() { return guiManager; }
-    
-    public MainCommand getMainCommand() { return mainCommand; }
-    public ChanceInputListener getChanceInputListener() { return chanceInputListener; }
-    public LimitInputListener getLimitInputListener() { return limitInputListener; }
-    public PermInputListener getPermInputListener() { return permInputListener; }
-    public BlockDropsListener getBlockDropsListener() { return blockDropsListener; }
-    public TextInputListener getTextInputListener() { return textInputListener; }
+    public Command<CommandSender> getRootCommand() { return rootCommand; }
+    public void setRootCommand(Command<CommandSender> rootCommand) { this.rootCommand = rootCommand; }
 }

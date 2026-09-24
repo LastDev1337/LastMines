@@ -1,131 +1,74 @@
 package ru.last.mines.commands;
 
-import com.google.common.reflect.ClassPath;
-import org.bukkit.command.Command;
+import dev.by1337.cmd.Command;
+import dev.laststudio.lib.api.LLibAPI;
+import dev.laststudio.lib.api.command.CommandService;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.TabCompleter;
-import org.jetbrains.annotations.NotNull;
 import ru.last.mines.LastMines;
+import ru.last.mines.commands.sub.*;
 import ru.last.mines.config.models.*;
-import ru.last.mines.utils.*;
+import ru.last.mines.utils.ColorUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+public final class MainCommand {
+    private MainCommand() {}
 
-import com.google.common.reflect.ClassPath.ClassInfo;
+    public static void register(LastMines plugin) {
+        CommandService cs = LLibAPI.get().commands();
 
-import java.util.*;
-
-public class MainCommand implements CommandExecutor, TabCompleter {
-    private final LastMines plugin;
-    private final Map<String, AbstractSubCommand> subCommands = new HashMap<>();
-
-    public MainCommand(LastMines plugin) {
-        this.plugin = plugin;
-        loadSubCommands();
-    }
-
-    public AbstractSubCommand getSubCommand(String name) {
-        return subCommands.get(name.toLowerCase());
-    }
-
-    public void loadSubCommands() {
-        subCommands.clear();
-        try {
-            boolean commandsEnabled = plugin.getConfigManager().getMainConfig().getModules().isCommandsEnabled();
-            if (!commandsEnabled) return;
-            
-            CommandsModule cmdModule = plugin.getConfigManager().getCommandsModule();
-            
-            ClassPath cp = ClassPath.from(plugin.getClass().getClassLoader());
-            for (ClassInfo info : cp.getTopLevelClasses("ru.last.mines.commands.sub")) {
-                Class<?> clazz = info.load();
-                if (AbstractSubCommand.class.isAssignableFrom(clazz) && clazz.isAnnotationPresent(SubCommand.class)) {
-                    SubCommand meta = clazz.getAnnotation(SubCommand.class);
-                    String baseName = meta.name().toLowerCase();
-                    
-                    CommandsModule.CommandConfig config = cmdModule.getCommand(baseName);
-                    if (!config.isEnable()) continue;
-                    
-                    AbstractSubCommand cmd = (AbstractSubCommand) clazz.getConstructor(LastMines.class).newInstance(plugin);
-                    subCommands.put(baseName, cmd);
-                    
-                    for (String alias : meta.aliases()) {
-                        subCommands.put(alias.toLowerCase(), cmd);
-                    }
-                    
-                    for (String customAlias : config.getAliases()) {
-                        subCommands.put(customAlias.toLowerCase(), cmd);
-                    }
-                }
-            }
-        } catch (Exception e) { e.printStackTrace(); }
-    }
-
-    @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
-        if (!plugin.getConfigManager().getMainConfig().getModules().isCommandsEnabled()) {
-            sender.sendMessage(ColorUtils.colorString("&cВсе команды плагина отключены в конфигурации."));
-            return true;
-        }
-        
-        if (!sender.hasPermission("lastmines.admin")) {
-            plugin.getConfigManager().getMessages().getNoPermission().send(sender);
-            return true;
+        Command<CommandSender> old = plugin.getRootCommand();
+        if (old != null) {
+            cs.unregister(old);
         }
 
-        if (args.length == 0) {
-            AbstractSubCommand help = subCommands.get("help");
-            if (help != null) help.execute(sender, args);
-            return true;
-        }
-
-        String subName = args[0].toLowerCase();
-        if (subCommands.containsKey(subName)) {
-            subCommands.get(subName).execute(sender, args);
-            return true;
-        }
-
-        AbstractSubCommand help = subCommands.get("help");
-        if (help != null) help.execute(sender, args);
-        else sender.sendMessage(ColorUtils.colorString(plugin.getConfigManager().getMessages().getPrefix() + "&cUnknown subcommand!"));
-        return true;
+        Command<CommandSender> root = build(plugin, cs);
+        cs.register(plugin, root);
+        plugin.setRootCommand(root);
     }
 
-    @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
-        if (!plugin.getConfigManager().getMainConfig().getModules().isCommandsEnabled()) return Collections.emptyList();
-        if (!sender.hasPermission("lastmines.admin")) return Collections.emptyList();
-        
+    public static void unregister(LastMines plugin) {
+        Command<CommandSender> root = plugin.getRootCommand();
+        if (root != null) {
+            LLibAPI.get().commands().unregister(root);
+            plugin.setRootCommand(null);
+        }
+    }
+
+    private static Command<CommandSender> build(LastMines plugin, CommandService cs) {
         CommandsModule cmdModule = plugin.getConfigManager().getCommandsModule();
-        
-        if (args.length == 1) {
-            List<String> list = new ArrayList<>();
-            for (AbstractSubCommand cmd : new HashSet<>(subCommands.values())) {
-                SubCommand info = cmd.getClass().getAnnotation(SubCommand.class);
-                if (info != null && info.name().toLowerCase().startsWith(args[0].toLowerCase())) {
-                    CommandsModule.CommandConfig config = cmdModule.getCommand(info.name());
-                    if (config.isTabCompleter()) {
-                        list.add(info.name());
-                    }
-                }
-            }
-            return list;
-        }
-        
-        String subName = args[0].toLowerCase();
-        if (subCommands.containsKey(subName)) {
-            AbstractSubCommand cmd = subCommands.get(subName);
-            SubCommand info = cmd.getClass().getAnnotation(SubCommand.class);
-            if (info != null) {
-                CommandsModule.CommandConfig config = cmdModule.getCommand(info.name());
-                if (!config.isTabCompleter()) return Collections.emptyList();
-            }
-            return cmd.tabComplete(sender, args);
-        }
-        
-        return Collections.emptyList();
+
+        Command<CommandSender> root = cs.command("lastmines")
+                .alias("mines")
+                .requires(sender -> {
+                    if (plugin.getConfigManager().getMainConfig().getModules().isCommandsEnabled()) return true;
+                    sender.sendMessage(ColorUtils.colorString("&cВсе команды плагина отключены в конфигурации."));
+                    return false;
+                })
+                .requires(cs.permission("lastmines.admin"))
+                .executor(sender -> Help.execute(plugin, sender));
+
+        add(root, cmdModule, Help.build(plugin, cs));
+        add(root, cmdModule, Create.build(plugin, cs), "c", "crt");
+        add(root, cmdModule, Delete.build(plugin, cs), "del", "remove");
+        add(root, cmdModule, ru.last.mines.commands.sub.List.build(plugin, cs));
+        add(root, cmdModule, Gui.build(plugin, cs), "menu");
+        add(root, cmdModule, Update.build(plugin, cs));
+        add(root, cmdModule, Reset.build(plugin, cs), "r");
+        add(root, cmdModule, ResetTimer.build(plugin, cs), "rt");
+        add(root, cmdModule, Tp.build(plugin, cs), "tp");
+        add(root, cmdModule, Migrate.build(plugin, cs), "mgrt");
+        add(root, cmdModule, Reload.build(plugin, cs), "rl");
+        add(root, cmdModule, DefaultMines.build(plugin, cs), "dm", "dmine", "dfmine", "dfm");
+        add(root, cmdModule, Language.build(plugin, cs), "lang");
+        add(root, cmdModule, Near.build(plugin, cs), "n", "radius");
+
+        return root;
+    }
+
+    private static void add(Command<CommandSender> root, CommandsModule cmdModule, Command<CommandSender> sub, String... defaultAliases) {
+        CommandsModule.CommandConfig cfg = cmdModule.getCommand(sub.name());
+        if (!cfg.isEnable()) return;
+        for (String alias : defaultAliases) sub.alias(alias);
+        for (String alias : cfg.getAliases()) sub.alias(alias);
+        root.sub(sub);
     }
 }

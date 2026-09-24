@@ -1,4 +1,4 @@
-package ru.last.mines.listeners.text;
+package ru.last.mines.listeners.impl.input;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;

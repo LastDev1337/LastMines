@@ -3,6 +3,7 @@ package ru.last.mines.commands.sub.migrate;
 import org.bukkit.command.CommandSender;
 import dev.by1337.yaml.YamlMap;
 import ru.last.mines.LastMines;
+import ru.last.mines.utils.ColorUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +18,7 @@ public class AutoMineMigration {
 
         File autoMinesFile = new File(plugin.getDataFolder().getParentFile(), "AutoMine/AutoMines.yml");
         if (!autoMinesFile.exists()) {
-            sender.sendMessage(prefix + "§cФайл plugins/AutoMine/AutoMines.yml не найден!");
+            sender.sendMessage(ColorUtils.colorString(prefix + "<red>Файл plugins/AutoMine/AutoMines.yml не найден!"));
             return;
         }
 
@@ -25,7 +26,7 @@ public class AutoMineMigration {
         try {
             config = YamlMap.load(autoMinesFile);
         } catch (Exception e) {
-            sender.sendMessage(prefix + "§cОшибка чтения AutoMines.yml!");
+            sender.sendMessage(ColorUtils.colorString(prefix + "<red>Ошибка чтения AutoMines.yml!"));
             return;
         }
 
@@ -33,7 +34,7 @@ public class AutoMineMigration {
         try { autoMinesSec = config.get("AutoMines").asYamlMap().orDefault(null); } catch (Exception ignored) {}
         
         if (autoMinesSec == null) {
-            sender.sendMessage(prefix + "§cВ AutoMines.yml нет секции AutoMines!");
+            sender.sendMessage(prefix + "<red>В AutoMines.yml нет секции AutoMines!");
             return;
         }
 
@@ -68,8 +69,7 @@ public class AutoMineMigration {
                 newConfig.set("reset_time", timeUpdate);
                 
                 YamlMap posMap = new YamlMap();
-                posMap.set("one", p1x + ";" + p1y + ";" + p1z);
-                posMap.set("two", p2x + ";" + p2y + ";" + p2z);
+                posMap.set("points", List.of(p1x + ";" + p1y + ";" + p1z, p2x + ";" + p2y + ";" + p2z));
                 newConfig.set("positions", posMap.getRaw());
 
                 YamlMap types = null;
@@ -157,11 +157,11 @@ public class AutoMineMigration {
         }
 
         if (migrated > 0) {
-            sender.sendMessage(prefix + "§aУспешно мигрировано " + migrated + " шахт из AutoMine!");
+            sender.sendMessage(ColorUtils.colorString(prefix + "<green>Успешно мигрировано " + migrated + " шахт из AutoMine!"));
             plugin.getMineManager().loadAll();
-            sender.sendMessage(prefix + "§aШахты загружены!");
+            sender.sendMessage(ColorUtils.colorString(prefix + "<green>Шахты загружены!"));
         } else {
-            sender.sendMessage(prefix + "§cНе удалось мигрировать ни одной шахты.");
+            sender.sendMessage(ColorUtils.colorString(prefix + "<red>Не удалось мигрировать ни одной шахты."));
         }
     }
 }

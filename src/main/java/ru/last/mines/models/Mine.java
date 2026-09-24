@@ -12,10 +12,10 @@ import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scheduler.BukkitRunnable;
 import ru.last.mines.LastMines;
 import ru.last.mines.api.events.*;
+import ru.last.mines.hooks.WEHook;
 import ru.last.mines.utils.Sounds;
-import ru.last.mines.utils.time.TimeUtils;
+import ru.last.mines.utils.time.*;
 import ru.last.mines.utils.ColorUtils;
-import ru.last.mines.utils.time.TimeFormatter;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -35,10 +35,16 @@ public class Mine {
     private final World world;
     
     private final MineMode mode;
-    
+
+    private final MineShape shape;
+    private final Object weRegion;
+    private final List<int[]> regionPoints;
+
     private final Location pos1;
     private final Location pos2;
-    
+
+    private boolean enable;
+
     private final List<MineBlock> blocks = new ArrayList<>();
     private final List<MineRarity> rarities = new ArrayList<>();
 
@@ -103,9 +109,32 @@ public class Mine {
         this.mode = parsedMode;
         
         YamlMap posMap = map.get("positions").asYamlMap().getOrThrow();
-        this.pos1 = parseLocation(world, posMap.get("one").asString("0;100;0"));
-        this.pos2 = parseLocation(world, posMap.get("two").asString("5;105;5"));
-        
+        MineShape parsedShape;
+        try { parsedShape = MineShape.fromString(posMap.get("shape").asString("cuboid")); }
+        catch (Exception ignored) { parsedShape = MineShape.CUBOID; }
+        this.shape = parsedShape;
+
+        List<String> shapePoints = getListOrEmpty(posMap.get("points")).stream().map(v -> YamlValue.wrap(v).asString("")).toList();
+        if (this.shape == MineShape.CUBOID) {
+            this.pos1 = parseLocation(world, !shapePoints.isEmpty() ? shapePoints.get(0) : "0;100;0");
+            this.pos2 = parseLocation(world, shapePoints.size() > 1 ? shapePoints.get(1) : "5;105;5");
+            this.weRegion = null;
+        } else {
+            Object region = WEHook.buildRegion(world, this.shape, shapePoints);
+            this.weRegion = region;
+            if (region != null) {
+                int[] min = WEHook.minPoint(region);
+                int[] max = WEHook.maxPoint(region);
+                this.pos1 = new Location(world, min[0], min[1], min[2]);
+                this.pos2 = new Location(world, max[0], max[1], max[2]);
+            } else {
+                plugin.getLogger().warning("[LastMines] Не удалось построить фигуру '" + this.shape + "' для шахты " + id + " (требуется WorldEdit). Шахта не будет работать корректно.");
+                this.pos1 = new Location(world, 0, 100, 0);
+                this.pos2 = new Location(world, 0, 100, 0);
+            }
+        }
+        this.regionPoints = this.weRegion != null ? WEHook.points(this.weRegion) : Collections.emptyList();
+
         if (this.mode == MineMode.BLOCKS) {
             for (Object blockValRaw : getListOrEmpty(map.get("blocks"))) {
                 YamlMap blockMap = YamlValue.wrap(blockValRaw).asYamlMap().getOrThrow();
@@ -182,6 +211,7 @@ public class Mine {
         this.resetTime = TimeUtils.parseToSeconds(map.get("reset_time").asString("5m"));
         this.timeLeft = this.resetTime;
         this.stopped = map.get("stopped").asBool(false);
+        this.enable = map.get("enable").asBool(true);
 
         startTasks();
         createHologram();
@@ -353,6 +383,7 @@ public class Mine {
         sourceMap.set("permissions.messages", permMessages);
         sourceMap.set("reset_time", resetTime);
         sourceMap.set("stopped", stopped);
+        sourceMap.set("enable", enable);
         sourceMap.set("enchant_requirements.enable", enchantEnable);
         sourceMap.set("enchant_requirements.enchantments", new LinkedHashMap<>(requiredEnchants));
         sourceMap.set("online.enable", onlineEnable);
@@ -415,6 +446,7 @@ public class Mine {
     }
     
     private void tick() {
+        if (!enable) return;
         if (stopped) {
             updateHologram();
             return;
@@ -625,8 +657,10 @@ public class Mine {
     public boolean isResetting() { return isResetting; }
 
     public boolean resetMine() {
+        if (!enable) return false;
         if (pos1 == null || pos2 == null || world == null) return false;
         if (isResetting) return false;
+        if (shape != MineShape.CUBOID && (weRegion == null || regionPoints.isEmpty())) return false;
 
         MinePreResetEvent preResetEvent = new MinePreResetEvent(this);
         Bukkit.getPluginManager().callEvent(preResetEvent);
@@ -635,37 +669,38 @@ public class Mine {
         int minX = Math.min(pos1.getBlockX(), pos2.getBlockX());
         int minY = Math.min(pos1.getBlockY(), pos2.getBlockY());
         int minZ = Math.min(pos1.getBlockZ(), pos2.getBlockZ());
-        
+
         int maxX = Math.max(pos1.getBlockX(), pos2.getBlockX());
         int maxY = Math.max(pos1.getBlockY(), pos2.getBlockY());
         int maxZ = Math.max(pos1.getBlockZ(), pos2.getBlockZ());
 
         int XY1 = (maxX - minX + 1) * (maxY - minY + 1) * (maxZ - minZ + 1);
+        int totalCells = shape == MineShape.CUBOID ? XY1 : regionPoints.size();
 
         List<MineBlock> targetBlocks = getCurrentBlocks();
         if (targetBlocks.isEmpty()) return false;
 
         double totalChance = targetBlocks.stream().mapToDouble(MineBlock::chance).sum();
-        
+
         isResetting = true;
         physicalBlocksCount = 0;
-        
+
         for (PeriodicAction pa : periodicActions) {
             pa.active = true;
             pa.durationLeft = pa.initialDuration;
             pa.counter = pa.interval;
         }
-        
+
         Map<Integer, Material> limitedPlacements = new HashMap<>();
         Random rnd = new Random();
-        
+
         for (MineBlock mb : targetBlocks) {
             if (mb.min() >= 0 && mb.max() >= mb.min()) {
                 int count = mb.min() + (mb.max() > mb.min() ? rnd.nextInt(mb.max() - mb.min() + 1) : 0);
                 for (int i = 0; i < count; i++) {
                     int attempts = 0;
                     while (attempts < 50) {
-                        int rIdx = rnd.nextInt(XY1);
+                        int rIdx = rnd.nextInt(totalCells);
                         if (!limitedPlacements.containsKey(rIdx)) {
                             limitedPlacements.put(rIdx, mb.material());
                             break;
@@ -676,64 +711,115 @@ public class Mine {
             }
         }
 
-        resetTask = new BukkitRunnable() {
-            int x = minX;
-            int y = minY;
-            int z = minZ;
-            int currentIndex = 0;
+        if (shape == MineShape.CUBOID) {
+            resetTask = new BukkitRunnable() {
+                int x = minX;
+                int y = minY;
+                int z = minZ;
+                int currentIndex = 0;
 
-            @Override
-            public void run() {
-                long startTime = System.currentTimeMillis();
-                int blocksSet = 0;
-                
-                while (x <= maxX) {
-                    while (y <= maxY) {
-                        while (z <= maxZ) {
-                            Material mat;
-                            if (limitedPlacements.containsKey(currentIndex)) {
-                                mat = limitedPlacements.get(currentIndex);
-                            } else {
-                                mat = getRandomBlock(targetBlocks, totalChance);
-                            }
-                            if (mat != null) {
-                                Block b = world.getBlockAt(x, y, z);
-                                if (b.getType() != mat) {
-                                    b.setType(mat, false);
-                                }
-                                if (mat != Material.AIR) {
-                                    physicalBlocksCount++;
-                                }
-                            }
-                            z++;
-                            currentIndex++;
-                            blocksSet++;
+                @Override
+                public void run() {
+                    long startTime = System.currentTimeMillis();
+                    int blocksSet = 0;
 
-                            if (blocksSet > 10000 || (System.currentTimeMillis() - startTime) > 10) {
-                                return;
+                    while (x <= maxX) {
+                        while (y <= maxY) {
+                            while (z <= maxZ) {
+                                Material mat;
+                                if (limitedPlacements.containsKey(currentIndex)) {
+                                    mat = limitedPlacements.get(currentIndex);
+                                } else {
+                                    mat = getRandomBlock(targetBlocks, totalChance);
+                                }
+                                if (mat != null) {
+                                    Block b = world.getBlockAt(x, y, z);
+                                    if (b.getType() != mat) {
+                                        b.setType(mat, false);
+                                    }
+                                    if (mat != Material.AIR) {
+                                        physicalBlocksCount++;
+                                    }
+                                }
+                                z++;
+                                currentIndex++;
+                                blocksSet++;
+
+                                if (blocksSet > 10000 || (System.currentTimeMillis() - startTime) > 10) {
+                                    return;
+                                }
+                            }
+                            z = minZ;
+                            y++;
+                        }
+                        y = minY;
+                        x++;
+                    }
+
+                    maxPhysicalBlocksCount = physicalBlocksCount;
+                    isResetting = false;
+
+                    for (String act : resetActions) {
+                        executeAction(act);
+                    }
+                    timeLeft = resetTime;
+                    updateHologram();
+
+                    Bukkit.getPluginManager().callEvent(new MineResetEvent(Mine.this));
+
+                    this.cancel();
+                }
+            }.runTaskTimer(plugin, 0L, 1L);
+        } else {
+            resetTask = new BukkitRunnable() {
+                int currentIndex = 0;
+
+                @Override
+                public void run() {
+                    long startTime = System.currentTimeMillis();
+                    int blocksSet = 0;
+                    int total = regionPoints.size();
+
+                    while (currentIndex < total) {
+                        int[] p = regionPoints.get(currentIndex);
+                        Material mat;
+                        if (limitedPlacements.containsKey(currentIndex)) {
+                            mat = limitedPlacements.get(currentIndex);
+                        } else {
+                            mat = getRandomBlock(targetBlocks, totalChance);
+                        }
+                        if (mat != null) {
+                            Block b = world.getBlockAt(p[0], p[1], p[2]);
+                            if (b.getType() != mat) {
+                                b.setType(mat, false);
+                            }
+                            if (mat != Material.AIR) {
+                                physicalBlocksCount++;
                             }
                         }
-                        z = minZ;
-                        y++;
+                        currentIndex++;
+                        blocksSet++;
+
+                        if (blocksSet > 10000 || (System.currentTimeMillis() - startTime) > 10) {
+                            return;
+                        }
                     }
-                    y = minY;
-                    x++;
+
+                    maxPhysicalBlocksCount = physicalBlocksCount;
+                    isResetting = false;
+
+                    for (String act : resetActions) {
+                        executeAction(act);
+                    }
+                    timeLeft = resetTime;
+                    updateHologram();
+
+                    Bukkit.getPluginManager().callEvent(new MineResetEvent(Mine.this));
+
+                    this.cancel();
                 }
-
-                maxPhysicalBlocksCount = physicalBlocksCount;
-                isResetting = false;
-
-                for (String act : resetActions) {
-                    executeAction(act);
-                }
-                timeLeft = resetTime;
-                updateHologram();
-
-                Bukkit.getPluginManager().callEvent(new MineResetEvent(Mine.this));
-
-                this.cancel();
-            }
-        }.runTaskTimer(plugin, 0L, 1L);
+            }.runTaskTimer(plugin, 0L, 1L);
+        }
         return true;
     }
 
@@ -757,12 +843,12 @@ public class Mine {
     }
 
     public void createHologram() {
-        if (!holoEnable) return;
+        if (!holoEnable || !enable) return;
         plugin.getHologramManager().create(this);
     }
-    
+
     public void updateHologram() {
-        if (!holoEnable) return;
+        if (!holoEnable || !enable) return;
         plugin.getHologramManager().update(this);
     }
     
@@ -815,6 +901,11 @@ public class Mine {
     public boolean isStopped() { return stopped; }
     public void setStopped(boolean stopped) { this.stopped = stopped; }
 
+    public boolean isEnable() { return enable; }
+    public void setEnable(boolean enable) { this.enable = enable; }
+
+    public MineShape getShape() { return shape; }
+
     public List<MineRarity> getRarities() { return rarities; }
 
     public boolean setNextRarity(String rarityId) {
@@ -856,6 +947,9 @@ public class Mine {
 
     public boolean isInMine(Location loc) {
         if (loc.getWorld() != world) return false;
+        if (shape != MineShape.CUBOID) {
+            return weRegion != null && WEHook.contains(weRegion, loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+        }
         int minX = Math.min(pos1.getBlockX(), pos2.getBlockX());
         int minY = Math.min(pos1.getBlockY(), pos2.getBlockY());
         int minZ = Math.min(pos1.getBlockZ(), pos2.getBlockZ());

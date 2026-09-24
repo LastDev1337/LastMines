@@ -2,27 +2,30 @@ package ru.last.mines.config.models;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.LinkedHashMap;
 
-import org.bukkit.Location;
+import org.bukkit.World;
 import dev.by1337.yaml.YamlMap;
+import ru.last.mines.models.MineShape;
 
 public class DefaultMine {
 
-    public static YamlMap generate(String id, Location pos1, Location pos2) {
+    public static YamlMap generate(String id, World world, MineShape shape, List<String> points) {
         YamlMap config = new YamlMap();
-        
+
         config.set("name", id);
-        config.set("world", pos1.getWorld().getName());
+        config.set("world", world.getName());
         config.set("reset_time", "5m");
         config.set("mode", "BLOCKS");
-        
+        config.set("enable", true);
+
         YamlMap positions = new YamlMap();
-        positions.set("one", pos1.getBlockX() + ";" + pos1.getBlockY() + ";" + pos1.getBlockZ());
-        positions.set("two", pos2.getBlockX() + ";" + pos2.getBlockY() + ";" + pos2.getBlockZ());
+        positions.set("shape", shape.name().toLowerCase(Locale.ROOT));
+        positions.set("points", points);
         config.set("positions", positions.getRaw());
-        
+
         List<Map<String, Object>> defaultBlocks = new ArrayList<>();
         
         Map<String, Object> stoneMap = new LinkedHashMap<>();
@@ -44,7 +47,7 @@ public class DefaultMine {
         actions.add("[message] [update:10] &fАвтоШахта &e" + id + " &fобновится через 10 секунд!");
         actions.add("[message] [update] &fАвтоШахта &e" + id + " &fобновилась!");
         config.set("actions", actions);
-        
+
         return config;
     }
 }

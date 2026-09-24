@@ -5,8 +5,11 @@ import dev.by1337.yaml.YamlMap;
 import ru.last.mines.api.events.*;
 import ru.last.mines.models.*;
 import ru.last.mines.LastMines;
+import ru.last.mines.old.OldManager;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,6 +55,16 @@ public class MineManager {
     private void loadFile(File file, int attempt) {
         try {
             YamlMap map = YamlMap.load(file);
+
+            if (OldManager.migrate(map)) {
+                try {
+                    Files.writeString(file.toPath(), map.saveToString(), StandardCharsets.UTF_8);
+                    plugin.getDebugger().info("Шахта " + file.getName() + ": конфиг позиций обновлён до формата points (одноразовая миграция).");
+                } catch (java.io.IOException e) {
+                    plugin.getDebugger().error("Не удалось сохранить мигрированный конфиг шахты " + file.getName(), e);
+                }
+            }
+
             String worldName = map.get("world").asString("world");
 
             if (Bukkit.getWorld(worldName) == null) {

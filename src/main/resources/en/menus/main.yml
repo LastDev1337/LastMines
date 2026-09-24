@@ -62,6 +62,27 @@ items:
         on_click:
           - '[mine_toggle_stop] {MINE_ID}'
 
+  toggle_enable:
+    slot: 7
+    oneOf:
+      - on_view: '{ENABLE} == true'
+        material: lime_dye
+        name: '&fMine is &aenabled'
+        lore:
+          - '&7The mine fully operates'
+          - '&7Click to disable it'
+        on_click:
+          - '[mine_toggle_enable] {MINE_ID}'
+      - on_view: '{ENABLE} == false'
+        material: gray_dye
+        name: '&fMine is &cdisabled'
+        lore:
+          - '&7Blocks in its area break'
+          - '&7as plain blocks, no mine effects'
+          - '&7Click to enable it'
+        on_click:
+          - '[mine_toggle_enable] {MINE_ID}'
+
   blocks:
     material: cobblestone
     name: '&fMine blocks'

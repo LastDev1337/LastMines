@@ -1,9 +1,8 @@
-package ru.last.mines.listeners.chance;
+package ru.last.mines.listeners.impl.input;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -15,10 +14,12 @@ import ru.last.mines.api.LastMinesProvider;
 import ru.last.mines.models.Mine;
 import ru.last.mines.models.MineBlock;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ChanceInputListener implements Listener {
+public class LimitInputListener implements Listener {
 
     private final Map<UUID, InputSession> activeSessions = new ConcurrentHashMap<>();
 
@@ -28,7 +29,7 @@ public class ChanceInputListener implements Listener {
             activeSessions.get(uuid).task.cancel();
         }
 
-        LastMines.get().getConfigManager().getMessages().getInputChance().send(player);
+        LastMines.get().getConfigManager().getMessages().getInputLimit().send(player);
 
         BukkitTask task = Bukkit.getScheduler().runTaskLater(LastMines.get(), () -> {
             if (activeSessions.remove(uuid) != null) {
@@ -50,38 +51,26 @@ public class ChanceInputListener implements Listener {
 
         String msg = PlainTextComponentSerializer.plainText().serialize(event.message()).trim();
         try {
-            double chance = Double.parseDouble(msg);
-            if (!Double.isFinite(chance) || chance < 0 || chance > 100) throw new NumberFormatException();
+            int limit = Integer.parseInt(msg);
+            if (limit < 1 || limit > 64) throw new NumberFormatException();
 
             Bukkit.getScheduler().runTask(LastMines.get(), () -> {
                 Mine mine = LastMinesProvider.getApi().getMine(session.mineId);
                 if (mine == null) return;
 
                 List<MineBlock> blocks = mine.getCurrentBlocks();
-                double total = 0;
                 MineBlock target = null;
                 for (MineBlock mb : blocks) {
                     if (mb.material().name().equals(session.material)) {
                         target = mb;
-                    } else {
-                        total += mb.chance();
+                        break;
                     }
-                }
-
-                if (total + chance > 100.0) {
-                    LastMines.get().getConfigManager().getMessages().getChanceExceeded().send(player);
-                    return;
                 }
 
                 if (target != null) {
-                    MineBlock newBlock = new MineBlock(target.material(), chance, target.min(), target.max(), target.drops());
+                    MineBlock newBlock = new MineBlock(target.material(), target.chance(), target.min(), limit, target.drops());
                     blocks.remove(target);
                     blocks.add(newBlock);
-                } else {
-                    Material mat = Material.matchMaterial(session.material);
-                    if (mat != null) {
-                        blocks.add(new MineBlock(mat, chance, 0, 0, Collections.emptyList()));
-                    }
                 }
 
                 mine.save();

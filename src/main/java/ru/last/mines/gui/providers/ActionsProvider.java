@@ -15,19 +15,17 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.Material;
 import ru.last.mines.LastMines;
 import ru.last.mines.api.LastMinesProvider;
+import ru.last.mines.gui.PagedView;
+import dev.by1337.bmenu.animation.util.AnimationUtil;
 import ru.last.mines.models.Mine;
 import ru.last.mines.utils.ColorUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.Arrays;
 
 public class ActionsProvider extends DefaultMenu {
 
-    private static final Map<UUID, Integer> pageByPlayer = new HashMap<>();
-    private static final Map<UUID, Integer> maxPageByPlayer = new HashMap<>();
+    private static final PagedView PAGES = new PagedView();
 
     public ActionsProvider(MenuConfig config, Player viewer, @Nullable Menu previousMenu) {
         super(config, viewer, previousMenu);
@@ -38,9 +36,7 @@ public class ActionsProvider extends DefaultMenu {
     }
 
     public static void changePage(Player player, int delta) {
-        int current = pageByPlayer.getOrDefault(player.getUniqueId(), 0);
-        int max = maxPageByPlayer.getOrDefault(player.getUniqueId(), 0);
-        pageByPlayer.put(player.getUniqueId(), Math.clamp(current + delta, 0, max));
+        PAGES.changePage(player, delta);
     }
 
     @Override
@@ -49,21 +45,20 @@ public class ActionsProvider extends DefaultMenu {
         if (!map.has("actions_list")) return;
         YamlMap listMap = map.get("actions_list").asYamlMap().orDefault(new YamlMap());
 
-        List<Integer> slots = parseSlots(listMap.get("slots").asString(""));
+        String slotsStr = listMap.get("slots").asString("");
+        List<Integer> slots = slotsStr.isBlank() ? List.of() : Arrays.stream(AnimationUtil.readSlots(slotsStr)).boxed().toList();
         String name = listMap.get("name").asString("&f{INDEX}. &7{ACTION}");
         int pageSize = Math.max(1, slots.size());
 
-        String mineId = LastMines.get().getGuiManager().getViewingMines().get(viewer.getUniqueId());
-        if (mineId == null) return;
-        Mine mine = LastMinesProvider.getApi().getMine(mineId);
+        String finalMineId = LastMines.get().getGuiManager().getViewingMines().get(viewer.getUniqueId());
+        if (finalMineId == null) return;
+        Mine mine = LastMinesProvider.getApi().getMine(finalMineId);
         if (mine == null) return;
 
         List<String> actions = mine.getRawActions();
 
-        int maxPage = Math.max(0, (actions.size() - 1) / pageSize);
-        maxPageByPlayer.put(viewer.getUniqueId(), maxPage);
-        int page = Math.min(pageByPlayer.getOrDefault(viewer.getUniqueId(), 0), maxPage);
-        pageByPlayer.put(viewer.getUniqueId(), page);
+        int page = PAGES.resolvePage(viewer.getUniqueId(), actions.size(), pageSize);
+        int maxPage = PAGES.maxPage(viewer.getUniqueId());
         addArgument("PAGE", String.valueOf(page + 1));
         addArgument("MAX_PAGE", String.valueOf(maxPage + 1));
 
@@ -73,6 +68,7 @@ public class ActionsProvider extends DefaultMenu {
         for (int i = from; i < to; i++) {
             String action = actions.get(i);
             int slot = slots.get(i - from);
+            if (slot < 0 || slot >= layers.getBaseLayer().length) continue;
             int index = i;
 
             Material icon = Material.PAPER;
@@ -84,12 +80,11 @@ public class ActionsProvider extends DefaultMenu {
             ItemStack item = new ItemStack(icon);
             ItemMeta meta = item.getItemMeta();
             if (meta != null) {
-                meta.setDisplayName(ColorUtils.colorString(name.replace("{INDEX}", String.valueOf(index + 1)).replace("{ACTION}", action)));
-                meta.setLore(List.of(ColorUtils.colorString("&cЛКМ: &7удалить")));
+                meta.displayName(ColorUtils.color(name.replace("{INDEX}", String.valueOf(index + 1)).replace("{ACTION}", action)));
+                meta.lore(List.of(ColorUtils.color("<red>ЛКМ: <gray>удалить")));
                 item.setItemMeta(meta);
             }
 
-            String finalMineId = mineId;
             layers.getBaseLayer()[slot] = new SimpleSlotContent(ItemModel.fromItemStack(item)) {
                 @Override
                 public void doClick(Menu menu, Player player, MenuClickType type) {
@@ -98,22 +93,5 @@ public class ActionsProvider extends DefaultMenu {
                 }
             };
         }
-    }
-
-    private List<Integer> parseSlots(String slotsStr) {
-        List<Integer> slots = new ArrayList<>();
-        for (String p : slotsStr.replace(" ", "").split(",")) {
-            if (p.contains("-")) {
-                String[] range = p.split("-");
-                if (range.length == 2) {
-                    try {
-                        for (int i = Integer.parseInt(range[0]); i <= Integer.parseInt(range[1]); i++) slots.add(i);
-                    } catch (Exception ignored) {}
-                }
-            } else {
-                try { slots.add(Integer.parseInt(p)); } catch (Exception ignored) {}
-            }
-        }
-        return slots;
     }
 }

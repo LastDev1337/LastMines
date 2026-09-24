@@ -1,33 +1,36 @@
 package ru.last.mines.commands.sub;
 
+import dev.by1337.cmd.Command;
+import dev.laststudio.lib.api.command.CommandService;
 import org.bukkit.command.CommandSender;
 import ru.last.mines.LastMines;
-import ru.last.mines.commands.*;
+import ru.last.mines.commands.MainCommand;
+import ru.last.mines.commands.SuggestingArgument;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-@SubCommand(name = "language", aliases = {"lang"})
-public class Language extends AbstractSubCommand {
+public final class Language {
+    private Language() {}
 
-    public Language(LastMines plugin) { super(plugin); }
+    public static Command<CommandSender> build(LastMines plugin, CommandService cs) {
+        return cs.command("language")
+                .argument(new SuggestingArgument("lang", () -> plugin.getConfigManager().getAvailableLanguages()))
+                .executor((sender, args) -> execute(plugin, sender, (String) args.get("lang")));
+    }
 
-    @Override
-    public void execute(CommandSender sender, String[] args) {
+    private static void execute(LastMines plugin, CommandSender sender, String lang) {
         List<String> available = plugin.getConfigManager().getAvailableLanguages();
         String languages = String.join(", ", available);
 
-        if (args.length < 2) {
+        if (lang == null) {
             plugin.getConfigManager().getMessages().getLanguageUsage().send(sender,
-                    "%languages%", languages,
-                    "%current%", plugin.getConfigManager().getMainConfig().getLanguage());
+                    "%languages%", languages, "%current%", plugin.getConfigManager().getMainConfig().getLanguage());
             return;
         }
 
-        String lang = args[1].toLowerCase();
+        lang = lang.toLowerCase();
         if (!available.contains(lang)) {
-            plugin.getConfigManager().getMessages().getLanguageInvalid().send(sender,
-                    "%lang%", lang, "%languages%", languages);
+            plugin.getConfigManager().getMessages().getLanguageInvalid().send(sender, "%lang%", lang, "%languages%", languages);
             return;
         }
 
@@ -37,18 +40,8 @@ public class Language extends AbstractSubCommand {
         plugin.getMineManager().unloadAll();
         plugin.getMineManager().loadAll();
         if (plugin.getGuiManager() != null) plugin.getGuiManager().reload();
-        if (plugin.getMainCommand() != null) plugin.getMainCommand().loadSubCommands();
+        MainCommand.register(plugin);
 
         plugin.getConfigManager().getMessages().getLanguageSet().send(sender, "%lang%", lang);
-    }
-
-    @Override
-    public List<String> tabComplete(CommandSender sender, String[] args) {
-        if (args.length == 2) {
-            return plugin.getConfigManager().getAvailableLanguages().stream()
-                    .filter(s -> s.startsWith(args[1].toLowerCase()))
-                    .collect(Collectors.toList());
-        }
-        return super.tabComplete(sender, args);
     }
 }

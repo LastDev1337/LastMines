@@ -10,6 +10,7 @@ import dev.by1337.bmenu.loader.MenuConfig;
 import dev.by1337.bmenu.menu.DefaultMenu;
 import dev.by1337.bmenu.menu.Menu;
 import dev.by1337.yaml.YamlMap;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 import org.bukkit.inventory.ItemStack;
@@ -17,6 +18,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.Material;
 import ru.last.mines.api.*;
 import ru.last.mines.gui.ClickCommandResolver;
+import dev.by1337.bmenu.animation.util.AnimationUtil;
 import ru.last.mines.models.*;
 import ru.last.mines.utils.*;
 import java.util.*;
@@ -33,17 +35,15 @@ public class RaritiesProvider extends DefaultMenu {
         }
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     protected void generate() {
-        
         slotToRarity.clear();
         YamlMap map = config.yaml();
         if (!map.has("rarities_list")) return;
         YamlMap listMap = map.get("rarities_list").asYamlMap().orDefault(new YamlMap());
         
         String slotsStr = listMap.get("slots").asString("");
-        List<Integer> slots = parseSlots(slotsStr);
+        List<Integer> slots = slotsStr.isBlank() ? List.of() : Arrays.stream(AnimationUtil.readSlots(slotsStr)).boxed().toList();
         
         String materialName = listMap.get("material").asString("NETHER_STAR");
         String name = listMap.get("name").asString("&eРедкость &f{RARITY_NAME}");
@@ -75,16 +75,16 @@ public class RaritiesProvider extends DefaultMenu {
             if (meta != null) {
                 String dName = name.replace("{RARITY_NAME}", mr.name())
                                    .replace("{RARITY_ID}", mr.id());
-                meta.setDisplayName(ColorUtils.colorString(dName));
+                meta.displayName(ColorUtils.color(dName));
                 
-                List<String> dLore = new ArrayList<>();
+                List<Component> dLore = new ArrayList<>();
                 for (String l : lore) {
                     String line = l.replace("{RARITY_NAME}", mr.name())
                                    .replace("{RARITY_ID}", mr.id())
                                    .replace("{CHANCE}", String.valueOf(mr.chance()));
-                    dLore.add(ColorUtils.colorString(line));
+                    dLore.add(ColorUtils.color(line));
                 }
-                meta.setLore(dLore);
+                meta.lore(dLore);
                 item.setItemMeta(meta);
             }
             layers.getBaseLayer()[slot] = new SimpleSlotContent(ItemModel.fromItemStack(item)) {
@@ -99,25 +99,5 @@ public class RaritiesProvider extends DefaultMenu {
             };
             slotToRarity.put(slot, mr);
         }
-    }
-
-    private List<Integer> parseSlots(String slotsStr) {
-        List<Integer> slots = new ArrayList<>();
-        String[] parts = slotsStr.replace(" ", "").split(",");
-        for (String p : parts) {
-            if (p.contains("-")) {
-                String[] range = p.split("-");
-                if (range.length == 2) {
-                    try {
-                        int min = Integer.parseInt(range[0]);
-                        int max = Integer.parseInt(range[1]);
-                        for (int i = min; i <= max; i++) slots.add(i);
-                    } catch (Exception ignored) {}
-                }
-            } else {
-                try { slots.add(Integer.parseInt(p)); } catch (Exception ignored) {}
-            }
-        }
-        return slots;
     }
 }

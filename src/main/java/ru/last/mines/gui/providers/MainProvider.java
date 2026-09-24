@@ -28,6 +28,7 @@ public class MainProvider extends DefaultMenu {
         if (mine == null) return;
 
         addArgument("STOPPED", String.valueOf(mine.isStopped()));
+        addArgument("ENABLE", String.valueOf(mine.isEnable()));
         addArgument("MODE", mine.getMode().name());
     }
 }

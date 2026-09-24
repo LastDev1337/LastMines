@@ -1,5 +1,15 @@
 package ru.last.mines.gui.providers;
 
+import dev.by1337.bmenu.command.ExecuteContext;
+import dev.by1337.bmenu.slot.component.MenuClickType;
+import dev.by1337.bmenu.slot.impl.SimpleSlotContent;
+import dev.by1337.item.ItemModel;
+import dev.by1337.yaml.YamlMap;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 import ru.last.mines.LastMines;
 
 import dev.by1337.bmenu.loader.MenuConfig;
@@ -7,6 +17,15 @@ import dev.by1337.bmenu.menu.DefaultMenu;
 import dev.by1337.bmenu.menu.Menu;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
+import ru.last.mines.api.LastMinesProvider;
+import dev.by1337.bmenu.animation.util.AnimationUtil;
+import ru.last.mines.models.Mine;
+import ru.last.mines.utils.ColorUtils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Arrays;
 
 public class OnlineProvider extends DefaultMenu {
     public OnlineProvider(MenuConfig config, Player viewer, @Nullable Menu previousMenu) {
@@ -21,43 +40,28 @@ public class OnlineProvider extends DefaultMenu {
     protected void generate() {
         String mineId = LastMines.get().getGuiManager().getViewingMines().get(viewer.getUniqueId());
         if (mineId == null) return;
-        ru.last.mines.models.Mine mine = ru.last.mines.api.LastMinesProvider.getApi().getMine(mineId);
+        Mine mine = LastMinesProvider.getApi().getMine(mineId);
         if (mine == null) return;
 
-        dev.by1337.yaml.YamlMap map = config.yaml();
+        YamlMap map = config.yaml();
         if (!map.has("online_list")) return;
-        dev.by1337.yaml.YamlMap listMap = map.get("online_list").asYamlMap().orDefault(new dev.by1337.yaml.YamlMap());
+        YamlMap listMap = map.get("online_list").asYamlMap().orDefault(new YamlMap());
 
         String slotsStr = listMap.get("slots").asString("0-17");
-        java.util.List<Integer> slots = new java.util.ArrayList<>();
-        String[] parts = slotsStr.replace(" ", "").split(",");
-        for (String p : parts) {
-            if (p.contains("-")) {
-                String[] range = p.split("-");
-                if (range.length == 2) {
-                    try {
-                        int min = Integer.parseInt(range[0]);
-                        int max = Integer.parseInt(range[1]);
-                        for (int i = min; i <= max; i++) slots.add(i);
-                    } catch (Exception ignored) {}
-                }
-            } else {
-                try { slots.add(Integer.parseInt(p)); } catch (Exception ignored) {}
-            }
-        }
+        List<Integer> slots = slotsStr.isBlank() ? List.of() : Arrays.stream(AnimationUtil.readSlots(slotsStr)).boxed().toList();
 
         String name = listMap.get("name").asString("&aИгрок &f{PLAYER}");
-        java.util.List<String> lore = new java.util.ArrayList<>();
+        List<String> lore = new ArrayList<>();
         if (listMap.has("lore")) {
             Object rawLore = listMap.get("lore").getRaw();
-            if (rawLore instanceof java.util.List<?> l) {
+            if (rawLore instanceof List<?> l) {
                 for (Object o : l) lore.add(o.toString());
             }
         }
 
-        java.util.List<Player> onlineInMine = new java.util.ArrayList<>();
-        for (Player p : org.bukkit.Bukkit.getOnlinePlayers()) {
-            if (mine.equals(ru.last.mines.api.LastMinesProvider.getApi().getMineAt(p.getLocation()))) {
+        List<Player> onlineInMine = new ArrayList<>();
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (mine.equals(LastMinesProvider.getApi().getMineAt(p.getLocation()))) {
                 onlineInMine.add(p);
             }
         }
@@ -65,23 +69,24 @@ public class OnlineProvider extends DefaultMenu {
         for (int i = 0; i < Math.min(slots.size(), onlineInMine.size()); i++) {
             Player p = onlineInMine.get(i);
             int slot = slots.get(i);
+            if (slot < 0 || slot >= layers.getBaseLayer().length) continue;
 
-            org.bukkit.inventory.ItemStack head = new org.bukkit.inventory.ItemStack(org.bukkit.Material.PLAYER_HEAD);
-            org.bukkit.inventory.meta.SkullMeta meta = (org.bukkit.inventory.meta.SkullMeta) head.getItemMeta();
+            ItemStack head = new ItemStack(Material.PLAYER_HEAD);
+            SkullMeta meta = (SkullMeta) head.getItemMeta();
             if (meta != null) {
                 meta.setOwningPlayer(p);
-                meta.setDisplayName(ru.last.mines.utils.ColorUtils.colorString(name.replace("{PLAYER}", p.getName())));
-                java.util.List<String> dLore = new java.util.ArrayList<>();
+                meta.displayName(ColorUtils.color(name.replace("{PLAYER}", p.getName())));
+                List<Component> dLore = new ArrayList<>();
                 for (String l : lore) {
-                    dLore.add(ru.last.mines.utils.ColorUtils.colorString(l.replace("{PLAYER}", p.getName())));
+                    dLore.add(ColorUtils.color(l.replace("{PLAYER}", p.getName())));
                 }
-                meta.setLore(dLore);
+                meta.lore(dLore);
                 head.setItemMeta(meta);
             }
 
-            layers.getBaseLayer()[slot] = new dev.by1337.bmenu.slot.impl.SimpleSlotContent(dev.by1337.item.ItemModel.fromItemStack(head)) {
+            layers.getBaseLayer()[slot] = new SimpleSlotContent(ItemModel.fromItemStack(head)) {
                 @Override
-                public void doClick(Menu menu, Player player, dev.by1337.bmenu.slot.component.MenuClickType type) {
+                public void doClick(Menu menu, Player player, MenuClickType type) {
                     String key = "on_" + type.name().toLowerCase() + "_click";
                     if (!listMap.has(key)) key = "on_click";
                     if (listMap.has(key)) {
@@ -94,7 +99,7 @@ public class OnlineProvider extends DefaultMenu {
                         }
                         for (String cmd : commands) {
                             String parsed = cmd.replace("{PLAYER}", p.getName()).replace("{MINE_ID}", mine.getId());
-                            menu.runCommands(dev.by1337.bmenu.command.ExecuteContext.of(menu), java.util.Collections.singletonList(parsed));
+                            menu.runCommands(ExecuteContext.of(menu), Collections.singletonList(parsed));
                         }
                     }
                 }

@@ -176,6 +176,18 @@ public class ActionManager {
         mine.save();
     }
 
+    public void toggleEnable(String mineId) {
+        Mine mine = LastMinesProvider.getApi().getMine(mineId);
+        if (mine == null) return;
+        mine.setEnable(!mine.isEnable());
+        mine.save();
+        if (mine.isEnable()) {
+            mine.createHologram();
+        } else {
+            mine.deleteHologram();
+        }
+    }
+
     public void editResetTime(String mineId, String deltaStr) {
         Mine mine = LastMinesProvider.getApi().getMine(mineId);
         if (mine == null) return;

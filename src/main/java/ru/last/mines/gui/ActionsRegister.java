@@ -5,6 +5,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import ru.last.mines.LastMines;
+import ru.last.mines.listeners.Listeners;
 import dev.by1337.bmenu.command.ExecuteContext;
 import dev.by1337.bmenu.menu.command.MenuCommands;
 import dev.by1337.cmd.Command;
@@ -126,7 +127,7 @@ public class ActionsRegister {
                         String mine = (String) args.getOrThrow("mine", "Use: [chance_input] <mine> <material>");
                         String mat = (String) args.getOrThrow("material", "");
                         ctx.menu.close();
-                        LastMines.get().getChanceInputListener().startSession(ctx.getPlayer(), mine, mat);
+                        Listeners.getChanceInputListener().startSession(ctx.getPlayer(), mine, mat);
                     })
             );
 
@@ -137,7 +138,7 @@ public class ActionsRegister {
                         String mine = (String) args.getOrThrow("mine", "Use: [limit_input] <mine> <material>");
                         String mat = (String) args.getOrThrow("material", "");
                         ctx.menu.close();
-                        LastMines.get().getLimitInputListener().startSession(ctx.getPlayer(), mine, mat);
+                        Listeners.getLimitInputListener().startSession(ctx.getPlayer(), mine, mat);
                     })
             );
 
@@ -215,7 +216,7 @@ public class ActionsRegister {
                         } else if ("value".equalsIgnoreCase(action)) {
                             ctx.menu.close();
                             ctx.getPlayer().sendMessage("§e▶ §fВведите новое право доступа в чат (например: lastmines.mine.default).\n§8(У вас есть 1 минута на ввод)");
-                            LastMines.get().getPermInputListener().startSession(ctx.getPlayer(), mineId, "value");
+                            Listeners.getPermInputListener().startSession(ctx.getPlayer(), mineId, "value");
                         }
                     })
             );
@@ -226,7 +227,7 @@ public class ActionsRegister {
                         String mine = (String) args.getOrThrow("mine", "Use: [perm_message_add_input] <mine>");
                         Player player = ctx.getPlayer();
                         ctx.menu.close();
-                        LastMines.get().getTextInputListener().startSession(player,
+                        Listeners.getTextInputListener().startSession(player,
                                 "&e▶ &fВведите строку действия в чат, например:\n&f[message] &7Текст сообщения",
                                 msg -> {
                                     if (msg.isBlank()) return;
@@ -257,6 +258,15 @@ public class ActionsRegister {
                     })
             );
 
+            root.sub(new Command<ExecuteContext>("[mine_toggle_enable]")
+                    .argument(new ArgumentString<>("mine"))
+                    .executor((ctx, args) -> {
+                        String mine = (String) args.getOrThrow("mine", "Use: [mine_toggle_enable] <mine>");
+                        actionManager.toggleEnable(mine);
+                        ctx.menu.refresh();
+                    })
+            );
+
             root.sub(new Command<ExecuteContext>("[reset_time_edit]")
                     .argument(new ArgumentString<>("mine"))
                     .argument(new ArgumentString<>("delta"))
@@ -275,7 +285,7 @@ public class ActionsRegister {
                         String mine = (String) args.getOrThrow("mine", "Use: [block_drops] <mine> <material>");
                         String mat = (String) args.getOrThrow("material", "");
                         ctx.menu.close();
-                        LastMines.get().getBlockDropsListener().open(ctx.getPlayer(), mine, mat);
+                        Listeners.getBlockDropsListener().open(ctx.getPlayer(), mine, mat);
                     })
             );
 
@@ -285,7 +295,7 @@ public class ActionsRegister {
                         String mine = (String) args.getOrThrow("mine", "Use: [block_add_input] <mine>");
                         Player player = ctx.getPlayer();
                         ctx.menu.close();
-                        LastMines.get().getTextInputListener().startSession(player,
+                        Listeners.getTextInputListener().startSession(player,
                                 "&e▶ &fВведите название блока в чат (например: STONE).",
                                 msg -> {
                                     Material mat = Material.matchMaterial(msg.trim());
@@ -305,7 +315,7 @@ public class ActionsRegister {
                         String mine = (String) args.getOrThrow("mine", "Use: [rarity_add_input] <mine>");
                         Player player = ctx.getPlayer();
                         ctx.menu.close();
-                        LastMines.get().getTextInputListener().startSession(player,
+                        Listeners.getTextInputListener().startSession(player,
                                 "&e▶ &fВведите ID новой редкости в чат (например: epic).",
                                 msg -> {
                                     String rarityId = msg.trim().replaceAll("\\s+", "_");
@@ -322,7 +332,7 @@ public class ActionsRegister {
                         String mine = (String) args.getOrThrow("mine", "Use: [holo_line_add_input] <mine>");
                         Player player = ctx.getPlayer();
                         ctx.menu.close();
-                        LastMines.get().getTextInputListener().startSession(player,
+                        Listeners.getTextInputListener().startSession(player,
                                 "&e▶ &fВведите новую строку голограммы в чат.",
                                 msg -> {
                                     if (msg.isBlank()) return;
@@ -338,7 +348,7 @@ public class ActionsRegister {
                         String mine = (String) args.getOrThrow("mine", "Use: [action_add_input] <mine>");
                         Player player = ctx.getPlayer();
                         ctx.menu.close();
-                        LastMines.get().getTextInputListener().startSession(player,
+                        Listeners.getTextInputListener().startSession(player,
                                 "&e▶ &fВведите строку действия в чат, например:\n&f[message] [update:15] &7Текст сообщения",
                                 msg -> {
                                     if (msg.isBlank()) return;

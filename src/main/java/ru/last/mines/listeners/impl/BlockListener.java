@@ -1,4 +1,4 @@
-package ru.last.mines.listeners;
+package ru.last.mines.listeners.impl;
 
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
@@ -35,7 +35,7 @@ public class BlockListener implements Listener {
         Location loc = block.getLocation();
 
         Mine mine = LastMinesProvider.getApi().getMineAt(loc);
-        if (mine != null) {
+        if (mine != null && mine.isEnable()) {
             MineBlockBreakEvent apiEvent = new MineBlockBreakEvent(player, mine, block);
             Bukkit.getPluginManager().callEvent(apiEvent);
             if (apiEvent.isCancelled()) {

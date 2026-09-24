@@ -1,0 +1,9 @@
+name: polygon
+world: world
+
+mode: BLOCKS
+
+positions:
+  shape: polygon
+  one: '10;100;10'
+  two: '15;105;15'

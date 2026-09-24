@@ -48,7 +48,7 @@ public class BlockCatalogManager {
                 .filter(Objects::nonNull)
                 .toList();
 
-        plugin.getDebugger().info("Каталог блоков (" + version + "): " + blocks.size()
+        plugin.getDebugger().info("Каталог блоков (" + getVersion() + "): " + blocks.size()
                 + " блоков, файл: " + canonicalVersion + "/blocks.json");
     }
 

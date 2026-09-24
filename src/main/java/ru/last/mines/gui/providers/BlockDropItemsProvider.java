@@ -20,10 +20,12 @@ import ru.last.mines.api.LastMinesProvider;
 import ru.last.mines.models.DropItem;
 import ru.last.mines.models.Mine;
 import ru.last.mines.models.MineBlock;
+import dev.by1337.bmenu.animation.util.AnimationUtil;
 import ru.last.mines.utils.ColorUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
 
 public class BlockDropItemsProvider extends DefaultMenu {
 
@@ -41,7 +43,8 @@ public class BlockDropItemsProvider extends DefaultMenu {
         if (!map.has("drop_items_list")) return;
         YamlMap listMap = map.get("drop_items_list").asYamlMap().orDefault(new YamlMap());
 
-        List<Integer> slots = parseSlots(listMap.get("slots").asString(""));
+        String slotsStr = listMap.get("slots").asString("");
+        List<Integer> slots = slotsStr.isBlank() ? List.of() : Arrays.stream(AnimationUtil.readSlots(slotsStr)).boxed().toList();
         String name = listMap.get("name").asString("&e{DROP_MATERIAL}");
         List<String> lore = new ArrayList<>();
         if (listMap.has("lore")) {
@@ -71,6 +74,7 @@ public class BlockDropItemsProvider extends DefaultMenu {
         for (int i = 0; i < Math.min(slots.size(), drops.size()); i++) {
             DropItem drop = drops.get(i);
             int slot = slots.get(i);
+            if (slot < 0 || slot >= layers.getBaseLayer().length) continue;
 
             ItemStack item = new ItemStack(drop.material());
             ItemMeta meta = item.getItemMeta();
@@ -105,22 +109,5 @@ public class BlockDropItemsProvider extends DefaultMenu {
                 }
             };
         }
-    }
-
-    private List<Integer> parseSlots(String slotsStr) {
-        List<Integer> slots = new ArrayList<>();
-        for (String p : slotsStr.replace(" ", "").split(",")) {
-            if (p.contains("-")) {
-                String[] range = p.split("-");
-                if (range.length == 2) {
-                    try {
-                        for (int i = Integer.parseInt(range[0]); i <= Integer.parseInt(range[1]); i++) slots.add(i);
-                    } catch (Exception ignored) {}
-                }
-            } else {
-                try { slots.add(Integer.parseInt(p)); } catch (Exception ignored) {}
-            }
-        }
-        return slots;
     }
 }

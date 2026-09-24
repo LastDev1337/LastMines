@@ -1,24 +1,21 @@
 package ru.last.mines.commands.sub;
 
+import dev.by1337.cmd.Command;
+import dev.laststudio.lib.api.command.CommandService;
 import org.bukkit.command.CommandSender;
 import ru.last.mines.LastMines;
-import ru.last.mines.commands.*;
 import ru.last.mines.utils.ColorUtils;
 
-@SubCommand(name = "defaultmine", aliases = {"dm", "dmine", "dfmine", "dfm"})
-public class DefaultMines extends AbstractSubCommand {
+public final class DefaultMines {
+    private DefaultMines() {}
 
-    public DefaultMines(LastMines plugin) { super(plugin); }
-
-    @Override
-    public void execute(CommandSender sender, String[] args) {
-        plugin.getMineManager().extractDefaultMines();
-        sender.sendMessage(ColorUtils.colorString(plugin.getConfigManager().getMessages().getPrefix()
-                + "<green>Стандартные шахты (blocks, rarity) восстановлены."));
-
-        AbstractSubCommand reload = plugin.getMainCommand().getSubCommand("reload");
-        if (reload != null) {
-            reload.execute(sender, args);
-        }
+    public static Command<CommandSender> build(LastMines plugin, CommandService cs) {
+        return cs.command("defaultmine")
+                .executor(sender -> {
+                    plugin.getMineManager().extractDefaultMines();
+                    sender.sendMessage(ColorUtils.colorString(plugin.getConfigManager().getMessages().getPrefix()
+                            + "<green>Стандартные шахты (blocks, rarity) восстановлены."));
+                    Reload.execute(plugin, sender);
+                });
     }
 }

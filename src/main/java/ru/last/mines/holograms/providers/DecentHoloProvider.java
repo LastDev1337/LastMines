@@ -5,8 +5,8 @@ import eu.decentsoftware.holograms.api.holograms.Hologram;
 import org.bukkit.Location;
 import ru.last.mines.holograms.*;
 import ru.last.mines.models.*;
-import ru.last.mines.utils.ColorUtils;
-import ru.last.mines.utils.time.TimeFormatter;
+import ru.last.mines.utils.*;
+import ru.last.mines.utils.time.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +46,9 @@ public class DecentHoloProvider implements HologramProvider {
 
     @Override
     public void removeAll() {
+        /*
+         DecentHolograms автоматически выгружает все голограммы на сервере
+        */
     }
 
     private List<String> applyPlaceholders(Mine mine, List<String> lines) {

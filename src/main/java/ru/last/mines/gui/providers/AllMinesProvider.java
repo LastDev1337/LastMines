@@ -15,8 +15,10 @@ import org.bukkit.Material;
 import dev.by1337.yaml.YamlMap;
 import ru.last.mines.LastMines;
 import ru.last.mines.api.*;
+import dev.by1337.bmenu.animation.util.AnimationUtil;
 import ru.last.mines.models.*;
 import ru.last.mines.utils.*;
+import net.kyori.adventure.text.Component;
 import me.clip.placeholderapi.PlaceholderAPI;
 import java.util.*;
 
@@ -28,16 +30,15 @@ public class AllMinesProvider extends DefaultMenu {
         super(config, viewer, previousMenu);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     protected void generate() {
         slotToMine.clear();
         YamlMap map = config.yaml();
         if (!map.has("mines_list")) return;
         YamlMap listMap = map.get("mines_list").asYamlMap().orDefault(new YamlMap());
-        
+
         String slotsStr = listMap.get("slots").asString("");
-        List<Integer> slots = parseSlots(slotsStr);
+        List<Integer> slots = slotsStr.isBlank() ? List.of() : Arrays.stream(AnimationUtil.readSlots(slotsStr)).boxed().toList();
         
         String materialName = listMap.get("material").asString("DIAMOND_ORE");
         String name = listMap.get("name").asString("&aШахта {MINE_ID}");
@@ -54,7 +55,8 @@ public class AllMinesProvider extends DefaultMenu {
         for (int i = 0; i < Math.min(slots.size(), mines.size()); i++) {
             Mine mine = mines.get(i);
             int slot = slots.get(i);
-            
+            if (slot < 0 || slot >= layers.getBaseLayer().length) continue;
+
             Material mat = Material.matchMaterial(materialName);
             if (mat == null) mat = Material.STONE;
             ItemStack item = new ItemStack(mat);
@@ -63,15 +65,15 @@ public class AllMinesProvider extends DefaultMenu {
             if (meta != null) {
                 String dName = name.replace("{MINE_ID}", mine.getId());
                 if (papiEnabled) dName = PlaceholderAPI.setPlaceholders(viewer, dName);
-                meta.setDisplayName(ColorUtils.colorString(dName));
+                meta.displayName(ColorUtils.color(dName));
 
-                List<String> dLore = new ArrayList<>();
+                List<Component> dLore = new ArrayList<>();
                 for (String l : lore) {
                     String line = l.replace("{MINE_ID}", mine.getId());
                     if (papiEnabled) line = PlaceholderAPI.setPlaceholders(viewer, line);
-                    dLore.add(ColorUtils.colorString(line));
+                    dLore.add(ColorUtils.color(line));
                 }
-                meta.setLore(dLore);
+                meta.lore(dLore);
                 item.setItemMeta(meta);
             }
             layers.getBaseLayer()[slot] = new SimpleSlotContent(ItemModel.fromItemStack(item)) {
@@ -98,25 +100,5 @@ public class AllMinesProvider extends DefaultMenu {
             };
             slotToMine.put(slot, mine.getId());
         }
-    }
-
-    private List<Integer> parseSlots(String slotsStr) {
-        List<Integer> slots = new ArrayList<>();
-        String[] parts = slotsStr.replace(" ", "").split(",");
-        for (String p : parts) {
-            if (p.contains("-")) {
-                String[] range = p.split("-");
-                if (range.length == 2) {
-                    try {
-                        int min = Integer.parseInt(range[0]);
-                        int max = Integer.parseInt(range[1]);
-                        for (int i = min; i <= max; i++) slots.add(i);
-                    } catch (Exception ignored) {}
-                }
-            } else {
-                try { slots.add(Integer.parseInt(p)); } catch (Exception ignored) {}
-            }
-        }
-        return slots;
     }
 }

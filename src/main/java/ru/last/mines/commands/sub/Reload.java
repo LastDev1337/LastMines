@@ -1,21 +1,24 @@
 package ru.last.mines.commands.sub;
 
+import dev.by1337.cmd.Command;
+import dev.laststudio.lib.api.command.CommandService;
 import org.bukkit.command.CommandSender;
 import ru.last.mines.LastMines;
-import ru.last.mines.commands.*;
+import ru.last.mines.commands.MainCommand;
 
-@SubCommand(name = "reload", aliases = {"rl"})
-public class Reload extends AbstractSubCommand {
+public final class Reload {
+    private Reload() {}
 
-    public Reload(LastMines plugin) { super(plugin); }
+    public static Command<CommandSender> build(LastMines plugin, CommandService cs) {
+        return cs.command("reload").executor(sender -> execute(plugin, sender));
+    }
 
-    @Override
-    public void execute(CommandSender sender, String[] args) {
+    public static void execute(LastMines plugin, CommandSender sender) {
         plugin.getConfigManager().loadAll();
         plugin.getMineManager().unloadAll();
         plugin.getMineManager().loadAll();
         if (plugin.getGuiManager() != null) plugin.getGuiManager().reload();
-        if (plugin.getMainCommand() != null) plugin.getMainCommand().loadSubCommands();
+        MainCommand.register(plugin);
         plugin.getConfigManager().getMessages().getReloaded().send(sender);
     }
 }

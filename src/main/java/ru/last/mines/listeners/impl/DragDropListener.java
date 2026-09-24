@@ -1,4 +1,4 @@
-package ru.last.mines.listeners.drop;
+package ru.last.mines.listeners.impl;
 
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;

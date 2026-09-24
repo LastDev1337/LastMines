@@ -3,6 +3,7 @@ package ru.last.mines.commands.sub.migrate;
 import org.bukkit.command.CommandSender;
 import dev.by1337.yaml.YamlMap;
 import ru.last.mines.LastMines;
+import ru.last.mines.utils.ColorUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,13 +18,13 @@ public class RealMinesMigration {
 
         File rmFolder = new File(plugin.getDataFolder().getParentFile(), "RealMines/mines");
         if (!rmFolder.exists() || !rmFolder.isDirectory()) {
-            sender.sendMessage(prefix + "§cПапка plugins/RealMines/mines не найдена!");
+            sender.sendMessage(ColorUtils.colorString(prefix + "<red>Папка plugins/RealMines/mines не найдена!"));
             return;
         }
 
         File[] files = rmFolder.listFiles((dir, name) -> name.endsWith(".yml"));
         if (files == null || files.length == 0) {
-            sender.sendMessage(prefix + "§cНет файлов для миграции в plugins/RealMines/mines/");
+            sender.sendMessage(ColorUtils.colorString(prefix + "<red>Нет файлов для миграции в plugins/RealMines/mines/"));
             return;
         }
 
@@ -89,8 +90,7 @@ public class RealMinesMigration {
                 newConfig.set("mode", "BLOCKS");
                 
                 YamlMap positions = new YamlMap();
-                positions.set("one", p1x + ";" + p1y + ";" + p1z);
-                positions.set("two", p2x + ";" + p2y + ";" + p2z);
+                positions.set("points", List.of(p1x + ";" + p1y + ";" + p1z, p2x + ";" + p2y + ";" + p2z));
                 newConfig.set("positions", positions.getRaw());
 
                 List<Map<String, Object>> newBlocks = new ArrayList<>();
@@ -118,11 +118,11 @@ public class RealMinesMigration {
         }
 
         if (migrated > 0) {
-            sender.sendMessage(prefix + "§aУспешно мигрировано " + migrated + " шахт из RealMines!");
+            sender.sendMessage(ColorUtils.colorString(prefix + "<green>Успешно мигрировано " + migrated + " шахт из RealMines!"));
             plugin.getMineManager().loadAll();
-            sender.sendMessage(prefix + "§aШахты загружены!");
+            sender.sendMessage(ColorUtils.colorString(prefix + "<green>Шахты загружены!"));
         } else {
-            sender.sendMessage(prefix + "§cНе удалось мигрировать ни одной шахты.");
+            sender.sendMessage(ColorUtils.colorString(prefix + "<red>Не удалось мигрировать ни одной шахты."));
         }
     }
 }

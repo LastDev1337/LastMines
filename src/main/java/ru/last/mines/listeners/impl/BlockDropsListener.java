@@ -1,4 +1,4 @@
-package ru.last.mines.listeners.drops;
+package ru.last.mines.listeners.impl;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;

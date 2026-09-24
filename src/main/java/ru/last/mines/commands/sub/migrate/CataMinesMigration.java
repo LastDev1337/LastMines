@@ -3,6 +3,7 @@ package ru.last.mines.commands.sub.migrate;
 import org.bukkit.command.CommandSender;
 import dev.by1337.yaml.YamlMap;
 import ru.last.mines.LastMines;
+import ru.last.mines.utils.ColorUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,13 +19,13 @@ public class CataMinesMigration {
 
         File cataFolder = new File(plugin.getDataFolder().getParentFile(), "CataMines/mines");
         if (!cataFolder.exists() || !cataFolder.isDirectory()) {
-            sender.sendMessage(prefix + "§cПапка plugins/CataMines/mines не найдена!");
+            sender.sendMessage(ColorUtils.colorString(prefix + "<red>Папка plugins/CataMines/mines не найдена!"));
             return;
         }
 
         File[] files = cataFolder.listFiles((dir, name) -> name.endsWith(".yml"));
         if (files == null || files.length == 0) {
-            sender.sendMessage(prefix + "§cНет файлов для миграции в plugins/CataMines/mines/");
+            sender.sendMessage(ColorUtils.colorString(prefix + "<red>Нет файлов для миграции в plugins/CataMines/mines/"));
             return;
         }
 
@@ -41,7 +42,11 @@ public class CataMinesMigration {
                 YamlMap cataConfig = YamlMap.loadFromString(cleanYaml);
                 
                 YamlMap mineSec = null;
-                try { mineSec = cataConfig.get("Mine").asYamlMap().orDefault(null); } catch (Exception ignored) {}
+                try {
+                    mineSec = cataConfig.get("Mine").asYamlMap().orDefault(null);
+                } catch (Exception ignored) {
+                    // nope
+                }
                 
                 if (mineSec == null) continue;
                 
@@ -71,8 +76,7 @@ public class CataMinesMigration {
                 newConfig.set("mode", "BLOCKS");
                 
                 YamlMap positions = new YamlMap();
-                positions.set("one", p1x + ";" + p1y + ";" + p1z);
-                positions.set("two", p2x + ";" + p2y + ";" + p2z);
+                positions.set("points", List.of(p1x + ";" + p1y + ";" + p1z, p2x + ";" + p2y + ";" + p2z));
                 newConfig.set("positions", positions.getRaw());
                 
                 List<Map<String, Object>> newBlocks = new ArrayList<>();
@@ -104,7 +108,7 @@ public class CataMinesMigration {
                 if (warnRaw instanceof List<?> list) {
                     for (Object o : list) warnSeconds.add(String.valueOf(o));
                 }
-                
+
                 List<String> newActions = new ArrayList<>();
                 for (String secStr : warnSeconds) {
                     try {
@@ -134,11 +138,11 @@ public class CataMinesMigration {
         }
         
         if (migrated > 0) {
-            sender.sendMessage(prefix + "§aУспешно мигрировано " + migrated + " шахт из CataMines!");
+            sender.sendMessage(ColorUtils.colorString(prefix + "<green>Успешно мигрировано " + migrated + " шахт из CataMines!"));
             plugin.getMineManager().loadAll();
-            sender.sendMessage(prefix + "§aШахты загружены!");
+            sender.sendMessage(ColorUtils.colorString(prefix + "<green>Шахты загружены!"));
         } else {
-            sender.sendMessage(prefix + "§cНе удалось мигрировать ни одной шахты.");
+            sender.sendMessage(ColorUtils.colorString(prefix + "<red>Не удалось мигрировать ни одной шахты."));
         }
     }
 }

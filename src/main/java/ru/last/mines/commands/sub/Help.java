@@ -1,17 +1,19 @@
 package ru.last.mines.commands.sub;
 
+import dev.by1337.cmd.Command;
+import dev.laststudio.lib.api.command.CommandService;
 import org.bukkit.command.CommandSender;
 import ru.last.mines.LastMines;
-import ru.last.mines.commands.*;
-import ru.last.mines.utils.*;
+import ru.last.mines.utils.ColorUtils;
 
-@SubCommand(name = "help")
-public class Help extends AbstractSubCommand {
+public final class Help {
+    private Help() {}
 
-    public Help(LastMines plugin) { super(plugin); }
+    public static Command<CommandSender> build(LastMines plugin, CommandService cs) {
+        return cs.command("help").executor(sender -> execute(plugin, sender));
+    }
 
-    @Override
-    public void execute(CommandSender sender, String[] args) {
+    public static void execute(LastMines plugin, CommandSender sender) {
         for (String line : plugin.getConfigManager().getMessages().getHelp()) {
             sender.sendMessage(ColorUtils.colorString(line));
         }

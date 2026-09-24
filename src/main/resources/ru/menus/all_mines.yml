@@ -27,11 +27,3 @@ items:
     slot: 4
     tick_speed: 20
     on_tick: '[update]'
-
-animation:
-  - tick: 19
-    opcodes:
-      - cmd: '[refresh]'
-  - tick: 20
-    opcodes:
-      - goto: 0

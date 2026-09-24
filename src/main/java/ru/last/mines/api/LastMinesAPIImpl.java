@@ -63,20 +63,7 @@ public class LastMinesAPIImpl implements LastMinesAPI {
     @Override
     public Mine getMineAt(Location location) {
         for (Mine mine : getMines()) {
-            if (mine.getPos1() != null && mine.getPos2() != null) {
-                double minX = Math.min(mine.getPos1().getX(), mine.getPos2().getX());
-                double maxX = Math.max(mine.getPos1().getX(), mine.getPos2().getX());
-                double minY = Math.min(mine.getPos1().getY(), mine.getPos2().getY());
-                double maxY = Math.max(mine.getPos1().getY(), mine.getPos2().getY());
-                double minZ = Math.min(mine.getPos1().getZ(), mine.getPos2().getZ());
-                double maxZ = Math.max(mine.getPos1().getZ(), mine.getPos2().getZ());
-
-                if (location.getWorld() != null && location.getWorld().equals(mine.getPos1().getWorld())) {
-                    if (location.getX() >= minX && location.getX() <= maxX &&
-                        location.getY() >= minY && location.getY() <= maxY &&
-                        location.getZ() >= minZ && location.getZ() <= maxZ) { return mine; }
-                }
-            }
+            if (mine.isInMine(location)) return mine;
         }
         return null;
     }

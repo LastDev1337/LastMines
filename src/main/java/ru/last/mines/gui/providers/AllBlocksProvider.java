@@ -16,12 +16,14 @@ import org.jetbrains.annotations.Nullable;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import ru.last.mines.LastMines;
+import dev.by1337.bmenu.animation.util.AnimationUtil;
 import ru.last.mines.utils.ColorUtils;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.Arrays;
 
 public class AllBlocksProvider extends DefaultMenu {
 
@@ -55,7 +57,8 @@ public class AllBlocksProvider extends DefaultMenu {
         String finalMineId = args.get("MINE_ID");
         if (finalMineId == null) return;
 
-        List<Integer> slots = parseSlots(config.yaml().get("slots").asString("0-44"));
+        String slotsStr = config.yaml().get("slots").asString("0-44");
+        List<Integer> slots = slotsStr.isBlank() ? List.of() : Arrays.stream(AnimationUtil.readSlots(slotsStr)).boxed().toList();
         lastPageSize = Math.max(1, slots.size());
 
         int page = Math.min(pageByPlayer.getOrDefault(viewer.getUniqueId(), 0), getMaxPage());
@@ -70,6 +73,7 @@ public class AllBlocksProvider extends DefaultMenu {
         for (int i = from; i < to; i++) {
             Material mat = allBlocks.get(i);
             int slot = slots.get(i - from);
+            if (slot < 0 || slot >= layers.getBaseLayer().length) continue;
 
             ItemStack item = new ItemStack(mat);
             ItemMeta meta = item.getItemMeta();
@@ -87,22 +91,5 @@ public class AllBlocksProvider extends DefaultMenu {
                 }
             };
         }
-    }
-
-    private List<Integer> parseSlots(String slotsStr) {
-        List<Integer> slots = new java.util.ArrayList<>();
-        for (String p : slotsStr.replace(" ", "").split(",")) {
-            if (p.contains("-")) {
-                String[] range = p.split("-");
-                if (range.length == 2) {
-                    try {
-                        for (int i = Integer.parseInt(range[0]); i <= Integer.parseInt(range[1]); i++) slots.add(i);
-                    } catch (Exception ignored) {}
-                }
-            } else {
-                try { slots.add(Integer.parseInt(p)); } catch (Exception ignored) {}
-            }
-        }
-        return slots;
     }
 }

@@ -1,4 +1,4 @@
-package ru.last.mines.listeners;
+package ru.last.mines.listeners.impl;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
