@@ -4,7 +4,7 @@ main: ru.last.mines.LastMines
 api-version: '1.21'
 
 depend: [ LLib ]
-softdepend: [ PlaceholderAPI, BMenu, WorldEdit, DecentHolograms, FancyHolograms ]
+softdepend: [ PlaceholderAPI, BLib, BMenu, WorldEdit, DecentHolograms, FancyHolograms ]
 
 author: Last
 website: https://laststudio.space

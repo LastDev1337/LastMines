@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "ru.last.mines"
-version = "0.3"
+version = "0.4"
 
 repositories {
     mavenCentral()
@@ -16,11 +16,12 @@ repositories {
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
     maven("https://maven.enginehub.org/repo/")
     maven("https://repo.fancyinnovations.com/releases")
+    maven("https://repo.laststudio.space/releases")
 }
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
-    compileOnly("dev.laststudio.lib:LLib:0.1")
+    compileOnly("dev.laststudio.lib:llib:0.1")
     compileOnly("dev.by1337.item:ConfigurableItems:1.5.6")
     compileOnly("dev.by1337.bmenu:BMenu:2.6")
     compileOnly("dev.by1337.cmd:BCmd:1.4")
