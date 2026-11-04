@@ -44,7 +44,7 @@ public class VanillaHoloProvider implements HologramProvider {
         display.setBackgroundColor(Color.fromARGB(0, 0, 0, 0));
         display.setPersistent(false);
         display.getPersistentDataContainer().set(hologramKey, PersistentDataType.STRING, mine.getId());
-        
+
         YamlMap holoMap = mine.getHoloMap();
         if (holoMap != null) {
             if (holoMap.has("view_range")) {
@@ -80,7 +80,7 @@ public class VanillaHoloProvider implements HologramProvider {
                 display.setTransformation(transformation);
             }
         }
-        
+
         displays.put(mine.getId(), display);
     }
 

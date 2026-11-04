@@ -4,7 +4,6 @@ import dev.by1337.yaml.YamlMap;
 import dev.by1337.yaml.YamlValue;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.*;
-import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -40,7 +39,7 @@ public class Mine {
     private final String id;
     private final String name;
     private final World world;
-    
+
     private final MineMode mode;
 
     private final MineShape shape;
@@ -61,7 +60,7 @@ public class Mine {
     private final List<MineAction> resetActions = new CopyOnWriteArrayList<>();
     private final List<MineAction> breakActions = new CopyOnWriteArrayList<>();
     private List<String> rawActions = new ArrayList<>();
-    
+
     private boolean permEnable;
     private String permValue;
     private List<String> permMessages;
@@ -87,10 +86,10 @@ public class Mine {
     private boolean stopped;
     private ScheduledTask task;
     private volatile int timeLeft;
-    
+
     private MineRarity currentRarity;
     private MineRarity nextRarity;
-    
+
     private final java.util.Set<Long> playerPlaced = ConcurrentHashMap.newKeySet();
     private final AtomicInteger physicalBlocksCount = new AtomicInteger();
     private volatile int maxPhysicalBlocksCount = 0;
@@ -99,7 +98,7 @@ public class Mine {
         int interval;
         boolean repeat;
         int initialDuration;
-        
+
         int durationLeft;
         MineAction action;
         int counter;
@@ -113,12 +112,12 @@ public class Mine {
         this.id = id;
         this.name = map.get("name").asString(id);
         this.world = Bukkit.getWorld(map.get("world").asString("world"));
-        
+
         String modeStr = map.get("mode").asString("BLOCKS").toUpperCase();
         MineMode parsedMode = MineMode.BLOCKS;
         try { parsedMode = MineMode.valueOf(modeStr); } catch (Exception ignored) {}
         this.mode = parsedMode;
-        
+
         boolean hasPositions = map.has("positions");
         YamlMap posMap = map.get("positions").asYamlMap().orDefault(new YamlMap());
         MineShape parsedShape;
@@ -129,7 +128,6 @@ public class Mine {
         List<String> shapePoints = getListOrEmpty(posMap.get("points")).stream().map(v -> YamlValue.wrap(v).asString("")).toList();
         if (this.shape == MineShape.CUBOID) {
             if (!hasPositions) {
-                // шахта без области (например, копия): работает только как набор настроек, пока не задана область
                 this.pos1 = null;
                 this.pos2 = null;
             } else {
@@ -153,7 +151,7 @@ public class Mine {
         }
         this.regionPoints = this.weRegion != null ? WEHook.points(this.weRegion) : Collections.emptyList();
 
-        this.resetPercent = Math.max(0, Math.min(99, map.get("reset_percent").asInt(0)));
+        this.resetPercent = Math.clamp(map.get("reset_percent").asInt(0), 0, 99);
         Material parsedFiller = Material.matchMaterial(map.get("filler").asString("stone").replace("minecraft:", "").toUpperCase());
         this.filler = parsedFiller != null && parsedFiller.isBlock() ? parsedFiller : Material.STONE;
 
@@ -184,13 +182,13 @@ public class Mine {
                 this.nextRarity = rollRarity();
             }
         }
-        
-        reparseActions(getListOrEmpty(map.get("actions")).stream().map(v -> YamlValue.wrap(v).asString("")).toList());
+
+        reparseActions(getListOrEmpty(map.get("actions")).stream().map(Mine::actionLine).toList());
 
         YamlMap permMap = map.get("permissions").asYamlMap().orDefault(new YamlMap());
         this.permEnable = permMap.get("enable").asBool(false);
         this.permValue = permMap.get("value").asString("");
-        this.permMessages = getListOrEmpty(permMap.get("messages")).stream().map(v -> YamlValue.wrap(v).asString("")).toList();
+        this.permMessages = getListOrEmpty(permMap.get("messages")).stream().map(Mine::actionLine).toList();
 
         YamlMap enchantMap = map.get("enchant_requirements").asYamlMap().orDefault(new YamlMap());
         this.enchantEnable = enchantMap.get("enable").asBool(false);
@@ -199,18 +197,18 @@ public class Mine {
             requiredEnchants.put(key.toLowerCase(Locale.ROOT), enchListMap.get(key).asInt(1));
         }
         List<String> defaultEnchantActions = List.of("[message] &cВаша кирка недостаточно зачарована для этой автошахты!");
-        List<String> parsedEnchantActions = getListOrEmpty(enchantMap.get("actions")).stream().map(v -> YamlValue.wrap(v).asString("")).toList();
+        List<String> parsedEnchantActions = getListOrEmpty(enchantMap.get("actions")).stream().map(Mine::actionLine).toList();
         this.enchantFailActions = parsedEnchantActions.isEmpty() ? defaultEnchantActions : parsedEnchantActions;
 
         YamlMap onlineMap = map.get("online").asYamlMap().orDefault(new YamlMap());
         this.onlineEnable = onlineMap.get("enable").asBool(false);
         this.onlineMin = onlineMap.get("min").asInt(0);
         this.onlineMax = onlineMap.get("max").asInt(1000);
-        
+
         YamlMap tpMap = map.get("teleport").asYamlMap().orDefault(new YamlMap());
         this.tpEnable = tpMap.get("enable").asBool(false);
         this.tpPos = parseLocation(world, tpMap.get("pos").asString("0;100;0"));
-        
+
         this.holoMap = map.get("hologram").asYamlMap().orDefault(new YamlMap());
         this.holoEnable = holoMap.get("enable").asBool(false);
         this.holoProvider = holoMap.get("provider").asString("Vanilla");
@@ -285,6 +283,17 @@ public class Mine {
                 case UPDATE_RESET -> resetActions.add(parsed.action());
                 case UPDATE_AT -> updateActions.computeIfAbsent(parsed.seconds(), k -> new CopyOnWriteArrayList<>()).add(parsed.action());
                 case BREAK -> breakActions.add(parsed.action());
+                case EVERY -> {
+                    PeriodicAction pa = new PeriodicAction();
+                    pa.interval = parsed.seconds();
+                    pa.repeat = true;
+                    pa.initialDuration = -1;
+                    pa.durationLeft = -1;
+                    pa.counter = pa.interval;
+                    pa.active = true;
+                    pa.action = parsed.action();
+                    periodicActions.add(pa);
+                }
                 case NONE -> {}
             }
         }
@@ -306,7 +315,7 @@ public class Mine {
                     .map(this::parseDropItem).filter(Objects::nonNull).toList();
             return new MineBlock(material, 0.0, count, count, countDrops);
         }
-        
+
         if (blockMap.has("limit")) {
             if (blockMap.has("chance")) {
                 plugin.getLogger().warning("[LastMines] У блока " + blockId + " в шахте " + id + " указан и chance, и limit! Используется chance, limit проигнорирован.");
@@ -314,7 +323,7 @@ public class Mine {
                 YamlValue limitVal = blockMap.get("limit");
                 YamlMap lMap = null;
                 try { lMap = limitVal.asYamlMap().orDefault(null); } catch (Exception ignored) {}
-                
+
                 if (lMap != null) {
                     min = lMap.get("min").asInt(1);
                     max = lMap.get("max").asInt(1);
@@ -445,7 +454,6 @@ public class Mine {
         }
     }
 
-
     private MineRarity rollRarity() {
         if (rarities.isEmpty()) return null;
         double total = rarities.stream().mapToDouble(MineRarity::chance).sum();
@@ -456,6 +464,14 @@ public class Mine {
             if (r <= current) return rarity;
         }
         return rarities.getFirst();
+    }
+
+    private static String actionLine(Object raw) {
+        if (raw instanceof Map<?, ?> map && map.size() == 1) {
+            Map.Entry<?, ?> entry = map.entrySet().iterator().next();
+            return "[" + entry.getKey() + "] " + entry.getValue();
+        }
+        return YamlValue.wrap(raw).asString("");
     }
 
     private List<Object> getListOrEmpty(YamlValue node) {
@@ -491,7 +507,7 @@ public class Mine {
     private static SchedulerService scheduler() {
         return LLibAPI.get().scheduler();
     }
-    
+
     private void tick() {
         if (!enable) return;
         if (stopped) {
@@ -529,14 +545,14 @@ public class Mine {
                 executeAction(act, null, null);
             }
         }
-        
+
         if (timeLeft <= 0) {
             forceUpdate();
         }
-        
+
         updateHologram();
     }
-    
+
     public boolean forceUpdate() {
         if (isResetting) return false;
 
@@ -555,7 +571,7 @@ public class Mine {
         }
         return resetMine();
     }
-    
+
     public String replacePlaceholders(String str) {
         if (str == null) return null;
         if (mode == MineMode.RARITY) {
@@ -572,17 +588,16 @@ public class Mine {
         str = str.replace("{MINE_ID}", id);
         str = str.replace("{BLOCKS_LEFT}", String.valueOf(physicalBlocksCount.get()));
         str = str.replace("{BLOCKS_MAX}", String.valueOf(maxPhysicalBlocksCount));
-        
+
         str = str.replace("%time%", TimeFormatter.format(timeLeft * 1000L, "default"));
         str = str.replace("%time_detail%", TimeFormatter.format(timeLeft * 1000L, "detail"));
         str = str.replace("%time:detail%", TimeFormatter.format(timeLeft * 1000L, "detail"));
         str = str.replace("%time_clock%", TimeFormatter.format(timeLeft * 1000L, "clock"));
         str = str.replace("%time:clock%", TimeFormatter.format(timeLeft * 1000L, "clock"));
-        
+
         return str;
     }
 
-    /** Запустить действия шахты для нужных игроков. breaker/material заполнены только для [break]. */
     public void executeAction(MineAction action, Player breaker, Material material) {
         Collection<? extends org.bukkit.command.CommandSender> targets = action.global()
                 ? List.of(Bukkit.getConsoleSender())
@@ -591,7 +606,6 @@ public class Mine {
         LLibAPI.get().actions().execute(plugin, targets, action.parsed(), placeholders(breaker, material));
     }
 
-    /** Действия [break] / [break:МАТЕРИАЛ] для добытого блока. */
     public void runBreakActions(Player breaker, Material material) {
         for (MineAction action : breakActions) {
             if (action.material() == null || action.material() == material) {
@@ -600,7 +614,6 @@ public class Mine {
         }
     }
 
-    /** Строки без тега "когда" (сообщения о правах, о зачарованиях) - только одному игроку. */
     public void runPlayerActions(Player player, List<String> rawActions) {
         for (String raw : rawActions) {
             MineActionParser.Parsed parsed = MineActionParser.parse(raw, plugin.getLogger());
@@ -626,23 +639,15 @@ public class Mine {
     }
 
     private Collection<? extends Player> selectPlayers(MineAction action, Player breaker) {
-        switch (action.target()) {
-            case SELF:
-                return breaker == null ? List.of() : List.of(breaker);
-            case MINE:
-                return Bukkit.getOnlinePlayers().stream().filter(p -> distanceToMine(p.getLocation()) == 0).toList();
-            case RADIUS:
-                return Bukkit.getOnlinePlayers().stream().filter(p -> distanceToMine(p.getLocation()) <= action.radius()).toList();
-            default:
-                return Bukkit.getOnlinePlayers();
-        }
+        return switch (action.target()) {
+            case SELF -> breaker == null ? List.of() : List.of(breaker);
+            case MINE -> Bukkit.getOnlinePlayers().stream().filter(p -> distanceToMine(p.getLocation()) == 0).toList();
+            case RADIUS ->
+                    Bukkit.getOnlinePlayers().stream().filter(p -> distanceToMine(p.getLocation()) <= action.radius()).toList();
+            default -> Bukkit.getOnlinePlayers();
+        };
     }
 
-    /**
-     * Расстояние от точки до ближайшей ГРАНИЦЫ коробки шахты (0 - внутри). Чужой мир - бесконечность.
-     * ponytail: getLocation() читается из глобального потока; на Folia это гонка с потоком игрока,
-     * но для выбора получателей сообщений безвредно.
-     */
     private double distanceToMine(Location loc) {
         if (pos1 == null || pos2 == null || world == null || !loc.getWorld().equals(world)) return Double.MAX_VALUE;
         int minX = Math.min(pos1.getBlockX(), pos2.getBlockX());
@@ -708,7 +713,6 @@ public class Mine {
         return true;
     }
 
-    /** Режимы BLOCKS/RARITY: шанс каждого блока + точные лимиты min..max для отдельных блоков. */
     private java.util.function.IntFunction<Material> buildChanceSource(List<MineBlock> targetBlocks, int totalCells) {
         double totalChance = targetBlocks.stream().mapToDouble(MineBlock::chance).sum();
         Map<Integer, Material> limitedPlacements = new HashMap<>();
@@ -736,12 +740,6 @@ public class Mine {
         };
     }
 
-    /**
-     * Режим ALL_BLOCKS: админ задаёт ТОЧНОЕ количество каждого блока, остаток занимает filler.
-     * Хранится компактно: палитра материалов + short[] номеров палитры на каждую ячейку
-     * (2 байта на ячейку, а не список объектов), затем Fisher-Yates перемешивание.
-     * Если сумма больше объёма - лишнее обрезается (с конца списка) и в лог пишется предупреждение.
-     */
     private java.util.function.IntFunction<Material> buildExactSource(List<MineBlock> targetBlocks, int totalCells) {
         List<Material> palette = new ArrayList<>();
         palette.add(filler);
@@ -775,17 +773,15 @@ public class Mine {
     }
 
     private static int exactCount(MineBlock mb) {
-        return Math.max(0, mb.max() >= 0 ? mb.max() : Math.max(0, mb.min()));
+        return mb.max() >= 0 ? mb.max() : Math.max(0, mb.min());
     }
 
-    /** Сколько ячеек занято блоками ALL_BLOCKS (для подсказок в меню и сообщений). */
     public long getAllBlocksUsed() {
         long sum = 0;
         for (MineBlock mb : blocks) sum += exactCount(mb);
         return sum;
     }
 
-    /** Объём области шахты в ячейках (0, если области нет). */
     public long getVolume() {
         if (pos1 == null || pos2 == null) return 0;
         if (shape != MineShape.CUBOID) return regionPoints.size();
@@ -794,12 +790,10 @@ public class Mine {
                 * (Math.abs(pos1.getBlockZ() - pos2.getBlockZ()) + 1);
     }
 
-    /** Блок поставил игрок: он не считается добычей шахты (иначе "поставил-сломал" = бесконечные дропы, деньги и статистика). */
     public void markPlaced(org.bukkit.block.Block block) {
         playerPlaced.add(blockKey(block));
     }
 
-    /** true, если ломается блок, который поставил игрок (метка снимается). */
     public boolean consumePlaced(org.bukkit.block.Block block) {
         return playerPlaced.remove(blockKey(block));
     }
@@ -808,7 +802,6 @@ public class Mine {
         return ((long) (b.getX() & 0x3FFFFFF) << 38) | ((long) (b.getZ() & 0x3FFFFFF) << 12) | ((b.getY() + 2048) & 0xFFFL);
     }
 
-    /** Сброс по проценту: вызывается после каждого добытого блока. */
     public void checkPercentReset() {
         if (resetPercent <= 0 || isResetting || maxPhysicalBlocksCount <= 0) return;
         if ((long) physicalBlocksCount.get() * 100L <= (long) maxPhysicalBlocksCount * resetPercent) {
@@ -816,7 +809,6 @@ public class Mine {
         }
     }
 
-    /** Вызывается из глобального потока, когда все части сброса готовы. */
     private void finishReset(int placedBlocks) {
         physicalBlocksCount.set(placedBlocks);
         maxPhysicalBlocksCount = placedBlocks;
@@ -837,7 +829,7 @@ public class Mine {
         } else if (mode == MineMode.RARITY && currentRarity != null) { return currentRarity.blocks(); }
         return Collections.emptyList();
     }
-    
+
     private Material getRandomBlock(List<MineBlock> blocks, double totalChance) {
         double r = Math.random() * totalChance;
         double current = 0;
@@ -859,7 +851,7 @@ public class Mine {
         if (!holoEnable || !enable) return;
         plugin.getHologramManager().update(this);
     }
-    
+
     public void deleteHologram() {
         plugin.getHologramManager().delete(this);
     }
@@ -887,7 +879,6 @@ public class Mine {
 
     public List<String> getRawActions() { return rawActions; }
 
-
     public int getPhysicalBlocksCount() { return physicalBlocksCount.get(); }
     public int getMaxPhysicalBlocksCount() { return maxPhysicalBlocksCount; }
     public void decrementPhysicalBlocks() { physicalBlocksCount.updateAndGet(v -> v > 0 ? v - 1 : 0); }
@@ -896,7 +887,7 @@ public class Mine {
 
     public Location getPos1() { return pos1; }
     public Location getPos2() { return pos2; }
-    
+
     public Location getTpPos() { return tpPos; }
     public void setTpPos(Location loc) { this.tpPos = loc; }
     public boolean isTpEnable() { return tpEnable; }
@@ -966,7 +957,7 @@ public class Mine {
         int minX = Math.min(pos1.getBlockX(), pos2.getBlockX());
         int minY = Math.min(pos1.getBlockY(), pos2.getBlockY());
         int minZ = Math.min(pos1.getBlockZ(), pos2.getBlockZ());
-        
+
         int maxX = Math.max(pos1.getBlockX(), pos2.getBlockX());
         int maxY = Math.max(pos1.getBlockY(), pos2.getBlockY());
         int maxZ = Math.max(pos1.getBlockZ(), pos2.getBlockZ());

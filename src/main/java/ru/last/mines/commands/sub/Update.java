@@ -26,8 +26,6 @@ public final class Update {
                         (String) args.get("id"), (String) args.get("rarity"), (String) args.get("next")));
     }
 
-    // Suggests rarity ids across all mines, not just the one being updated - BCmd doesn't
-    // expose an earlier argument's value while suggesting a later one on the same command.
     private static Collection<String> allRarityIds(LastMines plugin) {
         Set<String> ids = new LinkedHashSet<>();
         for (Mine mine : plugin.getMineManager().getMines().values()) {

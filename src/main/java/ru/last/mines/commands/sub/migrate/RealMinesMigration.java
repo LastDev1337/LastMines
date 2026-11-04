@@ -45,10 +45,10 @@ public class RealMinesMigration {
                 String world = "world";
                 double p1x = 0, p1y = 0, p1z = 0;
                 double p2x = 0, p2y = 0, p2z = 0;
-                
+
                 YamlMap p1Sec = null;
                 try { p1Sec = rmConfig.get("POS1").asYamlMap().orDefault(null); } catch (Exception ignored) {}
-                
+
                 if (p1Sec != null) {
                     p1x = p1Sec.get("x").asDouble(0.0); p1y = p1Sec.get("y").asDouble(0.0); p1z = p1Sec.get("z").asDouble(0.0);
                     world = p1Sec.get("world").asString("world");
@@ -89,7 +89,7 @@ public class RealMinesMigration {
                 newConfig.set("world", world);
                 newConfig.set("reset_time", resetTime);
                 newConfig.set("mode", "BLOCKS");
-                
+
                 YamlMap positions = new YamlMap();
                 positions.set("points", List.of(p1x + ";" + p1y + ";" + p1z, p2x + ";" + p2y + ";" + p2z));
                 newConfig.set("positions", positions.getRaw());
@@ -97,7 +97,7 @@ public class RealMinesMigration {
                 List<Map<String, Object>> newBlocks = new ArrayList<>();
                 YamlMap blocksSec = null;
                 try { blocksSec = rmConfig.get("Blocks").asYamlMap().orDefault(null); } catch (Exception ignored) {}
-                
+
                 if (blocksSec != null) {
                     for (String b : blocksSec.getRaw().keySet()) {
                         double chance = blocksSec.get(b).asDouble(0.0);

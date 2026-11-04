@@ -43,7 +43,7 @@ public class TimeFormatter {
 
         YamlMap formatsSec = config.get("formats").asYamlMap().hasResult() ? config.get("formats").asYamlMap().getOrThrow() : new YamlMap();
         YamlMap formatMap = formatsSec.get(formatType).asYamlMap().hasResult() ? formatsSec.get(formatType).asYamlMap().getOrThrow() : null;
-        
+
         if (formatMap == null) return formatDefault(millis, formatType);
 
         YamlMap f = formatMap.get("formats").asYamlMap().hasResult() ? formatMap.get("formats").asYamlMap().getOrThrow() : new YamlMap();
@@ -90,7 +90,7 @@ public class TimeFormatter {
         }
         return defaultsViews.get("all").asString("default");
     }
-    
+
     private static String getType(YamlValue node, long num) {
         if (node.getRaw() instanceof String) return node.asString("");
         if (node.asYamlMap().hasResult()) {

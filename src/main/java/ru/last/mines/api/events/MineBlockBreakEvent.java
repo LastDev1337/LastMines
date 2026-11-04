@@ -10,7 +10,7 @@ import ru.last.mines.mine.Mine;
 
 public class MineBlockBreakEvent extends Event implements Cancellable {
     private static final HandlerList HANDLERS = new HandlerList();
-    
+
     private final Player player;
     private final Mine mine;
     private final Block block;

@@ -25,7 +25,7 @@ import ru.last.mines.utils.*;
 import java.util.*;
 
 public class RaritiesProvider extends DefaultMenu {
-    
+
     private final Map<Integer, MineRarity> slotToRarity = new HashMap<>();
 
     public RaritiesProvider(MenuConfig config, Player viewer, @Nullable Menu previousMenu) {
@@ -42,10 +42,10 @@ public class RaritiesProvider extends DefaultMenu {
         YamlMap map = config.yaml();
         if (!map.has("rarities_list")) return;
         YamlMap listMap = map.get("rarities_list").asYamlMap().orDefault(new YamlMap());
-        
+
         String slotsStr = listMap.get("slots").asString("");
         List<Integer> slots = slotsStr.isBlank() ? List.of() : Arrays.stream(AnimationUtil.readSlots(slotsStr)).boxed().toList();
-        
+
         String materialName = listMap.get("material").asString("NETHER_STAR");
         String name = listMap.get("name").asString("&eРедкость &f{RARITY_NAME}");
         List<String> lore = new ArrayList<>();
@@ -55,14 +55,14 @@ public class RaritiesProvider extends DefaultMenu {
                 for (Object o : l) lore.add(o.toString());
             }
         }
-        
+
         String mineId = LastMines.get().getGuiManager().getViewingMines().get(viewer.getUniqueId());
         if (mineId == null) return;
         Mine mine = LastMinesProvider.getApi().getMine(mineId);
         if (mine == null) return;
-        
+
         List<MineRarity> rarities = mine.getRarities();
-        
+
         for (int i = 0; i < Math.min(slots.size(), rarities.size()); i++) {
             MineRarity mr = rarities.get(i);
             int slot = slots.get(i);
@@ -77,7 +77,7 @@ public class RaritiesProvider extends DefaultMenu {
                 String dName = name.replace("{RARITY_NAME}", mr.name())
                                    .replace("{RARITY_ID}", mr.id());
                 meta.displayName(ColorUtils.color(dName));
-                
+
                 List<Component> dLore = new ArrayList<>();
                 for (String l : lore) {
                     String line = l.replace("{RARITY_NAME}", mr.name())

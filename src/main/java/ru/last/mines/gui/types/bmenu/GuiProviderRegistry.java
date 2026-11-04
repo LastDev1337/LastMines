@@ -4,7 +4,7 @@ import dev.by1337.bmenu.BMenu;
 import ru.last.mines.gui.types.bmenu.providers.*;
 
 public class GuiProviderRegistry {
-    
+
     public static void register() {
         BMenu.menuLoader().codecRegistry().register("lastmines:main", MainProvider::new);
         BMenu.menuLoader().codecRegistry().register("lastmines:blocks", BlocksProvider::new);

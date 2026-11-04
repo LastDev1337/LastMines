@@ -33,7 +33,7 @@ public class AutoMineMigration {
 
         YamlMap autoMinesSec = null;
         try { autoMinesSec = config.get("AutoMines").asYamlMap().orDefault(null); } catch (Exception ignored) {}
-        
+
         if (autoMinesSec == null) {
             sender.sendMessage(prefix + "<red>В AutoMines.yml нет секции AutoMines!");
             return;
@@ -53,7 +53,7 @@ public class AutoMineMigration {
                 if (mineSec == null) continue;
 
                 String world = mineSec.get("world").asString("world");
-                
+
                 double p1x = mineSec.get("firstPos").asYamlMap().orDefault(new YamlMap()).get("x").asDouble(0.0);
                 double p1y = mineSec.get("firstPos").asYamlMap().orDefault(new YamlMap()).get("y").asDouble(0.0);
                 double p1z = mineSec.get("firstPos").asYamlMap().orDefault(new YamlMap()).get("z").asDouble(0.0);
@@ -68,14 +68,14 @@ public class AutoMineMigration {
                 newConfig.set("name", key);
                 newConfig.set("world", world);
                 newConfig.set("reset_time", timeUpdate);
-                
+
                 YamlMap posMap = new YamlMap();
                 posMap.set("points", List.of(p1x + ";" + p1y + ";" + p1z, p2x + ";" + p2y + ";" + p2z));
                 newConfig.set("positions", posMap.getRaw());
 
                 YamlMap types = null;
                 try { types = mineSec.get("typeMine").asYamlMap().orDefault(null); } catch (Exception ignored) {}
-                
+
                 if (types == null || types.getRaw().isEmpty()) {
                     newConfig.set("mode", "BLOCKS");
                     newConfig.set("blocks", new ArrayList<>());
@@ -83,13 +83,13 @@ public class AutoMineMigration {
                     if (types.getRaw().size() == 1) {
                         newConfig.set("mode", "BLOCKS");
                         String firstType = types.getRaw().keySet().iterator().next();
-                        
+
                         List<String> blockList = new ArrayList<>();
                         Object rawList = types.get(firstType).asYamlMap().orDefault(new YamlMap()).get("blockList").getRaw();
                         if (rawList instanceof List<?> list) {
                             for (Object o : list) blockList.add(String.valueOf(o));
                         }
-                        
+
                         List<Map<String, Object>> newBlocks = new ArrayList<>();
                         for (String b : blockList) {
                             String[] split = b.split(":");

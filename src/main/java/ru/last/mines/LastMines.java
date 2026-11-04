@@ -22,7 +22,7 @@ public class LastMines extends JavaPlugin {
 
     private static LastMines instance;
     private ConfigManager configManager;
-    
+
     private MineManager mineManager;
     private ActionManager actionManager;
     private BlockCatalogManager blockCatalogManager;
@@ -62,7 +62,7 @@ public class LastMines extends JavaPlugin {
         this.blockCatalogManager.load();
 
         this.hologramManager = new HologramManager(this);
-        
+
         this.mineManager = new MineManager(this);
         int delay = this.configManager.getMainConfig().getTimeLoadAllMines();
         if (delay > 0) {
@@ -130,7 +130,6 @@ public class LastMines extends JavaPlugin {
         getLogger().info("disabling successfully!");
     }
 
-    /** "1.21.4" -> [21, 4]; "26.2.build.7-beta" -> [26, 2] (берутся только ведущие числовые части). */
     private static int[] parseVersion(String raw) {
         String v = raw.startsWith("1.") ? raw.substring(2) : raw;
         java.util.List<Integer> out = new java.util.ArrayList<>();

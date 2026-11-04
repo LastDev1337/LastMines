@@ -25,7 +25,7 @@ import ru.last.mines.utils.*;
 import java.util.*;
 
 public class BlocksProvider extends DefaultMenu {
-    
+
     private final Map<Integer, MineBlock> slotToBlock = new HashMap<>();
 
     public BlocksProvider(MenuConfig config, Player viewer, @Nullable Menu previousMenu) {
@@ -42,10 +42,10 @@ public class BlocksProvider extends DefaultMenu {
         YamlMap map = config.yaml();
         if (!map.has("blocks_list")) return;
         YamlMap listMap = map.get("blocks_list").asYamlMap().orDefault(new YamlMap());
-        
+
         String slotsStr = listMap.get("slots").asString("");
         List<Integer> slots = slotsStr.isBlank() ? List.of() : Arrays.stream(AnimationUtil.readSlots(slotsStr)).boxed().toList();
-        
+
         String name = listMap.get("name").asString("&eБлок &f{MATERIAL}");
         List<String> lore = new ArrayList<>();
         if (listMap.has("lore")) {
@@ -54,14 +54,14 @@ public class BlocksProvider extends DefaultMenu {
                 for (Object o : l) lore.add(o.toString());
             }
         }
-        
+
         String mineId = LastMines.get().getGuiManager().getViewingMines().get(viewer.getUniqueId());
         if (mineId == null) return;
         Mine mine = LastMinesProvider.getApi().getMine(mineId);
         if (mine == null) return;
-        
+
         List<MineBlock> blocks = mine.getCurrentBlocks();
-        
+
         for (int i = 0; i < Math.min(slots.size(), blocks.size()); i++) {
             MineBlock mb = blocks.get(i);
             int slot = slots.get(i);

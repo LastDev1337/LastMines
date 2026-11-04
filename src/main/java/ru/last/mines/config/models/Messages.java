@@ -26,7 +26,7 @@ public class Messages {
     private final Message listHeader;
     private final Message listFormat;
     private final Message updateSuccess;
-    
+
     private final Message chanceExceeded;
     private final Message inputChance;
     private final Message inputLimit;
@@ -58,7 +58,7 @@ public class Messages {
         this.listHeader = new Message(prefix + map.get("list-header").asString("&aЗагруженные шахты:"));
         this.listFormat = new Message(map.get("list-format").asString("&8- &e%mine% &7(Осталось: %time% сек)"));
         this.updateSuccess = new Message(prefix + map.get("update-success").asString("&aШахта &e%mine% &aпринудительно обновлена!"));
-        
+
         this.chanceExceeded = new Message(prefix + map.get("chance-exceeded").asString("&cОбщий шанс не может превышать 100%!"));
         this.inputChance = new Message(prefix + map.get("input-chance").asString("&eНапишите шанс в чат (0.0001 - 100). &7У вас есть 1 минута."));
         this.inputLimit = new Message(prefix + map.get("input-limit").asString("&eНапишите лимит в чат (1 - 64). &7У вас есть 1 минута."));
@@ -98,7 +98,6 @@ public class Messages {
     public String getPrefix() { return prefix; }
     public Message getNoPermission() { return noPermission; }
     public Message getReloaded() { return reloaded; }
-    /** Сообщение по ключу из messages.yml; если ключа нет - берётся текст по умолчанию. */
     public Message custom(String key, String def) {
         return new Message(prefix + raw.get(key).asString(def));
     }
@@ -117,7 +116,7 @@ public class Messages {
     public Message getListHeader() { return listHeader; }
     public Message getListFormat() { return listFormat; }
     public Message getUpdateSuccess() { return updateSuccess; }
-    
+
     public Message getChanceExceeded() { return chanceExceeded; }
     public Message getInputChance() { return inputChance; }
     public Message getInputLimit() { return inputLimit; }

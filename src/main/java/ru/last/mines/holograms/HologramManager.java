@@ -32,10 +32,6 @@ public class HologramManager {
         }
     }
 
-    /**
-     * Голограмма - это сущность в мире: на Folia с ней можно работать только в потоке региона,
-     * где она стоит. Поэтому любая операция уходит в планировщик региона точки голограммы.
-     */
     private void onRegion(Mine mine, Runnable action) {
         Location loc = mine.getHoloOffset();
         if (loc == null || loc.getWorld() == null || !plugin.isEnabled()) {
@@ -93,11 +89,6 @@ public class HologramManager {
         }
     }
 
-    /**
-     * Выключение плагина: планировщик уже не принимает задачи, поэтому удаляем напрямую.
-     * На Folia из чужого потока это запрещено - но голограммы создаются непостоянными (setPersistent(false)),
-     * и при остановке сервера всё равно не сохраняются, так что ошибку можно проглотить.
-     */
     public void unloadAll() {
         try {
             HologramProvider vanilla = providers.get("vanilla");
@@ -109,7 +100,6 @@ public class HologramManager {
                 if (provider != null) provider.delete(mine);
             }
         } catch (Throwable ignored) {
-            // Folia: см. комментарий выше
         }
     }
 }

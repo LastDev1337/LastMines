@@ -10,7 +10,7 @@ public class DebugSettings {
         this.enable = map.get("enable").asBool(true);
         this.prefix = map.get("prefix").asString("[Debug] ");
     }
-    
+
     public DebugSettings(boolean enable, String prefix) {
         this.enable = enable;
         this.prefix = prefix;

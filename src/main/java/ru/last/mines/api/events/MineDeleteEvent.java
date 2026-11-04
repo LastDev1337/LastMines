@@ -8,7 +8,7 @@ import ru.last.mines.mine.Mine;
 
 public class MineDeleteEvent extends Event implements Cancellable {
     private static final HandlerList HANDLERS = new HandlerList();
-    
+
     private final Mine mine;
     private boolean cancelled = false;
 

@@ -27,21 +27,21 @@ public class DefaultMine {
         config.set("positions", positions.getRaw());
 
         List<Map<String, Object>> defaultBlocks = new ArrayList<>();
-        
+
         Map<String, Object> stoneMap = new LinkedHashMap<>();
         stoneMap.put("id", "STONE");
         stoneMap.put("chance", 80.0);
         stoneMap.put("drop", new ArrayList<String>());
         defaultBlocks.add(stoneMap);
-        
+
         Map<String, Object> coalMap = new LinkedHashMap<>();
         coalMap.put("id", "COAL_ORE");
         coalMap.put("chance", 20.0);
         coalMap.put("drop", new ArrayList<String>());
         defaultBlocks.add(coalMap);
-        
+
         config.set("blocks", defaultBlocks);
-        
+
         List<String> actions = new ArrayList<>();
         actions.add("[message] [update:60] &fАвтоШахта &e" + id + " &fобновится через 1 минуту!");
         actions.add("[message] [update:10] &fАвтоШахта &e" + id + " &fобновится через 10 секунд!");

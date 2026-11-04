@@ -23,7 +23,7 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import java.util.*;
 
 public class AllMinesProvider extends DefaultMenu {
-    
+
     private final Map<Integer, String> slotToMine = new HashMap<>();
 
     public AllMinesProvider(MenuConfig config, Player viewer, @Nullable Menu previousMenu) {
@@ -39,7 +39,7 @@ public class AllMinesProvider extends DefaultMenu {
 
         String slotsStr = listMap.get("slots").asString("");
         List<Integer> slots = slotsStr.isBlank() ? List.of() : Arrays.stream(AnimationUtil.readSlots(slotsStr)).boxed().toList();
-        
+
         String materialName = listMap.get("material").asString("DIAMOND_ORE");
         String name = listMap.get("name").asString("&aШахта {MINE_ID}");
         List<String> lore = new ArrayList<>();
@@ -49,9 +49,9 @@ public class AllMinesProvider extends DefaultMenu {
                 for (Object o : l) lore.add(o.toString());
             }
         }
-        
+
         List<Mine> mines = new ArrayList<>(LastMinesProvider.getApi().getMines());
-        
+
         for (int i = 0; i < Math.min(slots.size(), mines.size()); i++) {
             Mine mine = mines.get(i);
             int slot = slots.get(i);

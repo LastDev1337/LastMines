@@ -76,11 +76,6 @@ public class BlockDropsListener implements Listener {
         return item;
     }
 
-    /**
-     * Редактор дропа: слоты 0..44 - "призрачные". Клик предметом из курсора ставит в слот ПРОСТО иконку материала
-     * (предмет игрока не тратится), клик пустой рукой по слоту очищает его. Всё остальное запрещено, чтобы нельзя было
-     * вынести иконки себе в инвентарь (создание предметов) или потерять свои предметы внутри виртуального окна.
-     */
     @EventHandler
     public void onClick(InventoryClickEvent event) {
         Session session = sessions.get(event.getInventory());

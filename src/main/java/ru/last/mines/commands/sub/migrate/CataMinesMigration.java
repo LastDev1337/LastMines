@@ -39,18 +39,17 @@ public class CataMinesMigration {
                 List<String> lines = Files.readAllLines(file.toPath());
                 lines.removeIf(line -> line.contains("==:"));
                 String cleanYaml = String.join("\n", lines);
-                
+
                 YamlMap cataConfig = YamlMap.loadFromString(cleanYaml);
-                
+
                 YamlMap mineSec = null;
                 try {
                     mineSec = cataConfig.get("Mine").asYamlMap().orDefault(null);
                 } catch (Exception ignored) {
-                    // nope
                 }
-                
+
                 if (mineSec == null) continue;
-                
+
                 String name = mineSec.get("name").asString(file.getName().replace(".yml", ""));
                 if (!MineManager.isValidId(name)) {
                     plugin.getLogger().warning("Пропущена шахта с недопустимым id из CataMines: " + name);
@@ -59,27 +58,27 @@ public class CataMinesMigration {
 
                 YamlMap regionMap = mineSec.get("region").asYamlMap().orDefault(new YamlMap());
                 String world = regionMap.get("world").asString("world");
-                
+
                 double p1x = regionMap.get("p1").asYamlMap().orDefault(new YamlMap()).get("x").asDouble(0.0);
                 double p1y = regionMap.get("p1").asYamlMap().orDefault(new YamlMap()).get("y").asDouble(0.0);
                 double p1z = regionMap.get("p1").asYamlMap().orDefault(new YamlMap()).get("z").asDouble(0.0);
-                
+
                 double p2x = regionMap.get("p2").asYamlMap().orDefault(new YamlMap()).get("x").asDouble(0.0);
                 double p2y = regionMap.get("p2").asYamlMap().orDefault(new YamlMap()).get("y").asDouble(0.0);
                 double p2z = regionMap.get("p2").asYamlMap().orDefault(new YamlMap()).get("z").asDouble(0.0);
-                
+
                 int resetDelay = mineSec.get("resetDelay").asInt(300);
-                
+
                 YamlMap newConfig = new YamlMap();
                 newConfig.set("name", name);
                 newConfig.set("world", world);
                 newConfig.set("reset_time", resetDelay);
                 newConfig.set("mode", "BLOCKS");
-                
+
                 YamlMap positions = new YamlMap();
                 positions.set("points", List.of(p1x + ";" + p1y + ";" + p1z, p2x + ";" + p2y + ";" + p2z));
                 newConfig.set("positions", positions.getRaw());
-                
+
                 List<Map<String, Object>> newBlocks = new ArrayList<>();
                 Object compRaw = mineSec.get("composition").getRaw();
                 if (compRaw instanceof List<?> list) {
@@ -92,7 +91,7 @@ public class CataMinesMigration {
                             else if (chanceObj instanceof String s) {
                                 try { chance = Double.parseDouble(s); } catch (Exception ignored) {}
                             }
-                            
+
                             Map<String, Object> bm = new LinkedHashMap<>();
                             bm.put("id", blockId);
                             bm.put("chance", chance);
@@ -102,7 +101,7 @@ public class CataMinesMigration {
                     }
                 }
                 newConfig.set("blocks", newBlocks);
-                
+
                 YamlMap warnMap = mineSec.get("warn").asYamlMap().orDefault(new YamlMap());
                 Object warnRaw = warnMap.get("warnSeconds").getRaw();
                 List<String> warnSeconds = new ArrayList<>();
@@ -119,7 +118,7 @@ public class CataMinesMigration {
                 }
                 newActions.add("[message] [update] &fАвтоШахта &e" + name + " &fобновилась!");
                 newConfig.set("actions", newActions);
-                
+
                 boolean tpEnable = mineSec.get("teleportPlayers").asBool(false);
                 if (tpEnable) {
                     YamlMap tpMap = new YamlMap();
@@ -131,13 +130,13 @@ public class CataMinesMigration {
                     tpMap.set("pos", tpX + ";" + tpY + ";" + tpZ + ";0;0");
                     newConfig.set("teleport", tpMap.getRaw());
                 }
-                
+
                 File outFile = new File(lastMinesFolder, file.getName());
                 java.nio.file.Files.writeString(outFile.toPath(), newConfig.saveToString(), java.nio.charset.StandardCharsets.UTF_8);
                 migrated++;
             } catch (Exception e) { plugin.getLogger().warning("Ошибка при миграции шахты " + file.getName() + ": " + e.getMessage()); }
         }
-        
+
         if (migrated > 0) {
             sender.sendMessage(ColorUtils.colorString(prefix + "<green>Успешно мигрировано " + migrated + " шахт из CataMines!"));
             plugin.getMineManager().loadAll();

@@ -9,7 +9,7 @@ public class TimeUtils {
 
     public static long parseToMillis(String input) {
         if (input == null || input.isEmpty()) return 0;
-        
+
         Matcher matcher = TIME_PATTERN.matcher(input);
         long totalMillis = 0;
         boolean found = false;

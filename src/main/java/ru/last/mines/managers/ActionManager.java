@@ -83,7 +83,7 @@ public class ActionManager {
         if (mine == null) return;
         Material mat = Material.matchMaterial(blockMat);
         if (mat == null) return;
-        
+
         List<MineBlock> blocks = mine.getCurrentBlocks();
         MineBlock target = null;
         for (MineBlock mb : blocks) {
@@ -92,7 +92,7 @@ public class ActionManager {
                 break;
             }
         }
-        
+
         if ("chance".equalsIgnoreCase(action)) {
             double change = 0;
             try { change = Double.parseDouble(value); } catch(Exception ignored) {}
@@ -113,7 +113,7 @@ public class ActionManager {
     public void editRarity(String mineId, String rarityId, String action, String value) {
         Mine mine = LastMinesProvider.getApi().getMine(mineId);
         if (mine == null || mine.getRarities() == null) return;
-        
+
         List<MineRarity> rarities = mine.getRarities();
         MineRarity target = null;
         for (MineRarity mr : rarities) {
@@ -122,7 +122,7 @@ public class ActionManager {
                 break;
             }
         }
-        
+
         if ("chance".equalsIgnoreCase(action) && target != null) {
             double change = 0;
             try { change = Double.parseDouble(value); } catch(Exception ignored) {}
@@ -139,13 +139,13 @@ public class ActionManager {
     public void editHolo(String mineId, int index, String action, String value) {
         Mine mine = LastMinesProvider.getApi().getMine(mineId);
         if (mine == null) return;
-        
+
         List<String> current = mine.getRawHoloTexts();
         if (current == null) return;
-        
+
         List<String> lines = new ArrayList<>(current);
         if (index < 0 || index >= lines.size()) return;
-        
+
         if ("remove".equalsIgnoreCase(action)) {
             lines.remove(index);
         } else if ("set".equalsIgnoreCase(action)) {

@@ -29,7 +29,7 @@ public class CommandsModule {
         public CommandConfig(YamlMap map) {
             this.enable = map.get("enable").asBool(true);
             this.tabCompleter = map.get("tab-completer").asBool(true);
-            
+
             this.aliases = new ArrayList<>();
             Object rawAliases = map.get("aliases").getRaw();
             if (rawAliases instanceof List<?> list) {

@@ -46,9 +46,6 @@ public class DecentHoloProvider implements HologramProvider {
 
     @Override
     public void removeAll() {
-        /*
-         DecentHolograms автоматически выгружает все голограммы на сервере
-        */
     }
 
     private List<String> applyPlaceholders(Mine mine, List<String> lines) {

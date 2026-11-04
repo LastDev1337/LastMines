@@ -50,7 +50,7 @@ public class HologramsProvider extends DefaultMenu {
         if (mineId == null) return;
         Mine mine = LastMinesProvider.getApi().getMine(mineId);
         if (mine == null) return;
-        
+
         List<String> lines = mine.getHoloTexts();
         String name = listMap.get("name").asString("&eСтрока #{INDEX}");
         List<String> loreTemplate = new ArrayList<>();

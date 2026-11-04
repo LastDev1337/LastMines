@@ -18,7 +18,7 @@ public class Debugger {
 
         boolean enabled = false;
         String prefix = "";
-        
+
         switch (type) {
             case INFO -> {
                 enabled = config.getInfo().isEnable();
@@ -33,7 +33,7 @@ public class Debugger {
                 prefix = config.getError().getPrefix();
             }
         }
-        
+
         if (!enabled) return;
         Bukkit.getConsoleSender().sendMessage(ColorUtils.colorString("<white>[LastMines] <reset>" + prefix + message));
     }
@@ -41,7 +41,7 @@ public class Debugger {
     public void logError(String message, Throwable t) {
         Main config = LastMines.get().getConfigManager().getMainConfig();
         if (!config.isDebugEnable() || !config.getError().isEnable()) return;
-        
+
         String prefix = config.getError().getPrefix();
         Bukkit.getConsoleSender().sendMessage(ColorUtils.colorString("<red>============================================================"));
         Bukkit.getConsoleSender().sendMessage(ColorUtils.colorString("<aqua>[LastMines] <reset>" + prefix));

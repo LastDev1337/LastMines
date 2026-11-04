@@ -47,7 +47,6 @@ public class UpdateChecker {
         });
     }
 
-    /** Сравнение по числовым частям: "0.4" новее "0.3", но НЕ новее "0.5" (у разработчика версия может быть выше опубликованной). */
     static boolean isNewer(String latest, String current) {
         String[] a = latest.split("[.\\-]");
         String[] b = current.split("[.\\-]");

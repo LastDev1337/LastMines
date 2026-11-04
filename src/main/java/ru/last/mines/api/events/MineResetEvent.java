@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class MineResetEvent extends Event {
     private static final HandlerList HANDLERS = new HandlerList();
-    
+
     private final Mine mine;
 
     public MineResetEvent(Mine mine) { this.mine = mine; }

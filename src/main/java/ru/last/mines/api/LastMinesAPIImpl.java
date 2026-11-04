@@ -34,9 +34,9 @@ public class LastMinesAPIImpl implements LastMinesAPI {
         if (mine.getPos1() == null || mine.getPos2() == null) return false;
         if (location.getWorld() == null || !location.getWorld().equals(mine.getPos1().getWorld())) return false;
 
-        Location center = new Location(location.getWorld(), 
-            (mine.getPos1().getX() + mine.getPos2().getX()) / 2.0, 
-            (mine.getPos1().getY() + mine.getPos2().getY()) / 2.0, 
+        Location center = new Location(location.getWorld(),
+            (mine.getPos1().getX() + mine.getPos2().getX()) / 2.0,
+            (mine.getPos1().getY() + mine.getPos2().getY()) / 2.0,
             (mine.getPos1().getZ() + mine.getPos2().getZ()) / 2.0);
         return location.distance(center) <= radius;
     }

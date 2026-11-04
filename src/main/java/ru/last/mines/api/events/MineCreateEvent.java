@@ -7,7 +7,7 @@ import ru.last.mines.mine.Mine;
 
 public class MineCreateEvent extends Event {
     private static final HandlerList HANDLERS = new HandlerList();
-    
+
     private final Mine mine;
 
     public MineCreateEvent(Mine mine) { this.mine = mine; }

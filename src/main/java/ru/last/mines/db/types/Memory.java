@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-/** Хранилище в памяти: для тестов и мелких серверов, после выключения данные пропадают. */
 public final class Memory implements DBProvider {
 
     private final Map<UUID, PlayerStats> data = new ConcurrentHashMap<>();

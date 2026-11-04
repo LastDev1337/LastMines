@@ -26,7 +26,7 @@ public class PlaceHook extends PlaceholderExpansion {
                 params = params.replace("{MINE_ID}", guiMineId);
             }
         }
-        
+
         String statsValue = StatsPlaceholders.resolve(plugin, player, params);
         if (statsValue != null) return statsValue;
 
@@ -63,7 +63,7 @@ public class PlaceHook extends PlaceholderExpansion {
             Mine mine = plugin.getMineManager().getMine(id);
             if (mine != null) return String.valueOf(mine.getCurrentBlocks().size());
         } else if (params.equals("count")) { return String.valueOf(plugin.getMineManager().getMines().size()); }
-        
+
         return null;
     }
 }

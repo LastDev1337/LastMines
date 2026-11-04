@@ -12,7 +12,6 @@ import ru.last.mines.utils.time.TimeUtils;
 
 import java.io.File;
 
-/** Читает sql.yml и создаёт нужное хранилище. Возвращает null, если статистика выключена или база недоступна. */
 public final class DBManager {
 
     public record Settings(boolean enable, int flushSeconds, int topRefreshSeconds, int topSize) { }

@@ -34,7 +34,6 @@ public class WEHook {
                 return session.getSelection(session.getSelectionWorld());
             }
         } catch (Throwable ignored) {
-            // nope
         }
         return null;
     }

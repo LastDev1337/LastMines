@@ -87,14 +87,14 @@ public class BMenuManager implements Listener {
             fileWatcher.stopWatching();
         }
     }
-    
+
     public void openMenu(Player player, String mineId) {
         if (subLoader == null) return;
         try {
             viewingMines.put(player.getUniqueId(), mineId);
             Menu menu = BMenu.menuLoader().create("lastmines:main", player, null);
             menu.addArgument("MINE_ID", mineId);
-            
+
             try {
                 Class<?> resolverClass = Class.forName("dev.by1337.plc.PlaceholderResolver");
                 Object proxy = Proxy.newProxyInstance(
@@ -112,7 +112,7 @@ public class BMenuManager implements Listener {
                 );
                 menu.getClass().getMethod("addPlaceholderResolver", resolverClass).invoke(menu, proxy);
             } catch (Exception ignore) {}
-            
+
             menu.open();
         } catch (Throwable e) {
             plugin.getDebugger().error("Failed to open main menu", e);
