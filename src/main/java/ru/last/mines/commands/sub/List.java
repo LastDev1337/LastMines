@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import ru.last.mines.LastMines;
 import ru.last.mines.api.LastMinesProvider;
-import ru.last.mines.models.Mine;
+import ru.last.mines.mine.Mine;
 
 import java.util.Collection;
 

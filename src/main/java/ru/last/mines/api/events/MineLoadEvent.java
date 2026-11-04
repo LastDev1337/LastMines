@@ -3,7 +3,7 @@ package ru.last.mines.api.events;
 import org.jetbrains.annotations.NotNull;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import ru.last.mines.models.Mine;
+import ru.last.mines.mine.Mine;
 
 public class MineLoadEvent extends Event {
     private static final HandlerList handlers = new HandlerList();

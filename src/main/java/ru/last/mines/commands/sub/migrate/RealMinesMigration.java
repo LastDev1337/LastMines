@@ -3,6 +3,7 @@ package ru.last.mines.commands.sub.migrate;
 import org.bukkit.command.CommandSender;
 import dev.by1337.yaml.YamlMap;
 import ru.last.mines.LastMines;
+import ru.last.mines.mine.MineManager;
 import ru.last.mines.utils.ColorUtils;
 
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public class RealMinesMigration {
             try {
                 YamlMap rmConfig = YamlMap.load(file);
                 String name = rmConfig.get("name").asString(file.getName().replace(".yml", ""));
-                if (!ru.last.mines.managers.MineManager.isValidId(name)) {
+                if (!MineManager.isValidId(name)) {
                     plugin.getLogger().warning("Пропущена шахта с недопустимым id из RealMines: " + name);
                     continue;
                 }

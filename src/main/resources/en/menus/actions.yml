@@ -7,6 +7,7 @@ title: '&8Actions &7{MINE_ID}'
 actions_list:
   slots: 10-16,19-25,28-34,37-43
   name: "&f{INDEX}. &7{ACTION}"
+  on_click: '[action_remove] {MINE_ID} {INDEX}'
 
 items:
   back:

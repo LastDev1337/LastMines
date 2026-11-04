@@ -80,3 +80,21 @@ commands:
     tab-completer: true
     aliases:
       - "lang"
+
+  copy:
+    enable: true
+    tab-completer: true
+    aliases:
+      - "cp"
+      - "clone"
+
+  stats:
+    enable: true
+    tab-completer: true
+    aliases:
+      - "st"
+
+  top:
+    enable: true
+    tab-completer: true
+    aliases: []

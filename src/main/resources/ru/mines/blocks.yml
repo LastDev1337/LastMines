@@ -1,19 +1,21 @@
 name: default
 world: world
 
-# Wiki: https://wiki.laststudio.space/lastmines/modes.html
+# Wiki: https://wiki.laststudio.space/lastmines/моды
 # BLOCKS - принимает только блоки (одна редкость по факту)
 # RARITY - принимает несколько редкостей с блоками из конфигурации
 mode: BLOCKS
 
-# Wiki: https://wiki.laststudio.space/lastmines/geometry.html
-# Если у вас будет стоять WorldEdit или FAWE, то можно будет выделить последние 2 точки и создать шахту
-# плагин автоматически создаст шахту с этими точками
+# Wiki: https://wiki.laststudio.space/lastmines/позиции
+# Нужно выделить последние 2 точки и создать шахту и плагин автоматически создаст шахту с этими точками
+# ОБЯЗАТЕЛЬНО ДЛЯ ЭТОГО НУЖЕН FastAsyncWorldEdit или WorldEdit
 positions:
-  one: '0;100;0'
-  two: '5;105;5'
+  shape: cuboid
+  points:
+    - 0;100;0
+    - 5;105;5
 
-# Wiki: https://wiki.laststudio.space/lastmines/blocks.html
+# Wiki: https://wiki.laststudio.space/lastmines/моды#blocks
 blocks:
   # Какие есть типы ID (без учёта регистра):
   # minecraft:<ID>, <ID>
@@ -28,7 +30,7 @@ blocks:
       # Soon: li:<ID>, lastitems:<ID> (LastItems), ei:<ID>, executableitems:<ID> (ExecutableItems), eb:<ID>, executableblocks:<ID> (ExecutableBlocks)
       - 'stone'
 
-# Wiki: https://wiki.laststudio.space/lastmines/actions.html
+# Wiki: https://wiki.laststudio.space/lastmines/действия
 actions:
   # сообщения в чат
   # [message] [event] <text>
@@ -71,7 +73,7 @@ actions:
   # здесь будет 20;40;20 т.к. не написано время
   - '[title] [update] "&fАвтоШахта обновилась!\nТелепортируйся при помощи &6/warp mine"'
 
-# Wiki: https://wiki.laststudio.space/lastmines/permissions.html
+# Wiki: https://wiki.laststudio.space/lastmines/права
 permissions:
   enable: true
   value: 'lastmines.mine.default'
@@ -89,19 +91,19 @@ permissions:
     # - '[title] "&6LastMines\n&cУ Вас нету прав!" 20;45;15'
     # - title: '"&6LastMines\n&cУ Вас нету прав!" 20;45;15'
 
-# Wiki: https://wiki.laststudio.space/lastmines/online.html
+# Wiki: https://wiki.laststudio.space/lastmines/лимит-онлайна
 online:
   enable: true
   min: 1
   max: 1000
 
-# Wiki: https://wiki.laststudio.space/lastmines/teleport.html
+# Wiki: https://wiki.laststudio.space/lastmines/телепорт
 teleport:
   enable: true
   # x;y;z;yaw;pitch
   pos: '-1;100.0;-1;0.0;0.0'
 
-# Wiki: https://wiki.laststudio.space/lastmines/holograms.html
+# Wiki: https://wiki.laststudio.space/lastmines/голограммы
 hologram:
   enable: true
   # DecentHolograms, FancyHolograms, Vanilla (TextDisplay)

@@ -8,7 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import ru.last.mines.LastMines;
 import ru.last.mines.commands.SuggestingArgument;
-import ru.last.mines.models.Mine;
+import ru.last.mines.mine.Mine;
 import ru.last.mines.utils.ColorUtils;
 
 public final class Tp {

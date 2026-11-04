@@ -11,4 +11,8 @@ plugins {
 
 rootProject.name = "LastMines"
 
-includeBuild("../LLib")
+includeBuild("../LLib") {
+    dependencySubstitution {
+        substitute(module("dev.laststudio.lib:llib")).using(project(":"))
+    }
+}

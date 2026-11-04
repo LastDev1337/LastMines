@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Messages {
+    private final YamlMap raw;
     private final String prefix;
     private final Message noPermission;
     private final Message reloaded;
@@ -39,6 +40,7 @@ public class Messages {
     private final List<String> help;
 
     public Messages(YamlMap map) {
+        this.raw = map;
         this.prefix = map.get("prefix").asString("<gradient:#ffcc00:#ff9900>[LastMines]</gradient> ");
         this.noPermission = new Message(prefix + map.get("no-permission").asString("&cУ вас нет прав!"));
         this.reloaded = new Message(prefix + map.get("reloaded").asString("&aПлагин успешно перезагружен!"));
@@ -96,6 +98,11 @@ public class Messages {
     public String getPrefix() { return prefix; }
     public Message getNoPermission() { return noPermission; }
     public Message getReloaded() { return reloaded; }
+    /** Сообщение по ключу из messages.yml; если ключа нет - берётся текст по умолчанию. */
+    public Message custom(String key, String def) {
+        return new Message(prefix + raw.get(key).asString(def));
+    }
+
     public Message getMineReset() { return mineReset; }
     public Message getMineNotFound() { return mineNotFound; }
     public Message getGuiNotInstalled() { return guiNotInstalled; }

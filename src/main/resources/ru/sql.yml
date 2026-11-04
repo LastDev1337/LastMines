@@ -1,0 +1,34 @@
+# Memory, H2/SQLite, MySQL/MariaDB, PostgreSQL
+driver: H2
+table_prefix: 'lastmines'
+
+h2:
+  name: 'LastMines' # <name>.db
+
+sqlite:
+  name: 'LastMines' # <name>.db
+
+mysql:
+  host: 'localhost' # IP:PORT - если не указан PORT то будет по умолчанию 3306
+  name: 'lastmines'
+  user: 'Last'
+  pass: 'LastStudio'
+
+mariadb:
+  host: 'localhost' # IP:PORT - если не указан PORT то будет по умолчанию 3306
+  name: 'lastmines'
+  user: 'Last'
+  pass: 'LastStudio'
+
+postgresql:
+  host: 'localhost' # IP:PORT - если не указан PORT то будет по умолчанию 5432
+  name: 'lastmines'
+  user: 'Last'
+  pass: 'LastStudio'
+
+# Статистика добычи / Mining statistics
+stats:
+  enable: true
+  flush_interval: 5s    # как часто отправлять накопленное в базу / how often to write buffered increments
+  top_refresh: 45s      # как часто обновлять кэш топа / top cache refresh
+  top_size: 100         # сколько позиций топа держать в кэше / cached top positions

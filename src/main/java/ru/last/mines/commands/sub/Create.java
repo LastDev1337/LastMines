@@ -11,9 +11,9 @@ import ru.last.mines.LastMines;
 import ru.last.mines.api.events.MineCreateEvent;
 import ru.last.mines.config.models.DefaultMine;
 import ru.last.mines.hooks.WEHook;
-import ru.last.mines.managers.MineManager;
-import ru.last.mines.models.Mine;
-import ru.last.mines.models.MineShape;
+import ru.last.mines.mine.MineManager;
+import ru.last.mines.mine.Mine;
+import ru.last.mines.mine.models.MineShape;
 import ru.last.mines.utils.ColorUtils;
 
 import java.io.File;
@@ -54,7 +54,7 @@ public final class Create {
             return;
         }
         if (plugin.getMineManager().getMine(id) != null) {
-            plugin.getConfigManager().getMessages().getMineExists().send(sender);
+            plugin.getConfigManager().getMessages().getMineExists().send(sender, "%mine%", id);
             return;
         }
 

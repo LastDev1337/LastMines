@@ -4,7 +4,7 @@ import eu.decentsoftware.holograms.api.DHAPI;
 import eu.decentsoftware.holograms.api.holograms.Hologram;
 import org.bukkit.Location;
 import ru.last.mines.holograms.*;
-import ru.last.mines.models.*;
+import ru.last.mines.mine.Mine;
 import ru.last.mines.utils.*;
 import ru.last.mines.utils.time.*;
 

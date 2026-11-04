@@ -2,7 +2,7 @@ package ru.last.mines.api;
 
 import org.bukkit.entity.Player;
 import org.bukkit.Location;
-import ru.last.mines.models.Mine;
+import ru.last.mines.mine.Mine;
 
 import java.util.Collection;
 

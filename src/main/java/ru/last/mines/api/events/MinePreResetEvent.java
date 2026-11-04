@@ -3,7 +3,7 @@ package ru.last.mines.api.events;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import ru.last.mines.models.Mine;
+import ru.last.mines.mine.Mine;
 import org.jetbrains.annotations.NotNull;
 
 public class MinePreResetEvent extends Event implements Cancellable {

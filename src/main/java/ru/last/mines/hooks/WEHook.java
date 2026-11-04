@@ -13,7 +13,7 @@ import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import ru.last.mines.models.MineShape;
+import ru.last.mines.mine.models.MineShape;
 
 import java.util.ArrayList;
 import java.util.List;

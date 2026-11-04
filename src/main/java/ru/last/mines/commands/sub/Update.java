@@ -5,8 +5,8 @@ import dev.laststudio.lib.api.command.CommandService;
 import org.bukkit.command.CommandSender;
 import ru.last.mines.LastMines;
 import ru.last.mines.commands.SuggestingArgument;
-import ru.last.mines.models.Mine;
-import ru.last.mines.models.MineRarity;
+import ru.last.mines.mine.Mine;
+import ru.last.mines.mine.models.MineRarity;
 import ru.last.mines.utils.ColorUtils;
 
 import java.util.Collection;

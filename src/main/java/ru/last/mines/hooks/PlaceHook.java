@@ -3,7 +3,7 @@ package ru.last.mines.hooks;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.jetbrains.annotations.NotNull;
 import org.bukkit.entity.Player;
-import ru.last.mines.models.*;
+import ru.last.mines.mine.Mine;
 import ru.last.mines.LastMines;
 import ru.last.mines.utils.time.TimeFormatter;
 
@@ -27,6 +27,9 @@ public class PlaceHook extends PlaceholderExpansion {
             }
         }
         
+        String statsValue = StatsPlaceholders.resolve(plugin, player, params);
+        if (statsValue != null) return statsValue;
+
         if (params.startsWith("time_clock_")) {
             String id = params.replace("time_clock_", "");
             Mine mine = plugin.getMineManager().getMine(id);

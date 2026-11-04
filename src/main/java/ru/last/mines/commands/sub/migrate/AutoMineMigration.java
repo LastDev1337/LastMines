@@ -3,6 +3,7 @@ package ru.last.mines.commands.sub.migrate;
 import org.bukkit.command.CommandSender;
 import dev.by1337.yaml.YamlMap;
 import ru.last.mines.LastMines;
+import ru.last.mines.mine.MineManager;
 import ru.last.mines.utils.ColorUtils;
 
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class AutoMineMigration {
 
         for (String key : autoMinesSec.getRaw().keySet()) {
             try {
-                if (!ru.last.mines.managers.MineManager.isValidId(key)) {
+                if (!MineManager.isValidId(key)) {
                     plugin.getLogger().warning("Пропущена шахта с недопустимым id из AutoMine: " + key);
                     continue;
                 }

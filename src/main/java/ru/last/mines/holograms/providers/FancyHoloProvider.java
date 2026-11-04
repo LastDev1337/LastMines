@@ -9,7 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.TextDisplay;
 import org.joml.Vector3f;
 import ru.last.mines.holograms.*;
-import ru.last.mines.models.*;
+import ru.last.mines.mine.Mine;
 import ru.last.mines.utils.*;
 import ru.last.mines.utils.time.*;
 

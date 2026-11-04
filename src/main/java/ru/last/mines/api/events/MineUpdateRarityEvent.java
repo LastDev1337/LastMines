@@ -1,11 +1,11 @@
 package ru.last.mines.api.events;
 
-import ru.last.mines.models.Mine;
+import ru.last.mines.mine.Mine;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
-import ru.last.mines.models.MineRarity;
+import ru.last.mines.mine.models.MineRarity;
 
 public class MineUpdateRarityEvent extends Event {
     private static final HandlerList handlers = new HandlerList();

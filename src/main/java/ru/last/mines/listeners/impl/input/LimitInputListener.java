@@ -1,5 +1,7 @@
 package ru.last.mines.listeners.impl.input;
 
+import dev.laststudio.lib.api.LLibAPI;
+
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
@@ -8,11 +10,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scheduler.BukkitTask;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import ru.last.mines.LastMines;
 import ru.last.mines.api.LastMinesProvider;
-import ru.last.mines.models.Mine;
-import ru.last.mines.models.MineBlock;
+import ru.last.mines.mine.Mine;
+import ru.last.mines.mine.models.MineBlock;
 
 import java.util.List;
 import java.util.Map;
@@ -31,7 +33,7 @@ public class LimitInputListener implements Listener {
 
         LastMines.get().getConfigManager().getMessages().getInputLimit().send(player);
 
-        BukkitTask task = Bukkit.getScheduler().runTaskLater(LastMines.get(), () -> {
+        ScheduledTask task = LLibAPI.get().scheduler().globalLater(LastMines.get(), () -> {
             if (activeSessions.remove(uuid) != null) {
                 LastMines.get().getConfigManager().getMessages().getInputTimeout().send(player);
             }
@@ -52,9 +54,11 @@ public class LimitInputListener implements Listener {
         String msg = PlainTextComponentSerializer.plainText().serialize(event.message()).trim();
         try {
             int limit = Integer.parseInt(msg);
-            if (limit < 1 || limit > 64) throw new NumberFormatException();
+            Mine limitMine = LastMinesProvider.getApi().getMine(session.mineId);
+            int maxLimit = limitMine != null && limitMine.getMode() == ru.last.mines.mine.models.MineMode.ALL_BLOCKS ? 10_000_000 : 64;
+            if (limit < 1 || limit > maxLimit) throw new NumberFormatException();
 
-            Bukkit.getScheduler().runTask(LastMines.get(), () -> {
+            LLibAPI.get().scheduler().entity(LastMines.get(), player, () -> {
                 Mine mine = LastMinesProvider.getApi().getMine(session.mineId);
                 if (mine == null) return;
 
@@ -68,7 +72,8 @@ public class LimitInputListener implements Listener {
                 }
 
                 if (target != null) {
-                    MineBlock newBlock = new MineBlock(target.material(), target.chance(), target.min(), limit, target.drops());
+                    MineBlock newBlock = new MineBlock(target.material(), target.chance(),
+                            mine.getMode() == ru.last.mines.mine.models.MineMode.ALL_BLOCKS ? limit : target.min(), limit, target.drops());
                     blocks.remove(target);
                     blocks.add(newBlock);
                 }
@@ -90,5 +95,5 @@ public class LimitInputListener implements Listener {
         }
     }
 
-    private record InputSession(String mineId, String material, BukkitTask task) {}
+    private record InputSession(String mineId, String material, ScheduledTask task) {}
 }

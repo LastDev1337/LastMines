@@ -2,9 +2,10 @@ name: LastMines
 version: '${version}'
 main: ru.last.mines.LastMines
 api-version: '1.21'
+folia-supported: true
 
 depend: [ LLib ]
-softdepend: [ PlaceholderAPI, BLib, BMenu, WorldEdit, DecentHolograms, FancyHolograms ]
+softdepend: [ PlaceholderAPI, BLib, BMenu, DeluxeMenus, WorldEdit, DecentHolograms, FancyHolograms ]
 
 author: Last
 website: https://laststudio.space
@@ -12,3 +13,22 @@ website: https://laststudio.space
 permissions:
   lastmines.admin:
     default: op
+  lastmines.edit.commands:
+    default: op
+  lastmines.copy:
+    default: op
+  lastmines.stats:
+    default: true
+  lastmines.stats.others:
+    default: op
+  lastmines.top:
+    default: true
+
+libraries:
+  - com.zaxxer:HikariCP:7.0.2
+  - org.slf4j:slf4j-api:2.0.16
+  - org.slf4j:slf4j-simple:2.0.16
+  - com.h2database:h2:2.4.240
+  - org.xerial:sqlite-jdbc:3.53.2.0
+  - org.mariadb.jdbc:mariadb-java-client:3.5.8
+  - org.postgresql:postgresql:42.7.5

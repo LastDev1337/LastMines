@@ -3,7 +3,7 @@ package ru.last.mines.api;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.entity.Player;
-import ru.last.mines.models.Mine;
+import ru.last.mines.mine.Mine;
 
 import org.bukkit.Location;
 import ru.last.mines.LastMines;

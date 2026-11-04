@@ -3,7 +3,7 @@ package ru.last.mines.config;
 import dev.by1337.yaml.YamlMap;
 import org.bukkit.plugin.java.JavaPlugin;
 import ru.last.mines.config.models.*;
-import ru.last.mines.gui.GuiManager;
+import ru.last.mines.gui.types.bmenu.BMenuManager;
 import ru.last.mines.utils.time.*;
 
 import java.io.File;
@@ -144,7 +144,7 @@ public class ConfigManager {
                 ConfigType.TIME_FORMAT.getFileName(),
                 ConfigType.COMMANDS.getFileName()
         ));
-        for (String menu : GuiManager.DEFAULT_MENUS) {
+        for (String menu : BMenuManager.DEFAULT_MENUS) {
             result.add("menus/" + menu);
         }
         return result;

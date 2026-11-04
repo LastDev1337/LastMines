@@ -10,14 +10,13 @@ import ru.last.mines.api.LastMinesProvider;
 import ru.last.mines.commands.MainCommand;
 import ru.last.mines.config.ConfigManager;
 import ru.last.mines.debug.Debugger;
-import ru.last.mines.gui.GuiManager;
+import ru.last.mines.gui.types.bmenu.BMenuManager;
 import ru.last.mines.holograms.HologramManager;
 import ru.last.mines.hooks.PlaceHook;
 import ru.last.mines.listeners.Listeners;
-import ru.last.mines.listeners.impl.*;
 import ru.last.mines.managers.ActionManager;
 import ru.last.mines.managers.BlockCatalogManager;
-import ru.last.mines.managers.MineManager;
+import ru.last.mines.mine.MineManager;
 
 public class LastMines extends JavaPlugin {
 
@@ -29,7 +28,8 @@ public class LastMines extends JavaPlugin {
     private BlockCatalogManager blockCatalogManager;
     private HologramManager hologramManager;
     private Debugger debugger;
-    private GuiManager guiManager;
+    private ru.last.mines.stats.StatsService statsService;
+    private BMenuManager guiManager;
     private Command<CommandSender> rootCommand;
 
     private static final int[] MIN_VERSION = {21};
@@ -66,7 +66,7 @@ public class LastMines extends JavaPlugin {
         this.mineManager = new MineManager(this);
         int delay = this.configManager.getMainConfig().getTimeLoadAllMines();
         if (delay > 0) {
-            getServer().getScheduler().runTaskLater(this, () -> mineManager.loadAll(), delay * 20L);
+            dev.laststudio.lib.api.LLibAPI.get().scheduler().globalLater(this, () -> mineManager.loadAll(), delay * 20L);
         } else {
             this.mineManager.loadAll();
         }
@@ -76,6 +76,9 @@ public class LastMines extends JavaPlugin {
         } catch (Exception e) {
             getLogger().severe("Failed to register /lastmines command: " + e.getMessage());
         }
+
+        this.statsService = new ru.last.mines.stats.StatsService(this);
+        this.statsService.start();
 
         try {
             Listeners.register();
@@ -87,12 +90,15 @@ public class LastMines extends JavaPlugin {
 
         if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new PlaceHook(this).register();
+            new ru.last.mines.hooks.LmPlaceHook(this).register();
             getDebugger().info("PlaceholderAPI hooked!");
+        } else {
+            getDebugger().warn("PlaceholderAPI not found!");
         }
 
         if (getServer().getPluginManager().isPluginEnabled("BMenu")) {
             try {
-                this.guiManager = new GuiManager(this);
+                this.guiManager = new BMenuManager(this);
                 this.guiManager.register();
             } catch (Throwable t) {
                 this.guiManager = null;
@@ -116,6 +122,7 @@ public class LastMines extends JavaPlugin {
         getLogger().info("disabling...");
 
         MainCommand.unregister(this);
+        if (this.statsService != null) { this.statsService.stop(); }
         if (this.mineManager != null) { this.mineManager.unloadAll(); }
         if (this.hologramManager != null) { this.hologramManager.unloadAll(); }
         if (this.guiManager != null) { this.guiManager.unregister(); }
@@ -123,16 +130,17 @@ public class LastMines extends JavaPlugin {
         getLogger().info("disabling successfully!");
     }
 
+    /** "1.21.4" -> [21, 4]; "26.2.build.7-beta" -> [26, 2] (берутся только ведущие числовые части). */
     private static int[] parseVersion(String raw) {
         String v = raw.startsWith("1.") ? raw.substring(2) : raw;
-        String[] parts = v.split("\\.");
-        int[] result = new int[parts.length];
-        for (int i = 0; i < parts.length; i++) {
-            String digits = parts[i].replaceAll("[^0-9].*", "");
-            if (digits.isEmpty()) return null;
-            result[i] = Integer.parseInt(digits);
+        java.util.List<Integer> out = new java.util.ArrayList<>();
+        for (String part : v.split("\\.")) {
+            String digits = part.replaceAll("[^0-9].*", "");
+            if (digits.isEmpty() || !Character.isDigit(part.charAt(0))) break;
+            out.add(Integer.parseInt(digits));
         }
-        return result;
+        if (out.isEmpty()) return null;
+        return out.stream().mapToInt(Integer::intValue).toArray();
     }
 
     private static int compareVersions(int[] a, int[] b) {
@@ -156,13 +164,14 @@ public class LastMines extends JavaPlugin {
     }
 
     public static LastMines get() { return instance; }
+    public ru.last.mines.stats.StatsService getStatsService() { return statsService; }
     public ConfigManager getConfigManager() { return configManager; }
     public MineManager getMineManager() { return mineManager; }
     public ActionManager getActionManager() { return actionManager; }
     public BlockCatalogManager getBlockCatalogManager() { return blockCatalogManager; }
     public HologramManager getHologramManager() { return hologramManager; }
     public Debugger getDebugger() { return debugger; }
-    public GuiManager getGuiManager() { return guiManager; }
+    public BMenuManager getGuiManager() { return guiManager; }
     public Command<CommandSender> getRootCommand() { return rootCommand; }
     public void setRootCommand(Command<CommandSender> rootCommand) { this.rootCommand = rootCommand; }
 }

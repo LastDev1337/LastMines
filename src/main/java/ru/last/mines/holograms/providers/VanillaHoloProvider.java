@@ -11,7 +11,7 @@ import org.bukkit.Color;
 import org.bukkit.persistence.PersistentDataType;
 import ru.last.mines.LastMines;
 import ru.last.mines.holograms.*;
-import ru.last.mines.models.*;
+import ru.last.mines.mine.Mine;
 import ru.last.mines.utils.*;
 import ru.last.mines.utils.time.*;
 
@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 public class VanillaHoloProvider implements HologramProvider {
-    private final Map<String, TextDisplay> displays = new HashMap<>();
+    private final Map<String, TextDisplay> displays = new java.util.concurrent.ConcurrentHashMap<>();
     private final NamespacedKey hologramKey = new NamespacedKey(LastMines.get(), "hologram");
 
     public VanillaHoloProvider() { }

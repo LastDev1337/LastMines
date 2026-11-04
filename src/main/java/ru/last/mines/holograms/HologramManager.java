@@ -1,8 +1,10 @@
 package ru.last.mines.holograms;
 
+import dev.laststudio.lib.api.LLibAPI;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import ru.last.mines.holograms.providers.*;
-import ru.last.mines.models.*;
+import ru.last.mines.mine.Mine;
 import ru.last.mines.LastMines;
 
 import java.util.HashMap;
@@ -30,6 +32,19 @@ public class HologramManager {
         }
     }
 
+    /**
+     * Голограмма - это сущность в мире: на Folia с ней можно работать только в потоке региона,
+     * где она стоит. Поэтому любая операция уходит в планировщик региона точки голограммы.
+     */
+    private void onRegion(Mine mine, Runnable action) {
+        Location loc = mine.getHoloOffset();
+        if (loc == null || loc.getWorld() == null || !plugin.isEnabled()) {
+            action.run();
+            return;
+        }
+        LLibAPI.get().scheduler().region(plugin, loc, action);
+    }
+
     private HologramProvider getProvider(String name) { return providers.get(name.toLowerCase()); }
 
     public void create(Mine mine) {
@@ -44,7 +59,8 @@ public class HologramManager {
         }
 
         if (provider != null) {
-            provider.create(mine);
+            HologramProvider chosen = provider;
+            onRegion(mine, () -> chosen.create(mine));
         } else {
             plugin.getDebugger().error("Шахта " + mine.getId() + " не смогла создать голограмму: провайдер " + providerName + " не найден!");
         }
@@ -59,7 +75,8 @@ public class HologramManager {
             provider = getProvider(providerName);
         }
         if (provider != null) {
-            provider.update(mine);
+            HologramProvider chosen = provider;
+            onRegion(mine, () -> chosen.update(mine));
         }
     }
 
@@ -71,17 +88,28 @@ public class HologramManager {
             provider = getProvider(providerName);
         }
         if (provider != null) {
-            provider.delete(mine);
+            HologramProvider chosen = provider;
+            onRegion(mine, () -> chosen.delete(mine));
         }
     }
 
+    /**
+     * Выключение плагина: планировщик уже не принимает задачи, поэтому удаляем напрямую.
+     * На Folia из чужого потока это запрещено - но голограммы создаются непостоянными (setPersistent(false)),
+     * и при остановке сервера всё равно не сохраняются, так что ошибку можно проглотить.
+     */
     public void unloadAll() {
-        HologramProvider vanilla = providers.get("vanilla");
-        if (vanilla != null) {
-            vanilla.removeAll();
-        }
-        for (Mine mine : plugin.getMineManager().getMines().values()) {
-            delete(mine);
+        try {
+            HologramProvider vanilla = providers.get("vanilla");
+            if (vanilla != null) {
+                vanilla.removeAll();
+            }
+            for (Mine mine : plugin.getMineManager().getMines().values()) {
+                HologramProvider provider = getProvider(mine.getHoloProvider());
+                if (provider != null) provider.delete(mine);
+            }
+        } catch (Throwable ignored) {
+            // Folia: см. комментарий выше
         }
     }
 }

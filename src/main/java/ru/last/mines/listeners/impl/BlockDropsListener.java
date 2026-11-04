@@ -11,9 +11,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import ru.last.mines.LastMines;
 import ru.last.mines.api.LastMinesProvider;
-import ru.last.mines.models.DropItem;
-import ru.last.mines.models.Mine;
-import ru.last.mines.models.MineBlock;
+import ru.last.mines.mine.models.DropItem;
+import ru.last.mines.mine.Mine;
+import ru.last.mines.mine.models.MineBlock;
 import ru.last.mines.utils.ColorUtils;
 
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ public class BlockDropsListener implements Listener {
 
     private record Session(String mineId, String material) {}
 
-    private final Map<Inventory, Session> sessions = new HashMap<>();
+    private final Map<Inventory, Session> sessions = new java.util.concurrent.ConcurrentHashMap<>();
 
     public void open(Player player, String mineId, String material) {
         Mine mine = LastMinesProvider.getApi().getMine(mineId);
@@ -76,20 +76,41 @@ public class BlockDropsListener implements Listener {
         return item;
     }
 
+    /**
+     * Редактор дропа: слоты 0..44 - "призрачные". Клик предметом из курсора ставит в слот ПРОСТО иконку материала
+     * (предмет игрока не тратится), клик пустой рукой по слоту очищает его. Всё остальное запрещено, чтобы нельзя было
+     * вынести иконки себе в инвентарь (создание предметов) или потерять свои предметы внутри виртуального окна.
+     */
     @EventHandler
     public void onClick(InventoryClickEvent event) {
         Session session = sessions.get(event.getInventory());
         if (session == null) return;
-        if (event.getClickedInventory() == null || !event.getClickedInventory().equals(event.getInventory())) return;
-
-        int slot = event.getSlot();
-        if (slot < EDIT_SLOTS) return;
 
         event.setCancelled(true);
         Player player = (Player) event.getWhoClicked();
+        boolean top = event.getClickedInventory() != null && event.getClickedInventory().equals(event.getInventory());
+        Inventory inv = event.getInventory();
+
+        if (!top) {
+            if (event.isShiftClick() && event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) {
+                putGhost(inv, event.getCurrentItem().getType());
+            }
+            return;
+        }
+
+        int slot = event.getSlot();
+        if (slot < EDIT_SLOTS) {
+            ItemStack cursor = event.getCursor();
+            if (cursor != null && cursor.getType() != Material.AIR) {
+                inv.setItem(slot, new ItemStack(cursor.getType()));
+            } else {
+                inv.setItem(slot, null);
+            }
+            return;
+        }
 
         if (slot == SAVE_SLOT) {
-            List<DropItem> drops = collectDrops(event.getInventory(), session);
+            List<DropItem> drops = collectDrops(inv, session);
             LastMines.get().getActionManager().setBlockDrops(session.mineId(), session.material(), drops);
             player.sendMessage(ColorUtils.colorString("&aДроп блока " + session.material() + " сохранён (" + drops.size() + " предметов)."));
             player.closeInventory();
@@ -97,6 +118,24 @@ public class BlockDropsListener implements Listener {
         } else if (slot == BACK_SLOT) {
             player.closeInventory();
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lastmines gui " + session.mineId() + " block_settings " + player.getName() + " " + session.material());
+        }
+    }
+
+    @EventHandler
+    public void onDrag(org.bukkit.event.inventory.InventoryDragEvent event) {
+        if (sessions.containsKey(event.getInventory())) event.setCancelled(true);
+    }
+
+    private void putGhost(Inventory inv, Material material) {
+        for (int i = 0; i < EDIT_SLOTS; i++) {
+            ItemStack existing = inv.getItem(i);
+            if (existing != null && existing.getType() == material) return;
+        }
+        for (int i = 0; i < EDIT_SLOTS; i++) {
+            if (inv.getItem(i) == null) {
+                inv.setItem(i, new ItemStack(material));
+                return;
+            }
         }
     }
 

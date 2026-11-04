@@ -8,7 +8,7 @@ import java.util.LinkedHashMap;
 
 import org.bukkit.World;
 import dev.by1337.yaml.YamlMap;
-import ru.last.mines.models.MineShape;
+import ru.last.mines.mine.models.MineShape;
 
 public class DefaultMine {
 

@@ -1,5 +1,7 @@
 package ru.last.mines.listeners.impl.input;
 
+import dev.laststudio.lib.api.LLibAPI;
+
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
@@ -9,11 +11,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scheduler.BukkitTask;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import ru.last.mines.LastMines;
 import ru.last.mines.api.LastMinesProvider;
-import ru.last.mines.models.Mine;
-import ru.last.mines.models.MineBlock;
+import ru.last.mines.mine.Mine;
+import ru.last.mines.mine.models.MineBlock;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,7 +32,7 @@ public class ChanceInputListener implements Listener {
 
         LastMines.get().getConfigManager().getMessages().getInputChance().send(player);
 
-        BukkitTask task = Bukkit.getScheduler().runTaskLater(LastMines.get(), () -> {
+        ScheduledTask task = LLibAPI.get().scheduler().globalLater(LastMines.get(), () -> {
             if (activeSessions.remove(uuid) != null) {
                 LastMines.get().getConfigManager().getMessages().getInputTimeout().send(player);
             }
@@ -53,7 +55,7 @@ public class ChanceInputListener implements Listener {
             double chance = Double.parseDouble(msg);
             if (!Double.isFinite(chance) || chance < 0 || chance > 100) throw new NumberFormatException();
 
-            Bukkit.getScheduler().runTask(LastMines.get(), () -> {
+            LLibAPI.get().scheduler().entity(LastMines.get(), player, () -> {
                 Mine mine = LastMinesProvider.getApi().getMine(session.mineId);
                 if (mine == null) return;
 
@@ -101,5 +103,5 @@ public class ChanceInputListener implements Listener {
         }
     }
 
-    private record InputSession(String mineId, String material, BukkitTask task) {}
+    private record InputSession(String mineId, String material, ScheduledTask task) {}
 }

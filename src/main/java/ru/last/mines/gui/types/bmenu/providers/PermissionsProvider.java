@@ -1,0 +1,32 @@
+package ru.last.mines.gui.types.bmenu.providers;
+
+import ru.last.mines.LastMines;
+
+import dev.by1337.bmenu.loader.MenuConfig;
+import dev.by1337.bmenu.menu.DefaultMenu;
+import dev.by1337.bmenu.menu.Menu;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
+import ru.last.mines.mine.Mine;
+
+public class PermissionsProvider extends DefaultMenu {
+    public PermissionsProvider(MenuConfig config, Player viewer, @Nullable Menu previousMenu) {
+        super(config, viewer, previousMenu);
+        String mineId = LastMines.get().getGuiManager().getViewingMines().get(viewer.getUniqueId());
+        if (mineId != null) {
+            this.addArgument("MINE_ID", mineId);
+        }
+    }
+
+    @Override
+    protected void generate() {
+        String mineId = LastMines.get().getGuiManager().getViewingMines().get(viewer.getUniqueId());
+        if (mineId == null) return;
+
+        Mine mine = ru.last.mines.api.LastMinesProvider.getApi().getMine(mineId);
+        if (mine == null) return;
+
+        addArgument("STATUS", String.valueOf(mine.isPermEnable()));
+        addArgument("PERM_VALUE", mine.getPermValue() == null ? "Нет" : mine.getPermValue());
+    }
+}

@@ -17,8 +17,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import ru.last.mines.api.*;
 import ru.last.mines.api.events.*;
-import ru.last.mines.gui.ActionsRegister;
-import ru.last.mines.models.*;
+import ru.last.mines.gui.types.bmenu.ActionsRegister;
+import ru.last.mines.mine.Mine;
+import ru.last.mines.mine.models.*;
 import ru.last.mines.LastMines;
 import ru.last.mines.utils.ColorUtils;
 
@@ -53,7 +54,7 @@ public class ActionManager {
             Bukkit.getPluginManager().callEvent(apiEvent);
             if (apiEvent.isCancelled()) return;
 
-            player.teleport(mine.getTpPos());
+            dev.laststudio.lib.api.LLibAPI.get().scheduler().teleport(player, mine.getTpPos());
             plugin.getConfigManager().getMessages().getTeleported().send(player, "%mine%", mineId);
         }
     }

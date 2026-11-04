@@ -1,6 +1,6 @@
 package ru.last.mines.api.events;
 
-import ru.last.mines.models.Mine;
+import ru.last.mines.mine.Mine;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;

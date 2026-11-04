@@ -1,6 +1,6 @@
 package ru.last.mines.listeners.impl;
 
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import dev.by1337.bmenu.menu.Menu;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -13,7 +13,8 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import ru.last.mines.LastMines;
 import ru.last.mines.api.*;
-import ru.last.mines.models.*;
+import ru.last.mines.mine.Mine;
+import ru.last.mines.mine.models.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -25,11 +26,12 @@ public class DragDropListener implements Listener {
         if (!(event.getWhoClicked() instanceof Player player)) return;
 
         InventoryView view = event.getView();
-        String title = PlainTextComponentSerializer.plainText().serialize(view.title());
         Inventory topInv = view.getTopInventory();
         Inventory bottomInv = view.getBottomInventory();
 
-        if (!title.contains("Блоки шахты") && !title.contains("Блоки")) return;
+        if (!(topInv.getHolder(false) instanceof Menu menu)) return;
+        org.bukkit.NamespacedKey menuId = menu.config().id();
+        if (menuId == null || !"lastmines".equals(menuId.getNamespace()) || !"blocks".equals(menuId.getKey())) return;
 
         String mineId = LastMines.get().getGuiManager().getViewingMines().get(player.getUniqueId());
         if (mineId == null) return;

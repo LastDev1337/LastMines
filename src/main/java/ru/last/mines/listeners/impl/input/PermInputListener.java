@@ -1,5 +1,7 @@
 package ru.last.mines.listeners.impl.input;
 
+import dev.laststudio.lib.api.LLibAPI;
+
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
@@ -8,10 +10,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scheduler.BukkitTask;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import ru.last.mines.LastMines;
 import ru.last.mines.api.LastMinesProvider;
-import ru.last.mines.models.Mine;
+import ru.last.mines.mine.Mine;
 import ru.last.mines.utils.ColorUtils;
 
 import java.util.*;
@@ -27,7 +29,7 @@ public class PermInputListener implements Listener {
             activeSessions.get(uuid).task.cancel();
         }
 
-        BukkitTask task = Bukkit.getScheduler().runTaskLater(LastMines.get(), () -> {
+        ScheduledTask task = LLibAPI.get().scheduler().globalLater(LastMines.get(), () -> {
             if (activeSessions.remove(uuid) != null) {
                 LastMines.get().getConfigManager().getMessages().getInputTimeout().send(player);
             }
@@ -47,7 +49,7 @@ public class PermInputListener implements Listener {
 
         String msg = PlainTextComponentSerializer.plainText().serialize(event.message()).trim();
 
-        Bukkit.getScheduler().runTask(LastMines.get(), () -> {
+        LLibAPI.get().scheduler().entity(LastMines.get(), player, () -> {
             Mine mine = LastMinesProvider.getApi().getMine(session.mineId);
             if (mine == null) return;
 
@@ -69,5 +71,5 @@ public class PermInputListener implements Listener {
         }
     }
 
-    private record InputSession(String mineId, String type, BukkitTask task) {}
+    private record InputSession(String mineId, String type, ScheduledTask task) {}
 }

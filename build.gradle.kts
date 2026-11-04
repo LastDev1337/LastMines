@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "ru.last.mines"
-version = "0.4"
+version = "0.5"
 
 repositories {
     mavenCentral()
@@ -21,7 +21,7 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
-    compileOnly("dev.laststudio.lib:llib:0.1")
+    compileOnly("dev.laststudio.lib:llib:0.2")
     compileOnly("dev.by1337.item:ConfigurableItems:1.5.6")
     compileOnly("dev.by1337.bmenu:BMenu:2.6")
     compileOnly("dev.by1337.cmd:BCmd:1.4")
@@ -45,6 +45,7 @@ dependencies {
     }
     compileOnly("com.github.decentsoftware-eu:decentholograms:2.8.9")
     compileOnly("de.oliver:FancyHolograms:2.10.0")
+    compileOnly("com.zaxxer:HikariCP:7.0.2")
     implementation("org.bstats:bstats-bukkit:3.2.1")
 }
 
