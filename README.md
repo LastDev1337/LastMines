@@ -4,13 +4,10 @@
 заполняет её блоками по таймеру: руды, камень, редкости, точное количество каждого блока — как настроите.
 Игроки добывают блоки, шахта обновляется, считается статистика и топ.
 
-- **Minecraft:** 1.21 – 26.3 (Paper и **Folia**)
+- **Minecraft:** 1.21 – 26.3 (Paper, PurPur и Folia)
 - **Java:** 21+
-- **Версия:** 0.5
-- **Нужен плагин:** [LLib](https://github.com/LastDev1337/LLib) **0.2**
+- **Библиотека:** [LLib](https://github.com/LastDev1337/LLib)
 - **Wiki:** <https://wiki.laststudio.space/lastmines> · **Сайт:** <https://laststudio.space>
-
-> Что изменилось с 0.4 → [CHANGELOG.md](CHANGELOG.md). Список плейсхолдеров → [docs/PLACEHOLDERS.md](docs/PLACEHOLDERS.md).
 
 ## Содержание
 
