@@ -4,6 +4,7 @@ import dev.by1337.yaml.YamlMap;
 
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.TextDisplay;
@@ -15,7 +16,6 @@ import ru.last.mines.mine.Mine;
 import ru.last.mines.utils.*;
 import ru.last.mines.utils.time.*;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,14 +30,16 @@ public class VanillaHoloProvider implements HologramProvider {
     public void create(Mine mine) {
         TextDisplay tracked = displays.get(mine.getId());
         if (tracked != null && tracked.isValid()) return;
-        displays.remove(mine.getId());
 
         Location loc = mine.getHoloOffset();
-        if (loc == null || loc.getWorld() == null) return;
+        if (loc == null) return;
+        World world = loc.getWorld();
+        // Below FULL, an existing display can be invalid and absent from nearby entity queries.
+        if (world == null || !world.isChunkLoaded(loc.getBlockX() >> 4, loc.getBlockZ() >> 4)) return;
 
         removeOrphaned(loc, mine.getId());
 
-        TextDisplay display = (TextDisplay) loc.getWorld().spawnEntity(loc, EntityType.TEXT_DISPLAY);
+        TextDisplay display = (TextDisplay) world.spawnEntity(loc, EntityType.TEXT_DISPLAY);
         display.setBillboard(TextDisplay.Billboard.CENTER);
         display.setText(buildText(mine));
         display.setDefaultBackground(false);
@@ -91,7 +93,6 @@ public class VanillaHoloProvider implements HologramProvider {
         if (display != null && display.isValid()) {
             display.setText(buildText(mine));
         } else {
-            displays.remove(mine.getId());
             create(mine);
         }
     }
