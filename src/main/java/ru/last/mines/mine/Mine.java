@@ -516,7 +516,10 @@ public class Mine {
         }
         if (onlineEnable) {
             int online = Bukkit.getOnlinePlayers().size();
-            if (online < onlineMin || online > onlineMax) return;
+            if (online < onlineMin || online > onlineMax) {
+                updateHologram();
+                return;
+            }
         }
 
         for (PeriodicAction pa : periodicActions) {
